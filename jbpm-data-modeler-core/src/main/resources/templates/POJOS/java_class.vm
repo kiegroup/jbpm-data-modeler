@@ -1,0 +1,43 @@
+##
+## Template to generate a Pojo Class
+##
+#set($attributes = $context.currentDataObject.properties.values())
+#set($className = $nameTool.toJavaClass($context.currentDataObject.name))
+#set($packageName = $context.currentDataObject.packageName)
+
+
+package $packageName;
+
+/**
+ * Here comments
+ */
+public class $className {
+
+##
+## Generate attributes
+##
+#foreach( $attr in $attributes)
+    private $attr.className $nameTool.toJavaVar( $attr.name );
+#end
+
+##
+## Generate default constructor
+##
+    public $className() {
+
+    }
+
+##
+## Generate getters and setters
+##
+#foreach( $attr in $attributes)
+    #set( $varName = $nameTool.toJavaVar( $attr.name ))
+    public $attr.className $nameTool.toJavaGetter( $varName )() {
+        return this.$varName;
+    }
+
+    public void $nameTool.toJavaSetter( $varName )( $attr.className $varName ) {
+        this.$varName = $varName;
+    }
+#end
+}

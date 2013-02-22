@@ -1,0 +1,21 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+        >
+
+
+    <gwt:VerticalPanel ui:field="mainPanel">
+
+        <gwt:Label ui:field="objectName"></gwt:Label>
+
+        <b:CellTable ui:field="dataObjectPropertiesTable"  bordered="true" condensed="true" striped="true" width="100%"/>
+
+        <gwt:HTML>Create new property</gwt:HTML>
+
+        <gwt:TextBox ui:field="newPropertyName"></gwt:TextBox>
+        <b:ListBox ui:field="newPropertyType"></b:ListBox>
+        <gwt:Button ui:field="newPropertyButton">Create</gwt:Button>
+
+    </gwt:VerticalPanel>
+
+</ui:UiBinder>
