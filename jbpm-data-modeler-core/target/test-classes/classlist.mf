@@ -1,0 +1,2 @@
+org.jbpm.datamodeler.core.DataModelTest
+org.jbpm.datamodeler.impexp.codegen.TestSimplePOJOGeneration

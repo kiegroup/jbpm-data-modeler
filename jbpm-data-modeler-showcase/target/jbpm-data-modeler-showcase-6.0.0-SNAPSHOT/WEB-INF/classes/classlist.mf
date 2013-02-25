@@ -1,0 +1,8 @@
+org.jbpm.datamodeler.client.perspectives.HomePerspective
+org.jbpm.datamodeler.backend.server.impl.FileExplorerRootServiceImpl
+org.jbpm.datamodeler.backend.server.impl.AppSetup
+org.jbpm.datamodeler.client.ShowcaseEntryPoint
+org.jbpm.datamodeler.shared.security.ShowcaseRoles
+org.jbpm.datamodeler.shared.security.AppRoles
+org.jbpm.datamodeler.client.perspectives.HomePerspectiveActivity
+org.jbpm.datamodeler.client.i18n.Constants

@@ -1,0 +1,2 @@
+# Module org.jbpm.datamodeler.DatamodelerShowcase
+# RPC service class, partial path of RPC policy file

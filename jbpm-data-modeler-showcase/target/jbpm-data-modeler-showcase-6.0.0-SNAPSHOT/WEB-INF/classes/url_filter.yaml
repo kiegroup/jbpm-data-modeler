@@ -1,0 +1,12 @@
+filter:
+   - pattern: /admin/**
+     access: ADMIN
+   - pattern: /config/**
+     access: ADMIN, USER
+   - pattern: /private/**
+
+exclude:
+   - /*.ico
+   - /org.jbpm.datamodeler.DatamodelerShowcase/images/**
+   - /org.jbpm.datamodeler.DatamodelerShowcase/css/**
+   - /css/**
