@@ -1,3 +1,0 @@
-org.jbpm.datamodeler.editor.model.ObjectPropertyTO
-org.jbpm.datamodeler.editor.model.DataObjectTO
-org.jbpm.datamodeler.editor.model.DataModelTO

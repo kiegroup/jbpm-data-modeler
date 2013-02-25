@@ -1,6 +1,0 @@
-org.jbpm.datamodeler.editor.client.editors.DataModelEditorViewImpl
-org.jbpm.datamodeler.editor.client.editors.DataModelEditorPresenterActivity
-org.jbpm.datamodeler.editor.client.editors.DataModelBrowser
-org.jbpm.datamodeler.editor.client.editors.DataModelEditorPresenter
-org.jbpm.datamodeler.editor.client.editors.PropertyEditor
-org.jbpm.datamodeler.editor.client.editors.DataObjectEditor
