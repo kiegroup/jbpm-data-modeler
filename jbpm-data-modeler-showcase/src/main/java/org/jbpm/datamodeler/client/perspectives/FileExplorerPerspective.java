@@ -37,8 +37,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
-@WorkbenchPerspective(identifier = "homePerspective", isDefault = true)
-public class HomePerspective {
+@WorkbenchPerspective(identifier = "fileExplorerPerspective", isDefault = false)
+public class FileExplorerPerspective {
 
     @Inject
     private NewResourcePresenter newResourcePresenter;
@@ -59,12 +59,12 @@ public class HomePerspective {
     @Perspective
     public PerspectiveDefinition buildPerspective() {
         final PerspectiveDefinition p = new PerspectiveDefinitionImpl();
-        p.setName( "Project explorer" );
+        p.setName( "File explorer" );
 
         final PanelDefinition west = new PanelDefinitionImpl();
         west.setWidth( 200 );
         west.setMinWidth( 150 );
-        west.addPart( new PartDefinitionImpl(new DefaultPlaceRequest( "org.kie.guvnor.explorer"  ) ));
+        west.addPart( new PartDefinitionImpl( new DefaultPlaceRequest( "FileExplorer" ) ) );
 
         p.getRoot().insertChild( Position.WEST, west );
 
@@ -78,7 +78,7 @@ public class HomePerspective {
 
     private void buildMenuBar() {
         this.menus = MenuFactory.newTopLevelMenu("New")
-                .withItems(newResourcesMenu.getMenuItems())
+                .withItems( newResourcesMenu.getMenuItems() )
                 .endMenu().build();
     }
 }

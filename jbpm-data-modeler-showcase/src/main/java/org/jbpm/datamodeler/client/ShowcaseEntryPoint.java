@@ -82,7 +82,7 @@ public class ShowcaseEntryPoint {
         final AbstractWorkbenchPerspectiveActivity defaultPerspective = getDefaultPerspectiveActivity();
 
         final Menus menus =
-                newTopLevelMenu( "Home" )
+                newTopLevelMenu( "Project navigation" )
                         .respondsWith( new Command() {
                             @Override
                             public void execute() {
@@ -91,6 +91,14 @@ public class ShowcaseEntryPoint {
                                 } else {
                                     Window.alert("Default perspective not found.");
                                 }
+                            }
+                        } )
+                        .endMenu().newTopLevelMenu( "File navigation" )
+                        .respondsWith( new Command() {
+                            @Override
+                            public void execute() {
+                                    placeManager.goTo( new DefaultPlaceRequest( "fileExplorerPerspective" ) );
+
                             }
                         } )
                         .endMenu()
