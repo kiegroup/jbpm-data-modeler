@@ -29,9 +29,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -147,7 +145,6 @@ public class DataModelBrowser extends Composite {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 DataObjectTO selectedObjectTO = selectionModel.getSelectedObject();
-                //Window.alert("The selected entity is: " + selectedObjectTO.getName());
                 Command selectCommand = modelEditorPresenter.createSelectCommand(selectedObjectTO);
                 selectCommand.execute();
             }
@@ -170,12 +167,11 @@ public class DataModelBrowser extends Composite {
     @UiHandler("modelName")
     void modelSelected( ClickEvent event) {
         Command modelSelectedCommand = modelEditorPresenter.createModelSelectionCommand();        
-        //Window.alert("Model clicked: " + event.getSource());
         modelSelectedCommand.execute();
     }
 
     public void deleteDataObject(DataObjectTO dataObject, int index) {
-        dataObjectsProvider.getList().remove(dataObject);
+        dataObjectsProvider.getList().remove(index);
         dataObjectsProvider.flush();
         dataObjectsProvider.refresh();
     }

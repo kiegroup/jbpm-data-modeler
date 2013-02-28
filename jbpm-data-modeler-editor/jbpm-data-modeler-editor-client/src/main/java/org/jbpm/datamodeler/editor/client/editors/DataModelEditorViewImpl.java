@@ -16,8 +16,11 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
@@ -35,21 +38,25 @@ public class DataModelEditorViewImpl extends Composite
 
     private DataModelEditorPresenter presenter;
 
-    //this field is not injected because we are creating it here
     @DataField
-    private HorizontalPanel contentsPanel = new HorizontalPanel();
-    
+    private SimplePanel browserPanel = new SimplePanel();
+
+    @DataField
+    private SimplePanel dataObjectPanel = new SimplePanel();
+
+    @DataField
+    private SimplePanel propertiesPanel = new SimplePanel();
+
     @Inject
     private PropertyEditor propertyEditor;
-
-    
-    private DataModelTO dataModel;
 
     @Inject
     private DataModelBrowser dataModelBrowser;
 
     @Inject
     private DataObjectEditor dataObjectEditor;
+
+    private DataModelTO dataModel;
 
     public DataModelEditorViewImpl() {
     }
@@ -67,7 +74,6 @@ public class DataModelEditorViewImpl extends Composite
 
     @Override
     public void deleteDataObject(DataObjectTO dataObject, int index) {
-        //Window.alert("le piden a la vista que borre el elemento: " + dataObject + "index: " + index);
         dataModelBrowser.deleteDataObject(dataObject, index);
     }
 
@@ -105,9 +111,10 @@ public class DataModelEditorViewImpl extends Composite
     @Override
     public void init(final DataModelEditorPresenter presenter) {
         this.presenter = presenter;
-        contentsPanel.add(dataModelBrowser);
-        contentsPanel.add(dataObjectEditor);
-        contentsPanel.add(propertyEditor);
+        
+        browserPanel.add(dataModelBrowser);
+        dataObjectPanel.add(dataObjectEditor);
+        propertiesPanel.add(propertyEditor);
     }
 
 }

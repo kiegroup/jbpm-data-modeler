@@ -25,14 +25,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -193,13 +191,11 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.addDataDisplay(dataObjectPropertiesTable);
         dataObjectPropertiesProvider.refresh();
 
-        //newPropertyType = new com.github.gwtbootstrap.client.ui.ListBox();
-        //TODO init this list well
+        //TODO init this list well, the datatypes must be loaded from the DataModelerService, etc.
         newPropertyType.addItem("Integer", "java.lang.Integer");
         newPropertyType.addItem("String", "java.lang.String");
         newPropertyType.addItem("Date", "java.lang.Date");
     }
-
 
     @UiHandler("newPropertyButton")
     void newPropertyClick( ClickEvent event ) {
@@ -229,7 +225,7 @@ public class DataObjectEditor  extends Composite {
     }
 
     public void deleteDataObjectProperty(ObjectPropertyTO objectProperty, int index) {
-        dataObjectPropertiesProvider.getList().remove( index );
+        dataObjectPropertiesProvider.getList().remove(index);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
     }

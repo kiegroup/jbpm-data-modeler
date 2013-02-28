@@ -81,11 +81,11 @@ public class DataModelerServiceImpl implements DataModelerService {
 
         org.kie.commons.java.nio.file.Path kiePath = paths.convert( context ).resolve( fileName );
 
-        //create the file
+        //create the file to support the model
+        //TODO implement the "DataModelBuilder" that creates the empty model xml file
         ioService.createFile(kiePath);
         
         ioService.write(kiePath, "The file was created at: " + new Date());
-
 
         final Path path = paths.convert(kiePath, false);
 

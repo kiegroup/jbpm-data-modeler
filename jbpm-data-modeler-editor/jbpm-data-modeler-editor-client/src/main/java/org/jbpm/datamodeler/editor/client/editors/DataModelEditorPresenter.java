@@ -33,6 +33,8 @@ import org.uberfire.client.workbench.widgets.menu.MenuFactory;
 import org.uberfire.client.workbench.widgets.menu.MenuItem;
 import org.uberfire.client.workbench.widgets.menu.Menus;
 import org.uberfire.shared.mvp.PlaceRequest;
+import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
+
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -40,9 +42,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
-
-//import org.kie.guvnor.commons.ui.client.menu.FileMenuBuilder;
 
 @Dependent
 @WorkbenchEditor(identifier = "DataModelEditor", supportedTypes = {DataModelResourceType.class })
@@ -83,8 +82,7 @@ public class DataModelEditorPresenter {
     @Inject
     private Caller<DataModelerService> modelerService;
 
-    private Menus           menus;
-
+    private Menus menus;
 
     @WorkbenchPartTitle
     public String getTitle() {
@@ -109,7 +107,7 @@ public class DataModelEditorPresenter {
             @Override
             public void execute() {
 
-                //Window.alert("Aqui controlamos si el dataobject es puede borrar, si se puede, entones a la vista");
+                //TODO implement the required controls to ensure the requested object can be deleted
                 view.deleteDataObject(dataObjectTO, index);
                 notification.fire(new NotificationEvent("Data object: " + dataObjectTO.getName() + " was deleted"));
             }
@@ -122,7 +120,7 @@ public class DataModelEditorPresenter {
             @Override
             public void execute() {
 
-                //Window.alert("Aqui controlamos si el nombre es correcto");
+                //TODO implement the required controls to ensure the name valid, etc.
                 view.addDataObject(text);
                 notification.fire(new NotificationEvent("Data object: " + text + " was created"));
             }
@@ -137,7 +135,6 @@ public class DataModelEditorPresenter {
                 view.modelSelected();
             }
         };
-
     }
 
     public Command createSelectCommand(final DataObjectTO selectedObject) {
@@ -173,8 +170,7 @@ public class DataModelEditorPresenter {
         return new Command() {
             @Override
             public void execute() {
-
-                //Window.alert("Aqui controlamos si el nombre es correcto");
+                //TODO implement the required controls to ensure the property can be created
                 view.addDataObjectProperty(new ObjectPropertyTO(propertyName, propertyType));
             }
         };
@@ -216,8 +212,8 @@ public class DataModelEditorPresenter {
 
     @OnStart
     public void onStart(Path path, PlaceRequest placeRequest) {
-        //Window.alert("onStart: " + path.toURI());
 
+        //The onStart method must read the file and load the DataModel to be edited.
         makeMenuBar();
 
         this.path = path;
@@ -256,6 +252,9 @@ public class DataModelEditorPresenter {
 
         final List<MenuItem> menuItems = new ArrayList<MenuItem>();
 
+        //TODO take a look at guvnor editors to see if class org.kie.guvnor.commons.ui.client.menu.FileMenuBuilder
+        //can be used
+
         org.uberfire.client.mvp.Command validateCommand = new org.uberfire.client.mvp.Command() {
             @Override
             public void execute() {
@@ -270,8 +269,6 @@ public class DataModelEditorPresenter {
             }
         };
 
-        
-   
         if ( validateCommand != null ) {
             menuItems.add(newSimpleItem("Validate")
                     .respondsWith(validateCommand)
@@ -286,46 +283,5 @@ public class DataModelEditorPresenter {
 
         return menuItems;
     }
-
-/*
-    private void makeMenuBar() {
-        FileMenuBuilder fileMenuBuilder = menuBuilder.addValidation( new org.uberfire.client.mvp.Command() {
-            @Override
-            public void execute() {
-                Window.alert("Validate model");
-            }
-        } );
-
-        if ( "isReadOnly".equals("TODO") ) {
-           //fileMenuBuilder.addRestoreVersion( path );
-        } else {
-            fileMenuBuilder.addSave( new org.uberfire.client.mvp.Command() {
-                @Override
-                public void execute() {
-                    onSave();
-                }
-            } ).addDelete( new org.uberfire.client.mvp.Command() {
-                @Override
-                public void execute() {
-                    Window.alert("onDelete");
-                    //onDelete();
-                }
-            } ).addRename( new org.uberfire.client.mvp.Command() {
-                @Override
-                public void execute() {
-                    Window.alert("onRename");
-                    //onRename();
-                }
-            } ).addCopy( new org.uberfire.client.mvp.Command() {
-                @Override
-                public void execute() {
-                    Window.alert("onCopy");
-                    //onCopy();
-                }
-            } );
-        }
-        menus = fileMenuBuilder.build();
-    }
-*/
 }
 
