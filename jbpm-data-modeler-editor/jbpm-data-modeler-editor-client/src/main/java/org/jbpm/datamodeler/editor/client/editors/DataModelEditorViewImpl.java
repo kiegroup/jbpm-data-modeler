@@ -54,8 +54,15 @@ public class DataModelEditorViewImpl extends Composite
     public DataModelEditorViewImpl() {
     }
 
+    @Override
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+
+        dataModelBrowser.setDataModel(dataModel);
+        dataModelBrowser.setModelEditorPresenter(presenter);
+
+        dataObjectEditor.setDataModel(dataModel);
+        dataObjectEditor.setModelEditorPresenter(presenter);
     }
 
     @Override
@@ -98,15 +105,6 @@ public class DataModelEditorViewImpl extends Composite
     @Override
     public void init(final DataModelEditorPresenter presenter) {
         this.presenter = presenter;
-        this.dataModel = presenter.getDataModel();
-
-        dataModelBrowser.setDataModel(dataModel);
-        dataModelBrowser.setModelEditorPresenter(presenter);
-
-        dataObjectEditor.setDataModel(dataModel);
-        dataObjectEditor.setModelEditorPresenter(presenter);
-
-
         contentsPanel.add(dataModelBrowser);
         contentsPanel.add(dataObjectEditor);
         contentsPanel.add(propertyEditor);

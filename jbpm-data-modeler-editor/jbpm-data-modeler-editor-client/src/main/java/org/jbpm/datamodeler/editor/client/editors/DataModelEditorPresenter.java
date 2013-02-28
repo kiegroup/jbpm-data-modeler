@@ -17,29 +17,42 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
+import org.jboss.errai.bus.client.api.RemoteCallback;
+import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
-import org.uberfire.client.annotations.WorkbenchPartTitle;
-import org.uberfire.client.annotations.WorkbenchPartView;
-import org.uberfire.client.annotations.WorkbenchScreen;
+import org.jbpm.datamodeler.editor.service.DataModelerService;
+import org.uberfire.backend.vfs.Path;
+import org.uberfire.client.annotations.*;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
+import org.uberfire.client.workbench.widgets.menu.MenuFactory;
+import org.uberfire.client.workbench.widgets.menu.MenuItem;
+import org.uberfire.client.workbench.widgets.menu.Menus;
+import org.uberfire.shared.mvp.PlaceRequest;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
+
+//import org.kie.guvnor.commons.ui.client.menu.FileMenuBuilder;
+
 @Dependent
-@WorkbenchScreen(identifier = "DataModelEditor")
+@WorkbenchEditor(identifier = "DataModelEditor", supportedTypes = {DataModelResourceType.class })
 public class DataModelEditorPresenter {
 
     public interface DataModelEditorView
             extends
             UberView<DataModelEditorPresenter> {
+
+        void setDataModel(DataModelTO dataModel);
 
         void deleteDataObject(DataObjectTO dataObject, int index);
 
@@ -54,6 +67,7 @@ public class DataModelEditorPresenter {
         void addDataObjectProperty(ObjectPropertyTO objectProperty);
 
         void deleteDataObjectProperty(ObjectPropertyTO property, int index);
+
     }
 
     @Inject
@@ -63,23 +77,18 @@ public class DataModelEditorPresenter {
     private Event<NotificationEvent> notification;
 
     private DataModelTO dataModel;
+    
+    private Path path;
 
+    @Inject
+    private Caller<DataModelerService> modelerService;
 
-    @PostConstruct
-    public void init() {
+    private Menus           menus;
 
-        //TODO: implement the correct model loading
-        dataModel = new DataModelTO("TestModel");
-        List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
-        for (int i=0; i< 10 ; i++) {
-            dataObjects.add(new DataObjectTO(i));
-        }
-        dataModel.setDataObjects(dataObjects);
-    }
 
     @WorkbenchPartTitle
     public String getTitle() {
-        return "Data model editor";
+        return "Data model editor [ " + (path != null ? path.getFileName() : "") + " ]";
     }
 
     @WorkbenchPartView
@@ -171,4 +180,152 @@ public class DataModelEditorPresenter {
         };
     }
 
+    @IsDirty
+    public boolean isDirty() {
+        //Window.alert("isDirty invoked");
+        return false;
+    }
+
+    @OnClose
+    public void onClose() {
+        //Window.alert("onClose invoked");
+    }
+
+    @OnFocus
+    public void onFocus() {
+        //Window.alert("onFocus invoked");
+    }
+
+    @OnMayClose
+    public boolean onMayClose() {
+        //Window.alert("onMayClose");
+        return true;
+    }
+
+    @OnSave
+    public void onSave() {
+        Window.alert("onSave");
+        modelerService.call(new RemoteCallback<Object>() {
+            @Override
+            public void callback(Object response) {
+
+
+            }
+        }).saveModel(dataModel, path);
+    }
+
+    @OnStart
+    public void onStart(Path path, PlaceRequest placeRequest) {
+        //Window.alert("onStart: " + path.toURI());
+
+        makeMenuBar();
+
+        this.path = path;
+        modelerService.call(new RemoteCallback<DataModelTO>() {
+
+            @Override
+            public void callback(DataModelTO dataModel) {
+                setDataModel(dataModel);
+                view.setDataModel(dataModel);
+                notification.fire(new NotificationEvent("Model was loaded from server: " + dataModel.getName() + " at time: " + new java.util.Date()));
+            }
+
+        }).loadModel(path);
+                
+    }
+    
+    @OnReveal
+    public void onReveal() {
+        //Window.alert("onReveal");
+    }
+
+    @WorkbenchMenu
+    public Menus getMenus() {
+        return menus;
+    }
+
+    private void makeMenuBar() {
+        menus = MenuFactory
+                    .newTopLevelMenu("File")
+                    .withItems( getItems() )
+                    .endMenu().build();
+    }
+
+    
+    private List<MenuItem> getItems() {
+
+        final List<MenuItem> menuItems = new ArrayList<MenuItem>();
+
+        org.uberfire.client.mvp.Command validateCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                Window.alert("Validate model");
+            }
+        };
+
+        org.uberfire.client.mvp.Command saveCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                onSave();
+            }
+        };
+
+        
+   
+        if ( validateCommand != null ) {
+            menuItems.add(newSimpleItem("Validate")
+                    .respondsWith(validateCommand)
+                    .endMenu().build().getItems().get(0));
+        }
+
+        if ( saveCommand != null ) {
+            menuItems.add(newSimpleItem("Save")
+                    .respondsWith(saveCommand)
+                    .endMenu().build().getItems().get(0));
+        }
+
+        return menuItems;
+    }
+
+/*
+    private void makeMenuBar() {
+        FileMenuBuilder fileMenuBuilder = menuBuilder.addValidation( new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                Window.alert("Validate model");
+            }
+        } );
+
+        if ( "isReadOnly".equals("TODO") ) {
+           //fileMenuBuilder.addRestoreVersion( path );
+        } else {
+            fileMenuBuilder.addSave( new org.uberfire.client.mvp.Command() {
+                @Override
+                public void execute() {
+                    onSave();
+                }
+            } ).addDelete( new org.uberfire.client.mvp.Command() {
+                @Override
+                public void execute() {
+                    Window.alert("onDelete");
+                    //onDelete();
+                }
+            } ).addRename( new org.uberfire.client.mvp.Command() {
+                @Override
+                public void execute() {
+                    Window.alert("onRename");
+                    //onRename();
+                }
+            } ).addCopy( new org.uberfire.client.mvp.Command() {
+                @Override
+                public void execute() {
+                    Window.alert("onCopy");
+                    //onCopy();
+                }
+            } );
+        }
+        menus = fileMenuBuilder.build();
+    }
+*/
 }
+

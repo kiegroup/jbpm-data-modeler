@@ -15,6 +15,7 @@
 
     <dependencies>
 
+        <!-- UberFire -->
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-server</artifactId>
@@ -28,11 +29,6 @@
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-security-server</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.uberfire</groupId>
-            <artifactId>uberfire-backend-server</artifactId>
         </dependency>
 
         <dependency>
@@ -57,26 +53,13 @@
 
         <dependency>
             <groupId>org.uberfire</groupId>
-            <artifactId>uberfire-widget-markdown</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.uberfire</groupId>
             <artifactId>uberfire-workbench</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
         </dependency>
 
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -88,6 +71,16 @@
             <groupId>org.kie.commons</groupId>
             <artifactId>kie-nio2-fs</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.kie.commons</groupId>
+            <artifactId>kie-commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kie.commons</groupId>
+            <artifactId>kie-commons-data</artifactId>
+        </dependency>
+
 
         <!-- Errai Core -->
         <dependency>
@@ -122,8 +115,25 @@
             <artifactId>errai-cdi-jetty</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-ui</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-data-binding</artifactId>
+        </dependency>
+
+        <!--dependency>
+            <groupId>com.github.gwtbootstrap</groupId>
+            <artifactId>gwt-bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
+        </dependency-->
+
         <!-- CDI Development Utils -->
-        <!-- This must be placed above com.google.gwt:gwt-dev to override the Jetty that is present there -->
+        <!-- This must be placed above com.google.gwt:gwt-dev to override the
+   Jetty that is present there -->
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
@@ -132,6 +142,12 @@
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-plus</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>geronimo-spec-jta</artifactId>
+                    <groupId>geronimo-spec</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -158,9 +174,103 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.gchart</groupId>
-            <artifactId>gchart</artifactId>
-            <version>2.6</version>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-commons-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-core-services-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-core-services-backend</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-project-editor-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-project-editor-backend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-m2repo-editor-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-m2repo-editor-backend</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ant</artifactId>
+                    <groupId>org.apache.ant</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-metadata-widget</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-config-resource-widget</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-commons-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-project-config-editor-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-project-config-editor-backend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-project-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-view-source-widget</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-decorated-grid-widget</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-commons-services-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-commons-builder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-explorer-backend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.guvnor</groupId>
+            <artifactId>guvnor-explorer-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-guvnor-models-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jbpm</groupId>
+            <artifactId>jbpm-data-modeler-editor-api</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jbpm</groupId>
+            <artifactId>jbpm-data-modeler-editor-backend</artifactId>
+            <version>6.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -193,9 +303,27 @@
                     <module>org.jbpm.datamodeler.FastCompiledDatamodelerShowcase</module>
                     <logLevel>INFO</logLevel>
                     <compileSourcesArtifacts>
-                        <compileSourcesArtifact>org.kie.commons:kie-commons-validation</compileSourcesArtifact>
-                        <compileSourcesArtifact>org.kie.commons:kie-nio2-model</compileSourcesArtifact>
-                        <compileSourcesArtifact>org.kie.commons:kie-commons-io</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-decorated-grid-widget</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-view-source-widget</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-common-ui</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-commons-security</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-commons-services-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-metadata-widget</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-config-resource-widget</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-core-services-api</compileSourcesArtifact>
+
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-project-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-project-client</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-project-editor-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-project-editor-client</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-project-config-editor-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-project-config-editor-client</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-m2repo-editor-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-m2repo-editor-client</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-explorer-client</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.kie.guvnor:guvnor-explorer-client</compileSourcesArtifact>
+
+
                         <compileSourcesArtifact>org.uberfire:uberfire-security-api</compileSourcesArtifact>
                         <compileSourcesArtifact>org.uberfire:uberfire-security-client</compileSourcesArtifact>
                         <compileSourcesArtifact>org.uberfire:uberfire-api</compileSourcesArtifact>
@@ -204,6 +332,14 @@
                         <compileSourcesArtifact>org.uberfire:uberfire-workbench</compileSourcesArtifact>
                         <compileSourcesArtifact>org.uberfire:uberfire-backend-api</compileSourcesArtifact>
                         <compileSourcesArtifact>org.uberfire:uberfire-backend-commons</compileSourcesArtifact>
+
+
+                        <compileSourcesArtifact>org.kie.commons:kie-nio2-model</compileSourcesArtifact>
+
+                        <compileSourcesArtifact>org.jbpm:jbpm-data-modeler-editor-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.jbpm:jbpm-data-modeler-editor-client</compileSourcesArtifact>
+
+
                     </compileSourcesArtifacts>
                     <runTarget>org.jbpm.datamodeler.DatamodelerShowcase/Datamodeler.html</runTarget>
                     <extraJvmArgs>-Xmx4096m -XX:MaxPermSize=256m</extraJvmArgs>
