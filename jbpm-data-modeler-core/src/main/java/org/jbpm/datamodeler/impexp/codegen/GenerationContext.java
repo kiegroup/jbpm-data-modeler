@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.codegen;
+package org.jbpm.datamodeler.impexp.codegen;
 
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;

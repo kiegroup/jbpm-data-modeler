@@ -44,10 +44,10 @@ public class NewDataModelHandler extends DefaultNewResourceHandler {
             @Override
             public void callback( final Path path ) {
                 notifySuccess();
-                notifyResourceAdded(path);
                 final PlaceRequest place = new PathPlaceRequest(path, "DataModelEditor");
                 placeManager.goTo(place);
             }
         } ).createModel(context, buildFileName(resourceType, baseFileName));
     }
+
 }

@@ -1,6 +1,8 @@
 package org.jbpm.datamodeler.editor.backend.server;
 
 import org.jboss.errai.bus.server.annotations.Service;
+import org.jbpm.datamodeler.core.DataModel;
+import org.jbpm.datamodeler.editor.backend.server.DataModelHelper;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
@@ -67,8 +69,17 @@ public class DataModelerServiceImpl implements DataModelerService {
             String content = ioService.readAllString( paths.convert( path ) );
 
             content = content + " - file was saved at: " + new Date();
-
             ioService.write(paths.convert(path), content);
+
+            //convert to the domain model
+            DataModel dataModelDomain = DataModelHelper.to2Domain(dataModel);
+
+            org.jbpm.datamodeler.impexp.codegen.GenerationContext generationContext = new org.jbpm.datamodeler.impexp.codegen.GenerationContext(dataModelDomain);
+            generationContext.addTemplateSet("POJOS");
+            generationContext.setOutputPath("/tmp");
+            generationContext.setPackageName("org.jboss.test");
+
+            org.jbpm.datamodeler.impexp.codegen.GenerationEngine.getInstance().generateAllTemplates(generationContext);
 
 
         } catch (Exception e) {

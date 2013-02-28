@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.codegen;
+package org.jbpm.datamodeler.impexp.codegen;
 
 /**
  * Helper tools to generate names easily from templates

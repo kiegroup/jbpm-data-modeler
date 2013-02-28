@@ -19,6 +19,7 @@ package org.jbpm.datamodeler.editor.model;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,7 +28,7 @@ public class DataModelTO implements Serializable {
     
     private String name;
 
-    private List<DataObjectTO> dataObjects;
+    private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
 
     public DataModelTO() {
     }

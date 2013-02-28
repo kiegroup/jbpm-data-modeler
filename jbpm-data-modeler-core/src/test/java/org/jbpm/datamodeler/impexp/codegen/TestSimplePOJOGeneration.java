@@ -16,8 +16,6 @@
 
 package org.jbpm.datamodeler.impexp.codegen;
 
-import org.jbpm.datamodeler.codegen.GenerationContext;
-import org.jbpm.datamodeler.codegen.GenerationEngine;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;

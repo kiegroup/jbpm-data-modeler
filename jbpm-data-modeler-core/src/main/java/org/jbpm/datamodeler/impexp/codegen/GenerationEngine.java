@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.codegen;
+package org.jbpm.datamodeler.impexp.codegen;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
