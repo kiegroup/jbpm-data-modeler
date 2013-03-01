@@ -35,7 +35,7 @@ public class DataObjectTO implements Serializable {
     public DataObjectTO(int i) {
         this.name = "DataObject"+i;
         for (int prop = 0; prop < i; prop++) {
-            properties.add(new ObjectPropertyTO(name + ".property." + prop, "type->"+prop));
+            properties.add(new ObjectPropertyTO(name + "property" + prop, "java.lang.String"));
         }
     }
 

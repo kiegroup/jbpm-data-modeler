@@ -12,20 +12,21 @@
         }
 
     </ui:style>
-    <g:HTMLPanel>
+    <gwt:HTMLPanel>
         <b:Row addStyleNames="{style.center-column}">
             <b:Column size="12">
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
-                    <g:HTMLPanel>
+                    <gwt:HTMLPanel>
                         <table class="table table-bordered">
                             <tr>
                                 <td>
-                                    <gwt:Label ui:field="objectName"></gwt:Label>
-                                    <b:CellTable ui:field="dataObjectPropertiesTable" width="100%" styleName="table table-bordered table-striped table-hover"/>
+                                    <gwt:Label ui:field="objectName" styleName=""></gwt:Label>
+
+                                    <b:CellTable ui:field="dataObjectPropertiesTable" styleName="table table-bordered table-striped table-hover"/>
                                 </td>
                             </tr>
                         </table>
-                    </g:HTMLPanel>
+                    </gwt:HTMLPanel>
 
                     <gwt:HTML>
                         <strong>Create new property</strong>
@@ -40,5 +41,5 @@
                 </gwt:VerticalPanel>
             </b:Column>
         </b:Row>
-    </g:HTMLPanel>
+    </gwt:HTMLPanel>
 </ui:UiBinder>

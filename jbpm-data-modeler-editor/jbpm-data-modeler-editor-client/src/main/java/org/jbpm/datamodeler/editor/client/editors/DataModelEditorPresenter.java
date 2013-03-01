@@ -55,7 +55,7 @@ public class DataModelEditorPresenter {
 
         void deleteDataObject(DataObjectTO dataObject, int index);
 
-        void addDataObject(String text);
+        void addDataObject(DataObjectTO dataObject);
 
         void modelSelected();
 
@@ -108,6 +108,7 @@ public class DataModelEditorPresenter {
             public void execute() {
 
                 //TODO implement the required controls to ensure the requested object can be deleted
+                dataModel.getDataObjects().remove(dataObjectTO);
                 view.deleteDataObject(dataObjectTO, index);
                 notification.fire(new NotificationEvent("Data object: " + dataObjectTO.getName() + " was deleted"));
             }
@@ -121,7 +122,9 @@ public class DataModelEditorPresenter {
             public void execute() {
 
                 //TODO implement the required controls to ensure the name valid, etc.
-                view.addDataObject(text);
+                DataObjectTO dataObject = new DataObjectTO(text);
+                dataModel.getDataObjects().add(dataObject);
+                view.addDataObject(dataObject);
                 notification.fire(new NotificationEvent("Data object: " + text + " was created"));
             }
         };
@@ -155,23 +158,26 @@ public class DataModelEditorPresenter {
         };
     }
 
-    public Command createDeleteCommand(final ObjectPropertyTO property, final int index) {
+    public Command createDeleteCommand(final DataObjectTO dataObject, final ObjectPropertyTO property, final int index) {
         return new Command() {
             @Override
             public void execute() {
-
+                //TODO implement the required controls to ensure the property can be deleted from the dataObject
+                dataObject.getProperties().remove(property);
                 view.deleteDataObjectProperty(property, index);
             }
         };
     }
 
-    public Command createAddDataObjectPropertyCommand(final String propertyName, final String propertyType) {
+    public Command createAddDataObjectPropertyCommand(final DataObjectTO dataObject, final String propertyName, final String propertyType) {
 
         return new Command() {
             @Override
             public void execute() {
                 //TODO implement the required controls to ensure the property can be created
-                view.addDataObjectProperty(new ObjectPropertyTO(propertyName, propertyType));
+                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType);
+                dataObject.getProperties().add(property);
+                view.addDataObjectProperty(property);
             }
         };
     }

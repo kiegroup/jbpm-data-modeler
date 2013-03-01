@@ -6,6 +6,8 @@ import org.jbpm.datamodeler.editor.backend.server.DataModelHelper;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
+import org.jbpm.datamodeler.impexp.codegen.GenerationContext;
+import org.jbpm.datamodeler.impexp.codegen.GenerationEngine;
 import org.kie.commons.java.nio.file.OpenOption;
 import org.kie.commons.java.nio.file.StandardOpenOption;
 import org.uberfire.backend.vfs.Path;
@@ -74,12 +76,15 @@ public class DataModelerServiceImpl implements DataModelerService {
             //convert to the domain model
             DataModel dataModelDomain = DataModelHelper.to2Domain(dataModel);
 
-            org.jbpm.datamodeler.impexp.codegen.GenerationContext generationContext = new org.jbpm.datamodeler.impexp.codegen.GenerationContext(dataModelDomain);
+            GenerationContext generationContext = new GenerationContext(dataModelDomain);
             generationContext.addTemplateSet("POJOS");
             generationContext.setOutputPath("/tmp");
             generationContext.setPackageName("org.jboss.test");
 
-            org.jbpm.datamodeler.impexp.codegen.GenerationEngine.getInstance().generateAllTemplates(generationContext);
+
+            GenerationEngine generationEngine = GenerationEngine.getInstance();
+            generationEngine.init();
+            generationEngine.generateAllTemplates(generationContext);
 
 
         } catch (Exception e) {

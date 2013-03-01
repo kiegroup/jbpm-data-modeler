@@ -177,7 +177,7 @@ public class DataModelBrowser extends Composite {
     }
     
     public void addDataObject(DataObjectTO dataObject) {
-        dataObjectsProvider.getList().add(new DataObjectTO(newEntityName.getText()));
+        dataObjectsProvider.getList().add(dataObject);
         dataObjectsProvider.flush();
         dataObjectsProvider.refresh();
     }

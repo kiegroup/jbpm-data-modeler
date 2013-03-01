@@ -22,7 +22,7 @@ public class DataModelHelper {
 
         if (dataObjects != null) {
             for (DataObjectTO dataObjectTO  : dataObjects) {
-                dataObject = dataModel.addDataObject("default", dataModelTO.getName());
+                dataObject = dataModel.addDataObject("default", dataObjectTO.getName());
                 to2Domain(dataObjectTO, dataObject);
             }
         }

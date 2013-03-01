@@ -78,8 +78,8 @@ public class DataModelEditorViewImpl extends Composite
     }
 
     @Override
-    public void addDataObject(String text) {
-        dataModelBrowser.addDataObject(new DataObjectTO(text));
+    public void addDataObject(DataObjectTO dataObject) {
+        dataModelBrowser.addDataObject(dataObject);
     }
 
     @Override

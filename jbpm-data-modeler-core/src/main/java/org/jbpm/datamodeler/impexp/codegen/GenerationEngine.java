@@ -41,6 +41,7 @@ public class GenerationEngine {
     private static final GenerationEngine singleton = new GenerationEngine();
     private VelocityEngine velocityEngine = new VelocityEngine();
     private static final Logger logger = LoggerFactory.getLogger(GenerationEngine.class);
+    private static boolean inited = false;
 
     /**
      * Returns an instance of the GenerationEngine
@@ -56,20 +57,23 @@ public class GenerationEngine {
      */
     public void init() {
 
-        // Init velocity engine
-        Properties properties = new Properties();
+        if (!inited) {
+            // Init velocity engine
+            Properties properties = new Properties();
 
-        //properties.setProperty("file.resource.loader.path", templatesPath);
-        //properties.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-        //        "org.apache.velocity.runtime.log.SimpleLog4JLogSystem");
-        //properties.setProperty("runtime.log.logsystem.log4j.category", "velocity");
+            //properties.setProperty("file.resource.loader.path", templatesPath);
+            //properties.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+            //        "org.apache.velocity.runtime.log.SimpleLog4JLogSystem");
+            //properties.setProperty("runtime.log.logsystem.log4j.category", "velocity");
 
-        properties.setProperty("resource.loader", "class");
-        properties.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
-        properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+            properties.setProperty("resource.loader", "class");
+            properties.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
+            properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 
-        // init velocity engine
-        velocityEngine.init(properties);
+            // init velocity engine
+            velocityEngine.init(properties);
+            inited = true;
+        }
 
     }
 

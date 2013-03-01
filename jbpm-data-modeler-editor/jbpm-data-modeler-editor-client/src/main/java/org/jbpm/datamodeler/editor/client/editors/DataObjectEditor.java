@@ -112,7 +112,7 @@ public class DataObjectEditor  extends Composite {
                                 final ObjectPropertyTO property,
                                 final String value ) {
 
-                Command deleteCommand = modelEditorPresenter.createDeleteCommand(property, index);
+                Command deleteCommand = modelEditorPresenter.createDeleteCommand(dataObject, property, index);
                 deleteCommand.execute();
             }
         } );
@@ -195,11 +195,12 @@ public class DataObjectEditor  extends Composite {
         newPropertyType.addItem("Integer", "java.lang.Integer");
         newPropertyType.addItem("String", "java.lang.String");
         newPropertyType.addItem("Date", "java.lang.Date");
+        newPropertyType.addItem("Boolean", "java.lang.Boolean");
     }
 
     @UiHandler("newPropertyButton")
     void newPropertyClick( ClickEvent event ) {
-        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(newPropertyName.getText(), newPropertyType.getValue());
+        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue());
         createPropertyCommand.execute();
     }
 
