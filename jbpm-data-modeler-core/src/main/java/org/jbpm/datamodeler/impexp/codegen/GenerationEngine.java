@@ -43,6 +43,9 @@ public class GenerationEngine {
     private static final Logger logger = LoggerFactory.getLogger(GenerationEngine.class);
     private static boolean inited = false;
 
+    private GenerationListener generationListener;
+
+
     /**
      * Returns an instance of the GenerationEngine
      *
@@ -161,6 +164,13 @@ public class GenerationEngine {
         System.out.println("Writing " + fout.getAbsolutePath());
 
         IOUtils.write(writer.toString(), fos);
+
+        //TODO all this stuff will be refactored, at the moment we provide a
+        //simple implementation in order to put the modeler running quickly
+        
+        if (generationListener != null) {
+            generationListener.assetGenerated(outputPath, writer.toString());
+        }
     }
 
     /**
@@ -177,5 +187,13 @@ public class GenerationEngine {
         String templatePath = "/" + TEMPLATE_PATH + "/" + templateSetId + "/" + templateName;
         return templatePath;
 
+    }
+
+    public GenerationListener getGenerationListener() {
+        return generationListener;
+    }
+
+    public void setGenerationListener(GenerationListener generationListener) {
+        this.generationListener = generationListener;
     }
 }

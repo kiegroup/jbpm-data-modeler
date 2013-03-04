@@ -22,7 +22,8 @@ public class DataModelHelper {
 
         if (dataObjects != null) {
             for (DataObjectTO dataObjectTO  : dataObjects) {
-                dataObject = dataModel.addDataObject("default", dataObjectTO.getName());
+                //TODO remove this hardcoding
+                dataObject = dataModel.addDataObject("org.jbpm.datamodeler.test.pojos", dataObjectTO.getName());
                 to2Domain(dataObjectTO, dataObject);
             }
         }

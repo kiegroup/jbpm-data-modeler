@@ -8,12 +8,14 @@ import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.jbpm.datamodeler.impexp.codegen.GenerationContext;
 import org.jbpm.datamodeler.impexp.codegen.GenerationEngine;
+import org.jbpm.datamodeler.impexp.codegen.GenerationListener;
 import org.kie.commons.java.nio.file.OpenOption;
 import org.kie.commons.java.nio.file.StandardOpenOption;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.server.util.Paths;
 
 import org.kie.commons.io.IOService;
+import org.uberfire.backend.vfs.PathFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,6 +23,7 @@ import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 @Service
 @ApplicationScoped
@@ -81,15 +84,81 @@ public class DataModelerServiceImpl implements DataModelerService {
             generationContext.setOutputPath("/tmp");
             generationContext.setPackageName("org.jboss.test");
 
+            //calculate the project/src/main directory
+            org.kie.commons.java.nio.file.Path mainPath = getProjectMainPath(path);
+            org.kie.commons.java.nio.file.Path output = ensureProjectJavaPath(mainPath);
+
 
             GenerationEngine generationEngine = GenerationEngine.getInstance();
+            ServiceGenerationListener generationListener = new ServiceGenerationListener(output);
+            generationEngine.setGenerationListener(generationListener);
             generationEngine.init();
             generationEngine.generateAllTemplates(generationContext);
-
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public class ServiceGenerationListener implements GenerationListener {
+
+        org.kie.commons.java.nio.file.Path output;
+
+        public ServiceGenerationListener(org.kie.commons.java.nio.file.Path output) {
+            this.output = output;
+        }
+
+        @Override
+        public void assetGenerated(String fileName, String content) {
+
+            String subDir;
+            org.kie.commons.java.nio.file.Path subDirPath;
+            org.kie.commons.java.nio.file.Path destFilePath;
+            StringTokenizer dirNames;
+
+            subDirPath = output;
+            int index = fileName.lastIndexOf("/");
+            if (index == 0) {
+                //the file names was provided in the form /SomeFile.java
+                fileName = fileName.substring(1, fileName.length());
+            } else if (index > 0) {
+                //the file name was provided in the most common form /dir1/dir2/SomeFile.java
+                String dirNamesPath = fileName.substring(0, index);
+                fileName = fileName.substring(index+1, fileName.length());
+                dirNames = new StringTokenizer(dirNamesPath, "/");
+                while (dirNames.hasMoreElements()) {
+                    subDir = dirNames.nextToken();
+                    subDirPath = subDirPath.resolve(subDir);
+                    if (!ioService.exists(subDirPath)) {
+                        ioService.createDirectory(subDirPath);
+                    }
+                }
+            }
+
+            //the last subDirPath is the directory to crate the file.
+            destFilePath = subDirPath.resolve(fileName);
+            ioService.write(destFilePath, content);
+        }
+    }
+
+    private org.kie.commons.java.nio.file.Path getProjectMainPath(Path path) {
+        //complete path to the file.
+        org.kie.commons.java.nio.file.Path currentDir = paths.convert(path);
+
+        boolean srcFound = false;
+
+        while (!srcFound && (currentDir = currentDir.getParent()) != null) {
+            srcFound = currentDir.getFileName().endsWith("main");
+        }
+        return currentDir;
+    }
+
+    private org.kie.commons.java.nio.file.Path ensureProjectJavaPath(org.kie.commons.java.nio.file.Path mainPath) {
+        org.kie.commons.java.nio.file.Path javaPath = mainPath.resolve("java");
+        if (!ioService.exists(javaPath)) {
+            javaPath = ioService.createDirectory(javaPath);
+        }
+        return javaPath;
     }
 
     @Override
