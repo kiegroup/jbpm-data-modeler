@@ -2,20 +2,17 @@ package org.jbpm.datamodeler.editor.backend.server;
 
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.datamodeler.core.DataModel;
-import org.jbpm.datamodeler.editor.backend.server.DataModelHelper;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.jbpm.datamodeler.impexp.codegen.GenerationContext;
 import org.jbpm.datamodeler.impexp.codegen.GenerationEngine;
 import org.jbpm.datamodeler.impexp.codegen.GenerationListener;
-import org.kie.commons.java.nio.file.OpenOption;
-import org.kie.commons.java.nio.file.StandardOpenOption;
-import org.uberfire.backend.vfs.Path;
-import org.uberfire.backend.server.util.Paths;
-
 import org.kie.commons.io.IOService;
-import org.uberfire.backend.vfs.PathFactory;
+import org.kie.commons.java.nio.file.Files;
+import org.kie.guvnor.project.service.ProjectService;
+import org.uberfire.backend.server.util.Paths;
+import org.uberfire.backend.vfs.Path;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,12 +26,20 @@ import java.util.StringTokenizer;
 @ApplicationScoped
 public class DataModelerServiceImpl implements DataModelerService {
 
+    private static final String SOURCE_JAVA_PATH      = "src/main/java";
+    private static final String SOURCE_RESOURCES_PATH = "src/main/resources";
+    private static final String TEST_JAVA_PATH        = "src/test/java";
+    private static final String TEST_RESOURCES_PATH   = "src/test/resources";
+
     @Inject
     @Named("ioStrategy")
     IOService ioService;
 
     @Inject
     private Paths paths;
+
+    @Inject
+    private ProjectService projectService;
 
     public DataModelerServiceImpl() {
     }
@@ -54,9 +59,9 @@ public class DataModelerServiceImpl implements DataModelerService {
             e.printStackTrace();
         }
 
-
         //TODO: implement the correct model loading
-        DataModelTO dataModel = new DataModelTO("TestModel");
+        
+        DataModelTO dataModel = new DataModelTO(path.getFileName());
         List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
         for (int i=0; i< 10 ; i++) {
             dataObjects.add(new DataObjectTO(i));
@@ -64,6 +69,45 @@ public class DataModelerServiceImpl implements DataModelerService {
         dataModel.setDataObjects(dataObjects);
 
         return dataModel;
+    }
+
+    public Path resolveResourcePackage(final Path resource) {
+
+        //TODO this method should be moved to the ProjectService class
+        //Null resource paths cannot resolve to a Project
+        if ( resource == null ) {
+            return null;
+        }
+
+        //If Path is not within a Project we cannot resolve a package
+        final Path projectRoot = projectService.resolveProject(resource);
+        if ( projectRoot == null ) {
+            return null;
+        }
+
+        //The Path must be within a Project's src/main/resources or src/test/resources path
+        boolean resolved = false;
+        org.kie.commons.java.nio.file.Path path = paths.convert( resource ).normalize();
+        final org.kie.commons.java.nio.file.Path srcResourcesPath = paths.convert( projectRoot ).resolve( SOURCE_RESOURCES_PATH );
+        final org.kie.commons.java.nio.file.Path testResourcesPath = paths.convert( projectRoot ).resolve( TEST_RESOURCES_PATH );
+
+        if ( path.startsWith( srcResourcesPath ) ) {
+            resolved = true;
+        } else if ( path.startsWith( testResourcesPath ) ) {
+            resolved = true;
+        }
+        if ( !resolved ) {
+            return null;
+        }
+
+        //If the Path is already a folder simply return it
+        if ( Files.isDirectory(path) ) {
+            return resource;
+        }
+
+        path = path.getParent();
+
+        return paths.convert( path );
     }
 
     @Override
@@ -84,10 +128,9 @@ public class DataModelerServiceImpl implements DataModelerService {
             generationContext.setOutputPath("/tmp");
             generationContext.setPackageName("org.jboss.test");
 
-            //calculate the project/src/main directory
-            org.kie.commons.java.nio.file.Path mainPath = getProjectMainPath(path);
-            org.kie.commons.java.nio.file.Path output = ensureProjectJavaPath(mainPath);
-
+            //get the route to the root directory. (the main pom.xml directory)
+            Path projectPath = projectService.resolveProject(path);
+            org.kie.commons.java.nio.file.Path output = ensureProjectJavaPath(paths.convert(projectPath));
 
             GenerationEngine generationEngine = GenerationEngine.getInstance();
             ServiceGenerationListener generationListener = new ServiceGenerationListener(output);
@@ -141,23 +184,20 @@ public class DataModelerServiceImpl implements DataModelerService {
         }
     }
 
-    private org.kie.commons.java.nio.file.Path getProjectMainPath(Path path) {
-        //complete path to the file.
-        org.kie.commons.java.nio.file.Path currentDir = paths.convert(path);
-
-        boolean srcFound = false;
-
-        while (!srcFound && (currentDir = currentDir.getParent()) != null) {
-            srcFound = currentDir.getFileName().endsWith("main");
-        }
-        return currentDir;
-    }
-
     private org.kie.commons.java.nio.file.Path ensureProjectJavaPath(org.kie.commons.java.nio.file.Path mainPath) {
-        org.kie.commons.java.nio.file.Path javaPath = mainPath.resolve("java");
+        org.kie.commons.java.nio.file.Path javaPath = mainPath.resolve("src");
         if (!ioService.exists(javaPath)) {
             javaPath = ioService.createDirectory(javaPath);
         }
+        javaPath = javaPath.resolve("main");
+        if (!ioService.exists(javaPath)) {
+            javaPath = ioService.createDirectory(javaPath);
+        }
+        javaPath = javaPath.resolve("java");
+        if (!ioService.exists(javaPath)) {
+            javaPath = ioService.createDirectory(javaPath);
+        }
+
         return javaPath;
     }
 

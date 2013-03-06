@@ -1,8 +1,9 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-        >
+    >
+
     <ui:style>
         .center-column {
         background-color: #FFFFFF;
@@ -12,11 +13,13 @@
         }
 
     </ui:style>
+
     <gwt:HTMLPanel>
         <b:Row addStyleNames="{style.center-column}">
             <b:Column size="12">
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
                     <gwt:HTMLPanel>
+                       <div style="max-height:500px; overflow: auto;">
                         <table class="table table-bordered">
                             <tr>
                                 <td>
@@ -26,17 +29,22 @@
                                 </td>
                             </tr>
                         </table>
-                    </gwt:HTMLPanel>
+                       </div>
+                       </gwt:HTMLPanel>
 
                     <gwt:HTML>
                         <strong>Create new property</strong>
                     </gwt:HTML>
 
+
+                    <gwt:HorizontalPanel>
                     <gwt:TextBox ui:field="newPropertyName"></gwt:TextBox>
 
 
                     <b:ListBox ui:field="newPropertyType"></b:ListBox>
+
                     <gwt:Button ui:field="newPropertyButton" styleName="btn btn-primary">Create</gwt:Button>
+                    </gwt:HorizontalPanel>
 
                 </gwt:VerticalPanel>
             </b:Column>

@@ -13,4 +13,5 @@ public interface DataModelerService {
     
     Path createModel(Path context, String fileName);
 
+    Path resolveResourcePackage(final Path path);
 }

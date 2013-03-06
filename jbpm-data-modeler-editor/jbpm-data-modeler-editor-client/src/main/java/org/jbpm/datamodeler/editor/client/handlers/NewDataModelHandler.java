@@ -1,5 +1,6 @@
 package org.jbpm.datamodeler.editor.client.handlers;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
@@ -37,6 +38,16 @@ public class NewDataModelHandler extends DefaultNewResourceHandler {
     }
 
     @Override
+    public void acceptPath(final Path path, final Callback<Boolean, Void> callback) {
+        modelerService.call( new RemoteCallback<Path>() {
+            @Override
+            public void callback( final Path path ) {
+                callback.onSuccess( path != null );
+            }
+        } ).resolveResourcePackage(path);
+    }
+
+    @Override
     public void create(final Path context,
                         final String baseFileName) {
 
@@ -49,5 +60,4 @@ public class NewDataModelHandler extends DefaultNewResourceHandler {
             }
         } ).createModel(context, buildFileName(resourceType, baseFileName));
     }
-
 }

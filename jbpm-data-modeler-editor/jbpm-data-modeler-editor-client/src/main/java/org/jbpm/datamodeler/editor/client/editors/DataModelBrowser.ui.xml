@@ -2,7 +2,7 @@
              xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-        >
+>
 
     <ui:style>
 
@@ -12,11 +12,13 @@
 
 
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
-
+                    <gwt:HTMLPanel>
+                    <div  style="max-height:500px; overflow: auto;">
                     <gwt:Label ui:field="modelName"></gwt:Label>
 
                     <b:CellTable ui:field="dataObjectsTable" styleName="table table-condensed"/>
-
+                    </div>
+                    </gwt:HTMLPanel>
                     <gwt:HTML>
                         <strong>Create new entity</strong>
                     </gwt:HTML>
