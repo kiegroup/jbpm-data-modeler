@@ -16,12 +16,32 @@
 
 package org.jbpm.datamodeler.xml.impl;
 
-import org.jbpm.datamodeler.xml.ExportResult;
+import org.jbpm.datamodeler.core.DataModel;
+import org.jbpm.datamodeler.xml.SerializerException;
+import org.jbpm.datamodeler.xml.XMLSerializer;
 
-public class ExportResultImpl extends ImportExportResult implements ExportResult {
+import java.io.Reader;
+import java.io.Writer;
+
+public class XMLSerializerImpl implements XMLSerializer {
 
     @Override
-    public String getContent() {
+    public String serialize(DataModel dataModel) {
+        return null;
+    }
+
+    @Override
+    public void serialize(DataModel dataModel, Writer writer) {
+
+    }
+
+    @Override
+    public DataModel unserialize(String xml) throws SerializerException {
+        return null;
+    }
+
+    @Override
+    public DataModel unserialize(Reader reader) throws SerializerException {
         return null;
     }
 }

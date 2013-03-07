@@ -17,12 +17,18 @@
 package org.jbpm.datamodeler.xml;
 
 import org.jbpm.datamodeler.core.DataModel;
-import org.uberfire.backend.vfs.Path;
 
-public interface ExportManager {
+import java.io.Reader;
+import java.io.Writer;
 
-    ExportResult exportToXML(DataModel dataModel);
+public interface XMLSerializer {
     
-    ExportResult exportToJava(DataModel dataModel, Path path);
+    String serialize(DataModel dataModel);
+
+    void serialize(DataModel dataModel, Writer writer);
+
+    DataModel unserialize(String xml) throws SerializerException;
+
+    DataModel unserialize(Reader reader) throws SerializerException;
 
 }

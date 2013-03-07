@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.xml.impl;
+package org.jbpm.datamodeler.xml;
 
-import org.jbpm.datamodeler.core.DataModel;
-import org.jbpm.datamodeler.xml.ImportResult;
-
-
-public class ImportResultImpl extends ImportExportResult implements ImportResult {
- 
-    private DataModel dataModel;
-
-    public DataModel getDataModel() {
-        return dataModel;
+public class SerializerException extends Exception {
+    public SerializerException(String message) {
+        super(message);
     }
 
-    public void setDataModel(DataModel dataModel) {
-        this.dataModel = dataModel;
+    public SerializerException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
