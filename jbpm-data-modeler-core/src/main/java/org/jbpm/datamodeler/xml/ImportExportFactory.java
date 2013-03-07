@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.core;
+package org.jbpm.datamodeler.xml;
 
-import java.util.Map;
 
-public interface ModelElement {
-    
-    String getName();
-    
-    void setName(String name);
+public interface ImportExportFactory {
 
-    Map<String, Attribute> getAttributes();
+    ImportManager newImportManager();
 
-    Attribute addAttribute(String name, String value);
-    
-    Attribute removeAttribute(String name);
-
+    ExportManager newExportManager();
 }

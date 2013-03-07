@@ -169,7 +169,7 @@ public class DataModelBrowser extends Composite {
         dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label( "Empty table" ) );
 
         dataObjectsTable.addColumn(deleteDataObjectColumn);
-        dataObjectsTable.setColumnWidth(deleteDataObjectColumn, 40, Style.Unit.PCT);
+        dataObjectsTable.setColumnWidth(deleteDataObjectColumn, 20, Style.Unit.PX);
         dataObjectsTable.addColumn(dataObjectColumn);
 
         //Init the selection model

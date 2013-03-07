@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.core;
+package org.jbpm.datamodeler.xml.impl;
 
-import java.util.Map;
 
-public interface ModelElement {
-    
-    String getName();
-    
-    void setName(String name);
+import org.jbpm.datamodeler.core.DataModel;
+import org.jbpm.datamodeler.xml.ExportManager;
+import org.jbpm.datamodeler.xml.ExportResult;
+import org.uberfire.backend.vfs.Path;
 
-    Map<String, Attribute> getAttributes();
+public class ExportManagerImpl implements ExportManager {
 
-    Attribute addAttribute(String name, String value);
-    
-    Attribute removeAttribute(String name);
+    @Override
+    public ExportResult exportToXML(DataModel dataModel) {
+        //TODO implement this method
 
+        return null;
+    }
+
+    @Override
+    public ExportResult exportToJava(DataModel dataModel, Path path) {
+        //TODO implement this method
+
+        return null;
+    }
 }

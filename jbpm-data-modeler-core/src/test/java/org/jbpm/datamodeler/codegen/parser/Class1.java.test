@@ -1,0 +1,42 @@
+package org.jbpm.datamodeler.codegen.parser;
+
+import java.lang.String;
+import java.util.ArrayList;
+import java.applet.*;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: wmedvede
+ * Date: 3/5/13
+ * Time: 10:05 AM
+ * To change this template use File | Settings | File Templates.
+ */
+@Portable
+@DataObject(model="DataModel")
+@Templated(file="index.html")
+public static class  Class1 extends org.jbpm.Class1Parent implements Serializale, Redhatizable {
+
+    private Integer cantidad;
+    
+    private static String nombre;
+    
+    protected final int edad = 18;
+    
+    public int getCaka() {
+        return 5;
+    }
+
+    void procesador() {
+        int i = 0;
+        String r = "la erre";
+    }
+    private List<Integer> list = new ArrayList<Integer>();
+
+        public static void main(String[] args) {
+            System.out.println("Hello world!");
+        }
+
+    package java.lang.Boolean enabled;
+
+}
+

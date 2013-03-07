@@ -29,9 +29,12 @@ public class DataModelImpl extends ModelElementImpl implements DataModel {
     Map<String, DataObject> dataObjects = new HashMap<String, DataObject>();
     
     String version;
+    
+    String format;
 
-    public DataModelImpl(String name) {
+    public DataModelImpl(String name, String format) {
         super(name);
+        this.format = format;
     }
 
     @Override
@@ -42,6 +45,11 @@ public class DataModelImpl extends ModelElementImpl implements DataModel {
     @Override
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public String getFormat() {
+        return format;
     }
 
     @Override
@@ -63,7 +71,7 @@ public class DataModelImpl extends ModelElementImpl implements DataModel {
 
     @Override
     public DataObject addDataObject(String packageName, String name) {
-        DataObject dataObject = ModelFactoryImpl.getInstance().newDataObject(packageName, name);
+        DataObject dataObject = ModelFactoryImpl.getElementFactoryInstance().newDataObject(packageName, name);
         dataObjects.put(dataObject.getClassName(), dataObject);
         return dataObject;
     }

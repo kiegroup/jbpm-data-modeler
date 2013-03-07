@@ -20,12 +20,35 @@ import java.util.Set;
 
 public interface DataModel extends ModelElement {
 
+    /**
+     * This is an internal value that specifies the format used for the model. In the future this
+     * format attribute can enable model migration from an old format N to a newer format N+1.
+     *
+     * @return The model format.
+     *
+     */
+    String getFormat();
+
+    /**
+     * Specifies model version.
+     *
+     * @param version
+     */
     void setVersion(String version);
     
     String getVersion();
 
     Set<DataObject> getDataObjects();
 
+    /**
+     * The created data object will have the class name "packageName.name"
+     *
+     * @param packageName The package to locate the DataObject.
+     *
+     * @param name
+     *
+     * @return
+     */
     DataObject addDataObject(String packageName, String name);
 
     DataObject getDataObject(String className);

@@ -52,7 +52,7 @@ public abstract class ModelElementImpl implements ModelElement {
 
     @Override
     public Attribute addAttribute(String name, String value) {
-        Attribute attribute = ModelFactoryImpl.getInstance().newAttribute(name, value);
+        Attribute attribute = ModelFactoryImpl.getElementFactoryInstance().newAttribute(name, value);
         attributes.put(attribute.getName(), attribute);
         return attribute;
     }

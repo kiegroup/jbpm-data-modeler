@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.core;
+package org.jbpm.datamodeler.xml;
 
-import java.util.Map;
+import java.io.InputStream;
+import org.uberfire.backend.vfs.*;
 
-public interface ModelElement {
-    
-    String getName();
-    
-    void setName(String name);
+public interface ImportManager {
 
-    Map<String, Attribute> getAttributes();
+    ImportResult importFromXML(InputStream inputStream);
 
-    Attribute addAttribute(String name, String value);
-    
-    Attribute removeAttribute(String name);
+    ImportResult importFromXML(String content);
+
+    ImportResult importFromXML(Path path);
 
 }

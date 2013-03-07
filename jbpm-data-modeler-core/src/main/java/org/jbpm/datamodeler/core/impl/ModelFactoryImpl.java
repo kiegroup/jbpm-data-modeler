@@ -19,15 +19,21 @@ package org.jbpm.datamodeler.core.impl;
 import org.jbpm.datamodeler.core.*;
 
 
-public class ModelFactoryImpl implements ModelFactory {
+public class ModelFactoryImpl implements ModelFactory, ModelElementFactory {
     
+    private static String CURRENT_FORMAT = "1";
+
     public static ModelFactory getInstance() {
+        return new ModelFactoryImpl();
+    }
+
+    static ModelElementFactory getElementFactoryInstance() {
         return new ModelFactoryImpl();
     }
 
     @Override
     public DataModel newModel(String name) {
-        return new DataModelImpl(name);
+        return new DataModelImpl(name, CURRENT_FORMAT);
     }
 
     @Override

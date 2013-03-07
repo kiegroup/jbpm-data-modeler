@@ -78,7 +78,7 @@ public class DataObjectImpl extends ModelElementImpl implements DataObject {
 
     @Override
     public ObjectProperty addProperty(String name, String className, boolean multiple) {
-        ObjectProperty property = ModelFactoryImpl.getInstance().newProperty(name, className, multiple);
+        ObjectProperty property = ModelFactoryImpl.getElementFactoryInstance().newProperty(name, className, multiple);
         properties.put(name, property);
         return property;
     }
