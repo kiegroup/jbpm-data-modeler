@@ -7,6 +7,10 @@ public interface Constants extends Messages {
 
     public static final Constants INSTANCE = GWT.create(Constants.class);
 
+    public String modelEditor_newModel();
+
+    public String modelEditor_title();
+    
     public String modelBrowser_modelUnknown();
 
     public String modelBrowser_emptyTable();
@@ -26,5 +30,12 @@ public interface Constants extends Messages {
     public String objectEditor_columnName();
 
     public String objectEditor_columnType();
+
+    public String objectEditor_basicType();
+    
+    public String objectEditor_dataObjectType();
+    
+    public String objectEditor_multiple();
+    
 
 }

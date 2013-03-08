@@ -4,6 +4,7 @@ import com.google.gwt.core.client.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.kie.guvnor.commons.ui.client.handlers.DefaultNewResourceHandler;
@@ -29,7 +30,7 @@ public class NewDataModelHandler extends DefaultNewResourceHandler {
 
     @Override
     public String getDescription() {
-        return "Data Model";
+        return Constants.INSTANCE.modelEditor_newModel();
     }
 
     @Override

@@ -74,10 +74,13 @@ public class DataObjectEditor  extends Composite {
     Button newPropertyButton;
 
     @UiField
-    com.github.gwtbootstrap.client.ui.RadioButton basicType;
+    com.github.gwtbootstrap.client.ui.RadioButton newPropertyBasicType;
 
     @UiField
-    com.github.gwtbootstrap.client.ui.RadioButton dataObjectType;
+    com.github.gwtbootstrap.client.ui.RadioButton newPropertyDataObjectType;
+
+    @UiField
+    com.github.gwtbootstrap.client.ui.CheckBox newPropertyIsMultiple;
 
     private DataModelTO dataModel;
     
@@ -221,6 +224,8 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.addDataDisplay(dataObjectPropertiesTable);
         dataObjectPropertiesProvider.refresh();
 
+        newPropertyIsMultiple.setVisible(false);
+
         //TODO init this list well, the datatypes must be loaded from the DataModelerService, etc.
         newPropertyType.addItem("Integer", "java.lang.Integer");
         newPropertyType.addItem("String", "java.lang.String");
@@ -235,15 +240,14 @@ public class DataObjectEditor  extends Composite {
         createPropertyCommand.execute();
     }
 
-    @UiHandler("dataObjectType")
-    void selectDataObjectType(ClickEvent event) {
-        Window.alert("data object type selected");
-
+    @UiHandler("newPropertyDataObjectType")
+    void dataObjectTypeSelected(ClickEvent event) {
+        newPropertyIsMultiple.setVisible(true);
     }
 
-    @UiHandler("basicType")
+    @UiHandler("newPropertyBasicType")
     void basicTypeSelected(ClickEvent event) {
-        Window.alert("basic type selected");
+        newPropertyIsMultiple.setVisible(false);
     }
 
     public void setDataModel(DataModelTO dataModel) {

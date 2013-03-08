@@ -1,58 +1,60 @@
-    <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    >
+        >
 
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
 
     <ui:style>
         .center-column {
-        background-color: #FFFFFF;
-        margin: 0;
-        width: 100%;
-        z-index: 998;
+            background-color: #FFFFFF;
+            margin: 0;
+            width: 100%;
+            z-index: 998;
         }
-
     </ui:style>
 
     <gwt:HTMLPanel>
         <b:Row addStyleNames="{style.center-column}">
             <b:Column size="12">
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
+
                     <gwt:HTMLPanel>
-                       <div style="max-height:500px; overflow: auto;">
-                        <table class="table table-bordered">
+
+                        <table class="table table-bordered" style="margin-top:20px;">
                             <tr>
                                 <td>
-                                    <gwt:Label ui:field="objectName" styleName=""></gwt:Label>
-
-                                    <b:CellTable ui:field="dataObjectPropertiesTable" styleName="table table-bordered table-striped table-hover"/>
+                                    <h4>
+                                        <gwt:Label ui:field="objectName" styleName=""></gwt:Label>
+                                    </h4>
+                                    <gwt:ScrollPanel width="100%" height="400px">
+                                        <b:CellTable ui:field="dataObjectPropertiesTable"
+                                                     styleName="table table-bordered table-striped table-hover"/>
+                                    </gwt:ScrollPanel>
                                 </td>
                             </tr>
                         </table>
-                       </div>
-                       </gwt:HTMLPanel>
 
+                    </gwt:HTMLPanel>
 
-                       <gwt:Label text="{i18n.objectEditor_createProperty}"  />
+                    <gwt:HTMLPanel styleName="well">
+                        <gwt:HTML>
+                            <h5>Create new property</h5>
+                        </gwt:HTML>
 
-
-
-                    <gwt:HorizontalPanel>
-                    <gwt:TextBox ui:field="newPropertyName"></gwt:TextBox>
-
-                    <b:ButtonGroup>
-                        <b:RadioButton ui:field="newPropertyBasicType" name="radio" text="Basic" />
-                        <b:RadioButton ui:field="newPropertyDataObjectType" name="radio" text="Data object" />
-                    </b:ButtonGroup>
-
-                    <b:ListBox ui:field="newPropertyType"></b:ListBox>
-
-                    <b:CheckBox ui:field="newPropertyIsMultiple" name=""/>
-
-                    <gwt:Button ui:field="newPropertyButton" styleName="btn btn-primary" text="{i18n.objectEditor_create}" />
-                    </gwt:HorizontalPanel>
+                        <gwt:HorizontalPanel styleName="row-fluid">
+                            <gwt:TextBox ui:field="newPropertyName" styleName="span12"></gwt:TextBox>
+                            <b:RadioButton ui:field="newPropertyBasicType" name="typeMode"
+                                           text="{i18n.objectEditor_basicType}"/>
+                            <b:RadioButton ui:field="newPropertyDataObjectType" name="typeMode"
+                                           text="{i18n.objectEditor_dataObjectType}"/>
+                            <b:ListBox ui:field="newPropertyType"></b:ListBox>
+                            <b:CheckBox ui:field="newPropertyIsMultiple"
+                                        text="{i18n.objectEditor_multiple}"></b:CheckBox>
+                        </gwt:HorizontalPanel>
+                        <gwt:Button ui:field="newPropertyButton" styleName="btn btn-primary"
+                                    text="{i18n.objectEditor_create}"/>
+                    </gwt:HTMLPanel>
 
                 </gwt:VerticalPanel>
             </b:Column>
