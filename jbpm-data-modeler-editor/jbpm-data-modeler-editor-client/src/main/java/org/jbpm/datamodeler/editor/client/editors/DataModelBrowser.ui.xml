@@ -2,7 +2,7 @@
              xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
->
+        >
 
     <ui:style>
 
@@ -11,22 +11,23 @@
     <g:HTMLPanel>
 
 
-                <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
-                    <gwt:HTMLPanel>
-                    <div  style="max-height:500px; overflow: auto;">
-                    <gwt:Label ui:field="modelName"></gwt:Label>
-
+        <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
+            <gwt:HTMLPanel>
+                <h4>
+                <gwt:Label ui:field="modelName"></gwt:Label>
+                </h4>
+                <gwt:ScrollPanel width="100%" height="390px">
                     <b:CellTable ui:field="dataObjectsTable" styleName="table table-condensed"/>
-                    </div>
-                    </gwt:HTMLPanel>
-                    <gwt:HTML>
-                        <strong>Create new entity</strong>
-                    </gwt:HTML>
+                </gwt:ScrollPanel>
+            </gwt:HTMLPanel>
+            <gwt:HTML>
+                <h5>Create new entity</h5>
+            </gwt:HTML>
 
-                    <gwt:TextBox ui:field="newEntityName"></gwt:TextBox>
-                    <b:Button ui:field="newEntityButton" styleName="btn btn-primary">Create</b:Button>
+            <gwt:TextBox ui:field="newEntityName"></gwt:TextBox>
+            <b:Button ui:field="newEntityButton" styleName="btn btn-primary">Create</b:Button>
 
-                </gwt:VerticalPanel>
+        </gwt:VerticalPanel>
 
 
     </g:HTMLPanel>
