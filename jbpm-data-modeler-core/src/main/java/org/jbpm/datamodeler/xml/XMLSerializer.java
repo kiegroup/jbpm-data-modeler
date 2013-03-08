@@ -23,9 +23,9 @@ import java.io.Writer;
 
 public interface XMLSerializer {
     
-    String serialize(DataModel dataModel);
+    String serialize(DataModel dataModel) throws SerializerException;
 
-    void serialize(DataModel dataModel, Writer writer);
+    void serialize(DataModel dataModel, Writer writer) throws SerializerException;
 
     DataModel unserialize(String xml) throws SerializerException;
 

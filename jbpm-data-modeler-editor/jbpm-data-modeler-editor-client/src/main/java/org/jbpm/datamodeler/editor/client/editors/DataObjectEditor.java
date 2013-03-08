@@ -17,12 +17,11 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
-import com.github.gwtbootstrap.client.ui.constants.ButtonType;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -31,10 +30,13 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -71,13 +73,19 @@ public class DataObjectEditor  extends Composite {
     @UiField 
     Button newPropertyButton;
 
+    @UiField
+    com.github.gwtbootstrap.client.ui.RadioButton basicType;
+
+    @UiField
+    com.github.gwtbootstrap.client.ui.RadioButton dataObjectType;
+
     private DataModelTO dataModel;
     
     private DataObjectTO dataObject;
 
     private ListDataProvider<ObjectPropertyTO> dataObjectPropertiesProvider = new ListDataProvider<ObjectPropertyTO>();
 
-    private List<ObjectPropertyTO> dataObjectPoperties = new ArrayList<ObjectPropertyTO>();
+    private List<ObjectPropertyTO> dataObjectProperties = new ArrayList<ObjectPropertyTO>();
 
     private DataModelEditorPresenter modelEditorPresenter;
 
@@ -85,15 +93,36 @@ public class DataObjectEditor  extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
 
 
-        objectName.setText("The object model name");
-        dataObjectPropertiesProvider.setList(dataObjectPoperties);
+        objectName.setText(Constants.INSTANCE.objectEditor_objectUnknown());
+        dataObjectPropertiesProvider.setList(dataObjectProperties);
 
         //Init data objects table
 
-        dataObjectPropertiesTable.setEmptyTableWidget(new com.github.gwtbootstrap.client.ui.Label("Empty table"));
+        dataObjectPropertiesTable.setEmptyTableWidget(new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.objectEditor_emptyTable()));
 
 
-        //Init delete button column
+        //Init delete column
+        Column<ObjectPropertyTO, ImageResource> deletePropertyColumn = new Column<ObjectPropertyTO, ImageResource>(new ClickableImageResourceCell()) {
+
+            @Override
+            public ImageResource getValue(ObjectPropertyTO objectProperty) {
+                return ImagesResources.INSTANCE.Delete();
+            }
+        };
+
+        deletePropertyColumn.setFieldUpdater(new FieldUpdater<ObjectPropertyTO, ImageResource>() {
+
+            @Override
+            public void update(final int index,
+                               final ObjectPropertyTO objectProperty,
+                               final ImageResource value) {
+
+                Command deleteCommand = modelEditorPresenter.createDeleteCommand(dataObject, objectProperty, index);
+                deleteCommand.execute();
+            }
+        });
+
+        /*
         final com.github.gwtbootstrap.client.ui.ButtonCell deletePropertyButton = new com.github.gwtbootstrap.client.ui.ButtonCell();
         deletePropertyButton.setType( ButtonType.DEFAULT );
         deletePropertyButton.setIcon( IconType.REMOVE );
@@ -116,8 +145,10 @@ public class DataObjectEditor  extends Composite {
                 deleteCommand.execute();
             }
         } );
+        */
 
         dataObjectPropertiesTable.addColumn(deletePropertyColumn);
+        dataObjectPropertiesTable.setColumnWidth(deletePropertyColumn, 20, Style.Unit.PX);
 
 
         //Init property name column
@@ -130,7 +161,7 @@ public class DataObjectEditor  extends Composite {
         };
 
         propertyNameColumn.setSortable(true);
-        dataObjectPropertiesTable.addColumn(propertyNameColumn, "Name");
+        dataObjectPropertiesTable.addColumn(propertyNameColumn, Constants.INSTANCE.objectEditor_columnName());
 
         ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyNameColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
         propertyNameColHandler.setComparator(propertyNameColumn, new Comparator<ObjectPropertyTO>() {
@@ -153,7 +184,7 @@ public class DataObjectEditor  extends Composite {
         };
 
         propertyTypeColumn.setSortable(true);
-        dataObjectPropertiesTable.addColumn(propertyTypeColumn, "Type");
+        dataObjectPropertiesTable.addColumn(propertyTypeColumn, Constants.INSTANCE.objectEditor_columnType());
 
         ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyTypeColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
         propertyTypeColHandler.setComparator(propertyTypeColumn, new Comparator<ObjectPropertyTO>() {
@@ -180,7 +211,6 @@ public class DataObjectEditor  extends Composite {
                 ObjectPropertyTO selectedPropertyTO = selectionModel.getSelectedObject();
                 Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
                 selectCommand.execute();
-                //Window.alert("The selected property is: " + selectedPropertyTO.getName());
             }
         });
 
@@ -194,14 +224,26 @@ public class DataObjectEditor  extends Composite {
         //TODO init this list well, the datatypes must be loaded from the DataModelerService, etc.
         newPropertyType.addItem("Integer", "java.lang.Integer");
         newPropertyType.addItem("String", "java.lang.String");
-        newPropertyType.addItem("Date", "java.lang.Date");
+        newPropertyType.addItem("Date", "java.util.Date");
         newPropertyType.addItem("Boolean", "java.lang.Boolean");
+
     }
 
     @UiHandler("newPropertyButton")
-    void newPropertyClick( ClickEvent event ) {
+    void newPropertyClick(ClickEvent event) {
         Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue());
         createPropertyCommand.execute();
+    }
+
+    @UiHandler("dataObjectType")
+    void selectDataObjectType(ClickEvent event) {
+        Window.alert("data object type selected");
+
+    }
+
+    @UiHandler("basicType")
+    void basicTypeSelected(ClickEvent event) {
+        Window.alert("basic type selected");
     }
 
     public void setDataModel(DataModelTO dataModel) {
@@ -212,9 +254,9 @@ public class DataObjectEditor  extends Composite {
         this.dataObject = dataObject;
         objectName.setText(dataObject.getName());
 
-        dataObjectPoperties = dataObject.getProperties();
+        dataObjectProperties = dataObject.getProperties();
         dataObjectPropertiesProvider.getList().clear();
-        dataObjectPropertiesProvider.getList().addAll(dataObjectPoperties);
+        dataObjectPropertiesProvider.getList().addAll(dataObjectProperties);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
     }

@@ -4,10 +4,17 @@ import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.datamodeler.codegen.GenerationContext;
 import org.jbpm.datamodeler.codegen.GenerationEngine;
 import org.jbpm.datamodeler.codegen.GenerationListener;
+import org.jbpm.datamodeler.codegen.parser.DataModelParser;
+import org.jbpm.datamodeler.codegen.parser.DataObjectPropertyToken;
+import org.jbpm.datamodeler.codegen.parser.DataObjectToken;
 import org.jbpm.datamodeler.core.DataModel;
+import org.jbpm.datamodeler.core.DataObject;
+import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
-import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
+import org.jbpm.datamodeler.xml.SerializerException;
+import org.jbpm.datamodeler.xml.XMLSerializer;
+import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.project.service.ProjectService;
@@ -17,8 +24,7 @@ import org.uberfire.backend.vfs.Path;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -46,19 +52,27 @@ public class DataModelerServiceImpl implements DataModelerService {
 
     @Override
     public DataModelTO loadModel(Path path) {
-        System.out.println("read this path: " + path);
 
+        //TODO provide final implementation
+        System.out.println("read this path: " + path);
+        DataModel dataModel = null;
         try {
 
             final String content = ioService.readAllString( paths.convert( path ) );
 
             System.out.println("the file content is: " + content);
-
+            XMLSerializer serializer = new XMLSerializerImpl();
+            dataModel = serializer.unserialize(content);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        //READ the pojos from the kie filesystem in order to synchronize the model.
+        Path projectPath = projectService.resolveProject(path);
+        updateModel(dataModel, paths.convert(projectPath));
+
+        /*
         //TODO: implement the correct model loading
         
         DataModelTO dataModel = new DataModelTO(path.getFileName());
@@ -67,62 +81,26 @@ public class DataModelerServiceImpl implements DataModelerService {
             dataObjects.add(new DataObjectTO(i));
         }
         dataModel.setDataObjects(dataObjects);
+        */
 
-        return dataModel;
-    }
-
-    public Path resolveResourcePackage(final Path resource) {
-
-        //TODO this method should be moved to the ProjectService class
-        //Null resource paths cannot resolve to a Project
-        if ( resource == null ) {
-            return null;
-        }
-
-        //If Path is not within a Project we cannot resolve a package
-        final Path projectRoot = projectService.resolveProject(resource);
-        if ( projectRoot == null ) {
-            return null;
-        }
-
-        //The Path must be within a Project's src/main/resources or src/test/resources path
-        boolean resolved = false;
-        org.kie.commons.java.nio.file.Path path = paths.convert( resource ).normalize();
-        final org.kie.commons.java.nio.file.Path srcResourcesPath = paths.convert( projectRoot ).resolve( SOURCE_RESOURCES_PATH );
-        final org.kie.commons.java.nio.file.Path testResourcesPath = paths.convert( projectRoot ).resolve( TEST_RESOURCES_PATH );
-
-        if ( path.startsWith( srcResourcesPath ) ) {
-            resolved = true;
-        } else if ( path.startsWith( testResourcesPath ) ) {
-            resolved = true;
-        }
-        if ( !resolved ) {
-            return null;
-        }
-
-        //If the Path is already a folder simply return it
-        if ( Files.isDirectory(path) ) {
-            return resource;
-        }
-
-        path = path.getParent();
-
-        return paths.convert( path );
+        return DataModelHelper.domain2To(dataModel);
     }
 
     @Override
     public void saveModel(DataModelTO dataModel, Path path) {
 
+        //TODO provide final implementation
         try {
-
-            String content = ioService.readAllString( paths.convert( path ) );
-
-            content = content + " - file was saved at: " + new Date();
-            ioService.write(paths.convert(path), content);
-
             //convert to the domain model
             DataModel dataModelDomain = DataModelHelper.to2Domain(dataModel);
 
+            XMLSerializer serializer = new XMLSerializerImpl();
+            String content = serializer.serialize(dataModelDomain);
+
+            //Write the serialized model to the file
+            ioService.write(paths.convert(path), content);
+
+            //By now we generate the pojos here.
             GenerationContext generationContext = new GenerationContext(dataModelDomain);
             generationContext.addTemplateSet("POJOS");
             generationContext.setOutputPath("/tmp");
@@ -143,6 +121,33 @@ public class DataModelerServiceImpl implements DataModelerService {
         }
     }
     
+    @Override
+    public Path createModel(Path context, String fileName) {
+
+        //TODO provide final implementation
+        //kie path to store the created file.
+        org.kie.commons.java.nio.file.Path kiePath = paths.convert( context ).resolve( fileName );
+
+        DataModel dataModel = ModelFactoryImpl.getInstance().newModel(fileName);
+        
+        XMLSerializer serializer = new XMLSerializerImpl();
+        String serializedModel = "empty";
+        
+        try {
+            serializedModel = serializer.serialize(dataModel);
+        } catch (SerializerException e) {
+            e.printStackTrace();
+        }
+
+        ioService.createFile(kiePath);
+        
+        ioService.write(kiePath, serializedModel);
+
+        final Path path = paths.convert(kiePath, false);
+
+        return path;
+    }
+
     public class ServiceGenerationListener implements GenerationListener {
 
         org.kie.commons.java.nio.file.Path output;
@@ -184,8 +189,104 @@ public class DataModelerServiceImpl implements DataModelerService {
         }
     }
 
-    private org.kie.commons.java.nio.file.Path ensureProjectJavaPath(org.kie.commons.java.nio.file.Path mainPath) {
-        org.kie.commons.java.nio.file.Path javaPath = mainPath.resolve("src");
+    /**
+     * Update the model from the generated pojos in order to add manually changes in java sources to the model.
+     *
+     * @param dataModel
+     */
+    private void updateModel(DataModel dataModel, org.kie.commons.java.nio.file.Path projectPath) {
+
+        //check if the java dir exists
+
+        org.kie.commons.java.nio.file.Path javaPath = existsProjectJavaPath(projectPath);
+        if (javaPath != null) {
+            //It's ok to try to update the model from pojos.
+            //Iterate the dataObjects list.
+            for (DataObject dataObject : dataModel.getDataObjects()) {
+                updateDataObject(dataObject, javaPath);
+            }
+        }
+    }
+
+    private void updateDataObject(DataObject dataObject, org.kie.commons.java.nio.file.Path javaPath) {
+
+        //TODO implement errors handling
+        org.kie.commons.java.nio.file.Path javaFilePath = calculateFilePath(dataObject, javaPath);
+        if (ioService.exists(javaFilePath)) {
+            //ok, the pojo is there
+            String fileContent = ioService.readAllString(javaFilePath);
+            DataModelParser parser = null;
+            DataObjectToken token = null;
+
+            try {
+                parser = new DataModelParser(fileContent);
+                token = parser.parse();
+                updateDataObject(dataObject, token);
+            } catch (Exception e) {
+                // :(
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateDataObject(DataObject dataObject, DataObjectToken token) {
+        //TODO provide final implementation.
+        //current implementation add all to properties to the data object
+        List<DataObjectPropertyToken> propertyTokens = token.getProperties();
+        for (DataObjectPropertyToken propertyToken : propertyTokens) {
+            dataObject.addProperty(propertyToken.getName(), propertyToken.getType());
+        }
+    }
+
+    public Path resolveResourcePackage(final Path resource) {
+
+        //TODO this method should be moved to the ProjectService class
+        //Null resource paths cannot resolve to a Project
+        if ( resource == null ) {
+            return null;
+        }
+
+        //If Path is not within a Project we cannot resolve a package
+        final Path projectRoot = projectService.resolveProject(resource);
+        if ( projectRoot == null ) {
+            return null;
+        }
+
+        //The Path must be within a Project's src/main/resources or src/test/resources path
+        boolean resolved = false;
+        org.kie.commons.java.nio.file.Path path = paths.convert( resource ).normalize();
+        final org.kie.commons.java.nio.file.Path srcResourcesPath = paths.convert( projectRoot ).resolve( SOURCE_RESOURCES_PATH );
+        final org.kie.commons.java.nio.file.Path testResourcesPath = paths.convert( projectRoot ).resolve( TEST_RESOURCES_PATH );
+
+        if ( path.startsWith( srcResourcesPath ) ) {
+            resolved = true;
+        } else if ( path.startsWith( testResourcesPath ) ) {
+            resolved = true;
+        }
+        if ( !resolved ) {
+            return null;
+        }
+
+        //If the Path is already a folder simply return it
+        if ( Files.isDirectory(path) ) {
+            return resource;
+        }
+
+        path = path.getParent();
+
+        return paths.convert( path );
+    }
+
+    private org.kie.commons.java.nio.file.Path existsProjectJavaPath(org.kie.commons.java.nio.file.Path projectPath) {
+        org.kie.commons.java.nio.file.Path javaPath = projectPath.resolve("src").resolve("main").resolve("java");
+        if (ioService.exists(javaPath)) {
+            return javaPath;
+        }
+        return null;
+    }
+
+    private org.kie.commons.java.nio.file.Path ensureProjectJavaPath(org.kie.commons.java.nio.file.Path projectPath) {
+        org.kie.commons.java.nio.file.Path javaPath = projectPath.resolve("src");
         if (!ioService.exists(javaPath)) {
             javaPath = ioService.createDirectory(javaPath);
         }
@@ -201,19 +302,26 @@ public class DataModelerServiceImpl implements DataModelerService {
         return javaPath;
     }
 
-    @Override
-    public Path createModel(Path context, String fileName) {
+    /**
+     * Given a data object calculates the path to the java file allocating the corresponding pojo.
+     *
+     * @param dataObject
+     *
+     * @param javaPath Java sources root.
+     *
+     * @return
+     */
+    private org.kie.commons.java.nio.file.Path calculateFilePath(DataObject dataObject, org.kie.commons.java.nio.file.Path javaPath) {
+        String packageName = dataObject.getPackageName();
+        org.kie.commons.java.nio.file.Path filePath = javaPath;
 
-        org.kie.commons.java.nio.file.Path kiePath = paths.convert( context ).resolve( fileName );
-
-        //create the file to support the model
-        //TODO implement the "DataModelBuilder" that creates the empty model xml file
-        ioService.createFile(kiePath);
-        
-        ioService.write(kiePath, "The file was created at: " + new Date());
-
-        final Path path = paths.convert(kiePath, false);
-
-        return path;
+        if (packageName != null && !"".equals(packageName)) {
+            StringTokenizer packageTokens = new StringTokenizer(packageName, ".");
+            while (packageTokens.hasMoreElements()) {
+                filePath = filePath.resolve(packageTokens.nextToken());
+            }
+        }
+        filePath = filePath.resolve(dataObject.getName() + ".java");
+        return filePath;
     }
 }

@@ -4,6 +4,8 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
 >
 
+    <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
+
     <ui:style>
 
     </ui:style>
@@ -19,12 +21,12 @@
                     <b:CellTable ui:field="dataObjectsTable" styleName="table table-condensed"/>
                     </div>
                     </gwt:HTMLPanel>
-                    <gwt:HTML>
-                        <strong>Create new entity</strong>
-                    </gwt:HTML>
+
+
+                    <gwt:Label text="{i18n.modelBrowser_createDataObject}" />
 
                     <gwt:TextBox ui:field="newEntityName"></gwt:TextBox>
-                    <b:Button ui:field="newEntityButton" styleName="btn btn-primary">Create</b:Button>
+                    <b:Button ui:field="newEntityButton" styleName="btn btn-primary" text="{i18n.modelBrowser_create}" />
 
                 </gwt:VerticalPanel>
 

@@ -17,16 +17,8 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
-import com.github.gwtbootstrap.client.ui.constants.ButtonType;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.ImageResourceCell;
-import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.resources.client.ImageResource;
@@ -37,24 +29,17 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
-import org.jbpm.datamodeler.editor.client.editors.resources.DataModelerResources;
+import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import static com.google.gwt.dom.client.BrowserEvents.CLICK;
-import static com.google.gwt.dom.client.BrowserEvents.KEYDOWN;
 
 
 public class DataModelBrowser extends Composite {
@@ -110,18 +95,21 @@ public class DataModelBrowser extends Composite {
     public DataModelBrowser() {
         initWidget(uiBinder.createAndBindUi(this));
 
-        modelName.setText("(unknown)");
+        modelName.setText(Constants.INSTANCE.modelBrowser_modelUnknown());
         dataObjectsProvider.addDataDisplay(dataObjectsTable);
 
         //Init delete column
         Column<DataObjectTO, ImageResource> deleteDataObjectColumn = new Column<DataObjectTO, ImageResource>(new ClickableImageResourceCell()) {
+
             @Override
             public ImageResource getValue(DataObjectTO dataObject) {
-                return DataModelerResources.INSTANCE.Delete();
+                return ImagesResources.INSTANCE.Delete();
             }
         };
 
         deleteDataObjectColumn.setFieldUpdater( new FieldUpdater<DataObjectTO, ImageResource>() {
+
+            @Override
             public void update( final int index,
                                 final DataObjectTO object,
                                 final ImageResource value ) {
@@ -166,7 +154,7 @@ public class DataModelBrowser extends Composite {
         };
 
         //add columns
-        dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label( "Empty table" ) );
+        dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.modelBrowser_emptyTable()));
 
         dataObjectsTable.addColumn(deleteDataObjectColumn);
         dataObjectsTable.setColumnWidth(deleteDataObjectColumn, 20, Style.Unit.PX);

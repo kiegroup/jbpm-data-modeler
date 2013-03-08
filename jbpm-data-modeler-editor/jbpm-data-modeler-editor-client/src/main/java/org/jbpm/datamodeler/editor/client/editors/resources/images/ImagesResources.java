@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.editor.client.editors.resources;
+package org.jbpm.datamodeler.editor.client.editors.resources.images;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 
 
-public interface DataModelerResources
+public interface ImagesResources
         extends
         ClientBundle {
 
-    public DataModelerResources INSTANCE = GWT.create(DataModelerResources.class);
+    public ImagesResources INSTANCE = GWT.create(ImagesResources.class);
 
-    @Source("images/delete.gif")
+    @Source("delete.gif")
     ImageResource Delete();
 
 }

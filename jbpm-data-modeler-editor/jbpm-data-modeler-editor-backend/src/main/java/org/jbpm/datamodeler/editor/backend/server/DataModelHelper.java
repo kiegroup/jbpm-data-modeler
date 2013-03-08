@@ -62,6 +62,7 @@ public class DataModelHelper {
                 propertiesTO.add(new ObjectPropertyTO(property.getName(), property.getClassName()));
             }
         }
+        dataObjectTO.setProperties(propertiesTO);
     }
 
     //TODO provide a better implementation or another way to access domain objects from client code

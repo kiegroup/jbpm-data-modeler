@@ -17,7 +17,7 @@ public class DataObjectToken {
 
     private List<String> implementedInterfaces = new ArrayList<String>();
 
-    private ArrayList<DataObjectPropertyToken> properties = new ArrayList<DataObjectPropertyToken>();
+    private List<DataObjectPropertyToken> properties = new ArrayList<DataObjectPropertyToken>();
 
     public DataObjectToken() {
     }
@@ -70,11 +70,11 @@ public class DataObjectToken {
         this.implementedInterfaces = implementedInterfaces;
     }
 
-    public ArrayList<DataObjectPropertyToken> getProperties() {
+    public List<DataObjectPropertyToken> getProperties() {
         return properties;
     }
 
-    public void setProperties(ArrayList<DataObjectPropertyToken> properties) {
+    public void setProperties(List<DataObjectPropertyToken> properties) {
         this.properties = properties;
     }
 

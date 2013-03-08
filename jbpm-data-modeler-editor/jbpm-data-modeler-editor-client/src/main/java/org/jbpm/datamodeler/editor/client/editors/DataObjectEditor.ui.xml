@@ -4,6 +4,8 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
     >
 
+    <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
+
     <ui:style>
         .center-column {
         background-color: #FFFFFF;
@@ -32,18 +34,24 @@
                        </div>
                        </gwt:HTMLPanel>
 
-                    <gwt:HTML>
-                        <strong>Create new property</strong>
-                    </gwt:HTML>
+
+                       <gwt:Label text="{i18n.objectEditor_createProperty}"  />
+
 
 
                     <gwt:HorizontalPanel>
                     <gwt:TextBox ui:field="newPropertyName"></gwt:TextBox>
 
+                    <b:ButtonGroup>
+                        <b:RadioButton ui:field="newPropertyBasicType" name="radio" text="Basic" />
+                        <b:RadioButton ui:field="newPropertyDataObjectType" name="radio" text="Data object" />
+                    </b:ButtonGroup>
 
                     <b:ListBox ui:field="newPropertyType"></b:ListBox>
 
-                    <gwt:Button ui:field="newPropertyButton" styleName="btn btn-primary">Create</gwt:Button>
+                    <b:CheckBox ui:field="newPropertyIsMultiple" name=""/>
+
+                    <gwt:Button ui:field="newPropertyButton" styleName="btn btn-primary" text="{i18n.objectEditor_create}" />
                     </gwt:HorizontalPanel>
 
                 </gwt:VerticalPanel>
