@@ -38,9 +38,10 @@
                     </gwt:HTMLPanel>
 
                     <gwt:HTMLPanel styleName="well">
-                        <gwt:HTML>
-                            <h5>Create new property</h5>
-                        </gwt:HTML>
+
+                        <h5>
+                            <gwt:Label text="{i18n.objectEditor_createProperty}"/>
+                        </h5>
 
                         <gwt:HorizontalPanel styleName="row-fluid">
                             <gwt:TextBox ui:field="newPropertyName" styleName="span12"></gwt:TextBox>
