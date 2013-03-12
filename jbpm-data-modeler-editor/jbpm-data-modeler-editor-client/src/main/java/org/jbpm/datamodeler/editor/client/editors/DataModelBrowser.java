@@ -18,6 +18,8 @@ package org.jbpm.datamodeler.editor.client.editors;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
+import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -104,6 +106,32 @@ public class DataModelBrowser extends Composite {
         dataObjectsProvider.addDataDisplay(dataObjectsTable);
 
         //Init delete column
+
+        ClickableImageResourceCell clickableImageResourceCell = new ClickableImageResourceCell(true);
+        final com.github.gwtbootstrap.client.ui.ButtonCell deleteDataObjectButton = new com.github.gwtbootstrap.client.ui.ButtonCell();
+        deleteDataObjectButton.setType( ButtonType.DEFAULT );
+        deleteDataObjectButton.setIcon( IconType.REMOVE );
+        final TooltipCellDecorator<ImageResource> decorator = new TooltipCellDecorator<ImageResource>(clickableImageResourceCell);
+        decorator.setText("delete data object");
+
+        final Column<DataObjectTO, ImageResource> deleteDataObjectColumnImg = new Column<DataObjectTO, ImageResource>(decorator) {
+            @Override
+            public ImageResource getValue( final DataObjectTO global ) {
+                return ImagesResources.INSTANCE.Delete();
+            }
+        };
+
+        deleteDataObjectColumnImg.setFieldUpdater( new FieldUpdater<DataObjectTO, ImageResource>() {
+            public void update( final int index,
+                                final DataObjectTO object,
+                                final ImageResource value ) {
+
+                Command deleteCommand = modelEditorPresenter.createDeleteCommand(object, index);
+                deleteCommand.execute();
+            }
+        } );
+
+        /*
         Column<DataObjectTO, ImageResource> deleteDataObjectColumn = new Column<DataObjectTO, ImageResource>(new ClickableImageResourceCell(true)) {
 
             @Override
@@ -123,30 +151,6 @@ public class DataModelBrowser extends Composite {
                 deleteCommand.execute();
             }
         } );
-
-        /*
-        final com.github.gwtbootstrap.client.ui.ButtonCell deleteDataObjectButton = new com.github.gwtbootstrap.client.ui.ButtonCell();
-        deleteDataObjectButton.setType( ButtonType.DEFAULT );
-        deleteDataObjectButton.setIcon( IconType.REMOVE );
-        final TooltipCellDecorator<String> decorator = new TooltipCellDecorator<String>(deleteDataObjectButton);
-        decorator.setText("click to delete this data object");
-
-        final Column<DataObjectTO, String> deleteDataObjectColumn = new Column<DataObjectTO, String>(decorator) {
-            @Override
-            public String getValue( final DataObjectTO global ) {
-                return "";
-            }
-        };
-
-        deleteDataObjectColumn.setFieldUpdater( new FieldUpdater<DataObjectTO, String>() {
-            public void update( final int index,
-                                final DataObjectTO object,
-                                final String value ) {
-
-                Command deleteCommand = modelEditorPresenter.createDeleteCommand(object, index);
-                deleteCommand.execute();
-            }
-        } );
         */
 
         //Init data object column
@@ -161,8 +165,8 @@ public class DataModelBrowser extends Composite {
         //add columns
         dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.modelBrowser_emptyTable()));
 
-        dataObjectsTable.addColumn(deleteDataObjectColumn);
-        dataObjectsTable.setColumnWidth(deleteDataObjectColumn, 20, Style.Unit.PX);
+        dataObjectsTable.addColumn(deleteDataObjectColumnImg);
+        dataObjectsTable.setColumnWidth(deleteDataObjectColumnImg, 20, Style.Unit.PX);
         dataObjectsTable.addColumn(dataObjectColumn);
 
         //Init the selection model
@@ -177,6 +181,7 @@ public class DataModelBrowser extends Composite {
                 selectCommand.execute();
             }
         });
+
 
         dataObjectsTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
         dataObjectsTable.setSelectionModel(selectionModel);
