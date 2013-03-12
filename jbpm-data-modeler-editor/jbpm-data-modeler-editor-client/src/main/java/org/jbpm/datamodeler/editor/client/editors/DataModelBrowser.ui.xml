@@ -20,6 +20,10 @@
             </gwt:HTMLPanel>
 
             <gwt:HTMLPanel>
+                <b:SimplePager ui:field="pager" display="{dataObjectsTable}"  />
+            </gwt:HTMLPanel>
+
+            <gwt:HTMLPanel>
                 <h5>
                     <gwt:Label text="{i18n.modelBrowser_createDataObject}" />
                 </h5>

@@ -25,7 +25,7 @@ public class ClickableImageResourceCell extends ImageResourceCell {
     }
 
     public ClickableImageResourceCell(boolean asAnchor) {
-        this.asAnchor = false;
+        this.asAnchor = asAnchor;
     }
 
     @Override

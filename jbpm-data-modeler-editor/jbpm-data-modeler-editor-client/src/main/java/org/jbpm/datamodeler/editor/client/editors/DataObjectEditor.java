@@ -67,7 +67,7 @@ public class DataObjectEditor  extends Composite {
     Label objectName;
 
     @UiField(provided = true)
-    CellTable<ObjectPropertyTO> dataObjectPropertiesTable = new CellTable<ObjectPropertyTO>(5, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
+    CellTable<ObjectPropertyTO> dataObjectPropertiesTable = new CellTable<ObjectPropertyTO>(10, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
     TextBox newPropertyName;
@@ -87,6 +87,9 @@ public class DataObjectEditor  extends Composite {
     @UiField
     com.github.gwtbootstrap.client.ui.CheckBox newPropertyIsMultiple;
 
+    @UiField(provided = true)
+    SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
+
     private DataModelTO dataModel;
     
     private DataObjectTO dataObject;
@@ -97,9 +100,7 @@ public class DataObjectEditor  extends Composite {
 
     private DataModelEditorPresenter modelEditorPresenter;
 
-    private SimplePager pager = new SimplePager();
-    
-    private Pagination pagination = new Pagination();
+
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -229,13 +230,15 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
         dataObjectPropertiesTable.setSelectionModel(selectionModel);
 
+
         pager.setDisplay(dataObjectPropertiesTable);
-        pagination.clear();
+        pager.setPageSize(10);
 
         dataObjectPropertiesProvider.addDataDisplay(dataObjectPropertiesTable);
         dataObjectPropertiesProvider.refresh();
 
         newPropertyIsMultiple.setVisible(false);
+        newPropertyBasicType.setValue(true);
 
         //TODO init this list well, the datatypes must be loaded from the DataModelerService, etc.
         newPropertyType.addItem("Integer", "java.lang.Integer");
@@ -288,90 +291,10 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.getList().remove(index);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
-
-        rebuildPager(pagination, pager);
     }
 
     public void setModelEditorPresenter(DataModelEditorPresenter modelEditorPresenter) {
         this.modelEditorPresenter = modelEditorPresenter;
     }
-
-    private void rebuildPager(final Pagination pagination, final SimplePager pager) {
-
-            pagination.clear();
-
-            if (pager.getPageCount() == 0) {
-                return;
-            }
-
-            NavLink prev = new NavLink("<");
-
-            prev.addClickHandler(new ClickHandler() {
-
-                @Override
-                public void onClick(ClickEvent event) {
-                    GWT.log(String.valueOf("prev"));
-                    pager.previousPage();
-                }
-            });
-
-            prev.setDisabled(!pager.hasPreviousPage());
-
-            pagination.add(prev);
-
-            int before = 2;
-            int after = 2;
-
-            while (!pager.hasPreviousPages(before) && before > 0) {
-                before--;
-                if(pager.hasNextPages(after + 1)) {
-                    after++;
-                }
-            }
-
-
-            while (!pager.hasNextPages(after) && after > 0) {
-                after--;
-                if(pager.hasPreviousPages(before+1)) {
-                    before++;
-                }
-            }
-
-            for (int i = pager.getPage() - before; i <= pager.getPage() + after; i++) {
-
-                final int index = i + 1;
-
-                NavLink page = new NavLink(String.valueOf(index));
-
-                page.addClickHandler(new ClickHandler() {
-
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        pager.setPage(index - 1);
-                    }
-                });
-
-                if (i == pager.getPage()) {
-                    page.setActive(true);
-                }
-
-                pagination.add(page);
-            }
-
-            NavLink next = new NavLink(">");
-
-            next.addClickHandler(new ClickHandler() {
-
-                @Override
-                public void onClick(ClickEvent event) {
-                    GWT.log(String.valueOf("next"));
-                    pager.nextPage();
-                }
-            });
-
-            next.setDisabled(!pager.hasNextPage());
-
-            pagination.add(next);
-        }
 
 }

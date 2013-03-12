@@ -17,6 +17,8 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -57,13 +59,16 @@ public class DataModelBrowser extends Composite {
     @UiField Label modelName;
 
     @UiField(provided = true)
-    CellTable<DataObjectTO> dataObjectsTable = new CellTable<DataObjectTO>(5, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
+    CellTable<DataObjectTO> dataObjectsTable = new CellTable<DataObjectTO>(10, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
     TextBox newEntityName;
 
     @UiField
     com.github.gwtbootstrap.client.ui.Button newEntityButton;
+
+    @UiField(provided = true)
+    SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
 
     private DataModelTO dataModel;
 
@@ -175,10 +180,14 @@ public class DataModelBrowser extends Composite {
 
         dataObjectsTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
         dataObjectsTable.setSelectionModel(selectionModel);
-        
+
+        pager.setDisplay(dataObjectsTable);
+        pager.setPageSize(10);
 
         dataObjectsProvider.setList(dataObjects);
         dataObjectsProvider.refresh();
+
+        newEntityButton.setIcon(IconType.PLUS_SIGN);
     }
 
     @UiHandler("newEntityButton")
