@@ -25,7 +25,7 @@ public class ClickableImageResourceCell extends ImageResourceCell {
     }
 
     public ClickableImageResourceCell(boolean asAnchor) {
-        this.asAnchor = false;
+        this.asAnchor = asAnchor;
     }
 
     @Override
@@ -57,14 +57,14 @@ public class ClickableImageResourceCell extends ImageResourceCell {
                 startAnchor = new SafeHtml() {
                     @Override
                     public String asString() {
-                        return "<a href=\"#\">";
+                        return "<div style=\"cursor: pointer;\">";
                     }
                 };
 
                 endAnchor = new SafeHtml() {
                     @Override
                     public String asString() {
-                        return "</a>";
+                        return "</div>";
                     }
                 };
 

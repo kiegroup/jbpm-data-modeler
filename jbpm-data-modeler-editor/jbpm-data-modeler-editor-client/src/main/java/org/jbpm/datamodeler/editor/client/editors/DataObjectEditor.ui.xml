@@ -29,6 +29,10 @@
                         </div>
                     </gwt:HTMLPanel>
 
+                    <gwt:HTMLPanel>
+                        <b:SimplePager ui:field="pager" display="{dataObjectPropertiesTable}"  />
+                    </gwt:HTMLPanel>
+
                     <gwt:HTMLPanel styleName="well">
                         <h5>
                             <gwt:Label text="{i18n.objectEditor_createProperty}"/>
