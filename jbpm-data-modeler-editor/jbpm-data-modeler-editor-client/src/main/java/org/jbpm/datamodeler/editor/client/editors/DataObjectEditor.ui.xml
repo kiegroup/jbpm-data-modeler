@@ -25,12 +25,8 @@
                                 <gwt:Label ui:field="objectName"></gwt:Label>
                             </h4>
                             <b:CellTable ui:field="dataObjectPropertiesTable" styleName="table table-bordered table-striped table-hover"/>
-                            <b:SimplePager display="{dataObjectPropertiesTable}" location="RIGHT" fastForwardRows="10"/>
+                            <b:SimplePager ui:field="pager" display="{dataObjectPropertiesTable}"  />
                         </div>
-                    </gwt:HTMLPanel>
-
-                    <gwt:HTMLPanel>
-                        <b:SimplePager ui:field="pager" display="{dataObjectPropertiesTable}"  />
                     </gwt:HTMLPanel>
 
                     <gwt:HTMLPanel styleName="well">
