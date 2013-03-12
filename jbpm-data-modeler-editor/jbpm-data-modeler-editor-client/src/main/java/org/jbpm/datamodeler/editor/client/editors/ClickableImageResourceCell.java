@@ -6,6 +6,8 @@ import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 
@@ -17,7 +19,13 @@ import static com.google.gwt.dom.client.BrowserEvents.KEYDOWN;
 
 public class ClickableImageResourceCell extends ImageResourceCell {
 
+    private boolean asAnchor = false;
+
     public ClickableImageResourceCell() {
+    }
+
+    public ClickableImageResourceCell(boolean asAnchor) {
+        this.asAnchor = false;
     }
 
     @Override
@@ -36,6 +44,36 @@ public class ClickableImageResourceCell extends ImageResourceCell {
                 valueUpdater.update(value);
                 break;
 
+        }
+    }
+
+    @Override
+    public void render(Context context, ImageResource value, SafeHtmlBuilder sb) {
+
+        if (value != null) {
+            SafeHtml startAnchor = null;
+            SafeHtml endAnchor = null;
+            if (asAnchor) {
+                startAnchor = new SafeHtml() {
+                    @Override
+                    public String asString() {
+                        return "<a href=\"#\">";
+                    }
+                };
+
+                endAnchor = new SafeHtml() {
+                    @Override
+                    public String asString() {
+                        return "</a>";
+                    }
+                };
+
+                sb.append(startAnchor);
+            }
+            super.render(context, value, sb);
+            if (asAnchor) {
+                sb.append(endAnchor);
+            }
         }
     }
 }

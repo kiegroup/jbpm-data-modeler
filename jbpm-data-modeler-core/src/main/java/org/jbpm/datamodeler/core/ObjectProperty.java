@@ -19,6 +19,8 @@ package org.jbpm.datamodeler.core;
 
 public interface ObjectProperty extends ModelElement {
     
+    String EQUALS_ATTR = "equals";
+
     String getClassName();
 
     void setClassName(String className);

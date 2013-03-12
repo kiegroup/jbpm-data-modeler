@@ -16,11 +16,14 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -32,6 +35,8 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -61,8 +66,8 @@ public class DataObjectEditor  extends Composite {
     @UiField
     Label objectName;
 
-    @UiField
-    CellTable<ObjectPropertyTO> dataObjectPropertiesTable;
+    @UiField(provided = true)
+    CellTable<ObjectPropertyTO> dataObjectPropertiesTable = new CellTable<ObjectPropertyTO>(5, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
     TextBox newPropertyName;
@@ -70,7 +75,7 @@ public class DataObjectEditor  extends Composite {
     @UiField
     com.github.gwtbootstrap.client.ui.ListBox newPropertyType;
 
-    @UiField 
+    @UiField
     Button newPropertyButton;
 
     @UiField
@@ -92,6 +97,10 @@ public class DataObjectEditor  extends Composite {
 
     private DataModelEditorPresenter modelEditorPresenter;
 
+    private SimplePager pager = new SimplePager();
+    
+    private Pagination pagination = new Pagination();
+
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -105,7 +114,7 @@ public class DataObjectEditor  extends Composite {
 
 
         //Init delete column
-        Column<ObjectPropertyTO, ImageResource> deletePropertyColumn = new Column<ObjectPropertyTO, ImageResource>(new ClickableImageResourceCell()) {
+        Column<ObjectPropertyTO, ImageResource> deletePropertyColumn = new Column<ObjectPropertyTO, ImageResource>(new ClickableImageResourceCell(true)) {
 
             @Override
             public ImageResource getValue(ObjectPropertyTO objectProperty) {
@@ -220,6 +229,8 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
         dataObjectPropertiesTable.setSelectionModel(selectionModel);
 
+        pager.setDisplay(dataObjectPropertiesTable);
+        pagination.clear();
 
         dataObjectPropertiesProvider.addDataDisplay(dataObjectPropertiesTable);
         dataObjectPropertiesProvider.refresh();
@@ -231,6 +242,8 @@ public class DataObjectEditor  extends Composite {
         newPropertyType.addItem("String", "java.lang.String");
         newPropertyType.addItem("Date", "java.util.Date");
         newPropertyType.addItem("Boolean", "java.lang.Boolean");
+
+        newPropertyButton.setIcon(IconType.PLUS);
 
     }
 
@@ -275,9 +288,90 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.getList().remove(index);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
+
+        rebuildPager(pagination, pager);
     }
 
     public void setModelEditorPresenter(DataModelEditorPresenter modelEditorPresenter) {
         this.modelEditorPresenter = modelEditorPresenter;
     }
+
+    private void rebuildPager(final Pagination pagination, final SimplePager pager) {
+
+            pagination.clear();
+
+            if (pager.getPageCount() == 0) {
+                return;
+            }
+
+            NavLink prev = new NavLink("<");
+
+            prev.addClickHandler(new ClickHandler() {
+
+                @Override
+                public void onClick(ClickEvent event) {
+                    GWT.log(String.valueOf("prev"));
+                    pager.previousPage();
+                }
+            });
+
+            prev.setDisabled(!pager.hasPreviousPage());
+
+            pagination.add(prev);
+
+            int before = 2;
+            int after = 2;
+
+            while (!pager.hasPreviousPages(before) && before > 0) {
+                before--;
+                if(pager.hasNextPages(after + 1)) {
+                    after++;
+                }
+            }
+
+
+            while (!pager.hasNextPages(after) && after > 0) {
+                after--;
+                if(pager.hasPreviousPages(before+1)) {
+                    before++;
+                }
+            }
+
+            for (int i = pager.getPage() - before; i <= pager.getPage() + after; i++) {
+
+                final int index = i + 1;
+
+                NavLink page = new NavLink(String.valueOf(index));
+
+                page.addClickHandler(new ClickHandler() {
+
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        pager.setPage(index - 1);
+                    }
+                });
+
+                if (i == pager.getPage()) {
+                    page.setActive(true);
+                }
+
+                pagination.add(page);
+            }
+
+            NavLink next = new NavLink(">");
+
+            next.addClickHandler(new ClickHandler() {
+
+                @Override
+                public void onClick(ClickEvent event) {
+                    GWT.log(String.valueOf("next"));
+                    pager.nextPage();
+                }
+            });
+
+            next.setDisabled(!pager.hasNextPage());
+
+            pagination.add(next);
+        }
+
 }

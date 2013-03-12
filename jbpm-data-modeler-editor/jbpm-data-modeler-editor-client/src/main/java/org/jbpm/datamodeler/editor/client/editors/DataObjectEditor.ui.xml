@@ -37,6 +37,10 @@
 
                     </gwt:HTMLPanel>
 
+                    <gwt:HTMLPanel>
+                        <b:SimplePager display="{dataObjectPropertiesTable}" location="RIGHT" fastForwardRows="10" />
+                    </gwt:HTMLPanel>
+
                     <gwt:HTMLPanel styleName="well">
 
                         <h5>
@@ -53,8 +57,8 @@
                             <b:CheckBox ui:field="newPropertyIsMultiple"
                                         text="{i18n.objectEditor_multiple}"></b:CheckBox>
                         </gwt:HorizontalPanel>
-                        <gwt:Button ui:field="newPropertyButton" styleName="btn btn-primary"
-                                    text="{i18n.objectEditor_create}"/>
+                        <b:Button ui:field="newPropertyButton" styleName="btn btn-primary"
+                                    text="{i18n.objectEditor_create}" />
                     </gwt:HTMLPanel>
 
                 </gwt:VerticalPanel>

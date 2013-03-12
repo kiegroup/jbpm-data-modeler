@@ -26,6 +26,10 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
     
     private boolean multiple;
 
+    public ObjectPropertyImpl() {
+        addAttribute(EQUALS_ATTR, "false");
+    }
+
     public ObjectPropertyImpl(String name, String className, boolean multiple) {
         super(name);
         this.className = className;

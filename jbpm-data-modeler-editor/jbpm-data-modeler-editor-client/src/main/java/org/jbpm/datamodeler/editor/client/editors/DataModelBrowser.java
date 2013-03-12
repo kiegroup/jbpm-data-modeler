@@ -56,8 +56,8 @@ public class DataModelBrowser extends Composite {
     
     @UiField Label modelName;
 
-    @UiField
-    CellTable<DataObjectTO> dataObjectsTable;
+    @UiField(provided = true)
+    CellTable<DataObjectTO> dataObjectsTable = new CellTable<DataObjectTO>(5, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
     TextBox newEntityName;
@@ -99,7 +99,7 @@ public class DataModelBrowser extends Composite {
         dataObjectsProvider.addDataDisplay(dataObjectsTable);
 
         //Init delete column
-        Column<DataObjectTO, ImageResource> deleteDataObjectColumn = new Column<DataObjectTO, ImageResource>(new ClickableImageResourceCell()) {
+        Column<DataObjectTO, ImageResource> deleteDataObjectColumn = new Column<DataObjectTO, ImageResource>(new ClickableImageResourceCell(true)) {
 
             @Override
             public ImageResource getValue(DataObjectTO dataObject) {
