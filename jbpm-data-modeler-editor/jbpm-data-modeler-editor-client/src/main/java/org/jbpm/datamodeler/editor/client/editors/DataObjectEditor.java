@@ -243,7 +243,7 @@ public class DataObjectEditor  extends Composite {
         newPropertyType.addItem("Date", "java.util.Date");
         newPropertyType.addItem("Boolean", "java.lang.Boolean");
 
-        newPropertyButton.setIcon(IconType.PLUS);
+        newPropertyButton.setIcon(IconType.PLUS_SIGN);
 
     }
 
