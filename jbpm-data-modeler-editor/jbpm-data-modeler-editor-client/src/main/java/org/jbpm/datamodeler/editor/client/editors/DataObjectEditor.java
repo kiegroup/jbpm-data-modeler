@@ -87,8 +87,8 @@ public class DataObjectEditor  extends Composite {
     @UiField
     com.github.gwtbootstrap.client.ui.CheckBox newPropertyIsMultiple;
 
-    @UiField(provided = true)
-    SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
+    //@UiField(provided = true)
+    //SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
 
     final SingleSelectionModel<ObjectPropertyTO> selectionModel = new SingleSelectionModel<ObjectPropertyTO>();
 
@@ -231,8 +231,8 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesTable.setSelectionModel(selectionModel);
 
 
-        pager.setDisplay(dataObjectPropertiesTable);
-        pager.setPageSize(10);
+        //pager.setDisplay(dataObjectPropertiesTable);
+        //pager.setPageSize(10);
 
         dataObjectPropertiesProvider.addDataDisplay(dataObjectPropertiesTable);
         dataObjectPropertiesProvider.refresh();

@@ -14,9 +14,10 @@
                     <b:CellTable ui:field="dataObjectsTable" styleName="table table-condensed table-hover row-fluid"/>
                 </gwt:ScrollPanel>
             </gwt:HTMLPanel>
-            <gwt:HTMLPanel>
+
+            <!--gwt:HTMLPanel>
                 <b:SimplePager ui:field="pager" display="{dataObjectsTable}"  />
-            </gwt:HTMLPanel>
+            </gwt:HTMLPanel-->
 
             <gwt:HTMLPanel>
                 <h5>

@@ -64,7 +64,7 @@ public class DataModelBrowser extends Composite {
     @UiField Label modelName;
 
     @UiField(provided = true)
-    CellTable<DataObjectTO> dataObjectsTable = new CellTable<DataObjectTO>(10, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
+    CellTable<DataObjectTO> dataObjectsTable = new CellTable<DataObjectTO>(1000, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
     TextBox newEntityName;
@@ -72,8 +72,8 @@ public class DataModelBrowser extends Composite {
     @UiField
     com.github.gwtbootstrap.client.ui.Button newEntityButton;
 
-    @UiField(provided = true)
-    SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
+    //@UiField(provided = true)
+    //SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
 
     SingleSelectionModel<DataObjectTO> selectionModel = new SingleSelectionModel<DataObjectTO>();
 
@@ -206,8 +206,8 @@ public class DataModelBrowser extends Composite {
         dataObjectsTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
         dataObjectsTable.setSelectionModel(selectionModel);
 
-        pager.setDisplay(dataObjectsTable);
-        pager.setPageSize(10);
+        //pager.setDisplay(dataObjectsTable);
+        //pager.setPageSize(10);
 
         dataObjectsProvider.setList(dataObjects);
         dataObjectsProvider.refresh();
