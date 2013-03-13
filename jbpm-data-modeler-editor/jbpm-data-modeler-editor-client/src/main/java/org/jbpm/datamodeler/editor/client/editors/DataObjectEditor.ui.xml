@@ -6,25 +6,22 @@
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
 
     <ui:style>
-        .center-column {
-            background-color: #FFFFFF;
-            margin: 0;
-            width: 100%;
-            z-index: 998;
-        }
+
     </ui:style>
 
     <gwt:HTMLPanel>
-        <b:Row addStyleNames="{style.center-column}">
+
             <b:Column size="12">
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
 
                     <gwt:HTMLPanel>
                         <div class="well" style="margin-top:20px;">
                             <h4>
-                                <gwt:Label ui:field="objectName"></gwt:Label>
+                                <gwt:Label ui:field="objectName" ></gwt:Label>
                             </h4>
+                            <gwt:ScrollPanel width="100%" height="350px">
                             <b:CellTable ui:field="dataObjectPropertiesTable" styleName="table table-bordered table-striped table-hover"/>
+                            </gwt:ScrollPanel>
                             <!--b:SimplePager ui:field="pager" display="{dataObjectPropertiesTable}"  /-->
                         </div>
                     </gwt:HTMLPanel>
@@ -37,34 +34,34 @@
                         <gwt:VerticalPanel styleName="row-fluid">
                             <gwt:TextBox ui:field="newPropertyName" styleName="span6"></gwt:TextBox>
                             <gwt:HTMLPanel>
-                                <fieldset>
-                                    <table>
+                                <div class="well span6">
+                                    <table class="row-fluid">
                                         <tr>
-                                            <td>
-                                                <b:RadioButton ui:field="newPropertyBasicType" name="typeMode" text="{i18n.objectEditor_basicType}"/>
+                                            <td class="span3">
+                                                <b:RadioButton ui:field="newPropertyBasicType" name="typeMode" text="{i18n.objectEditor_basicType}" />
                                             </td>
-                                            <td>
-                                                <b:RadioButton ui:field="newPropertyDataObjectType" name="typeMode" text="{i18n.objectEditor_dataObjectType}"/>
+                                            <td class="span4">
+                                                <b:ListBox ui:field="newPropertyType"></b:ListBox>
+                                            </td>
+                                            <td class="span3">
+                                                <b:CheckBox ui:field="newPropertyIsMultiple" text="{i18n.objectEditor_multiple}"/>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
-                                                <b:ListBox ui:field="newPropertyType"></b:ListBox>
+                                            <td class="span3">
+                                                <b:RadioButton ui:field="newPropertyDataObjectType" name="typeMode" text="{i18n.objectEditor_dataObjectType}"/>
                                             </td>
-                                            <td>
-                                                <b:CheckBox ui:field="newPropertyIsMultiple" text="{i18n.objectEditor_multiple}"></b:CheckBox>
+                                            <td colspan="2">
                                             </td>
                                         </tr>
                                     </table>
-                                </fieldset>
+                                </div>
                             </gwt:HTMLPanel>
                         </gwt:VerticalPanel>
-
                         <b:Button ui:field="newPropertyButton" styleName="btn btn-primary" text="{i18n.objectEditor_create}"/>
                     </gwt:HTMLPanel>
-
                 </gwt:VerticalPanel>
             </b:Column>
-        </b:Row>
+
     </gwt:HTMLPanel>
 </ui:UiBinder>

@@ -67,7 +67,7 @@ public class DataObjectEditor  extends Composite {
     Label objectName;
 
     @UiField(provided = true)
-    CellTable<ObjectPropertyTO> dataObjectPropertiesTable = new CellTable<ObjectPropertyTO>(10, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
+    CellTable<ObjectPropertyTO> dataObjectPropertiesTable = new CellTable<ObjectPropertyTO>(1000, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
     TextBox newPropertyName;
