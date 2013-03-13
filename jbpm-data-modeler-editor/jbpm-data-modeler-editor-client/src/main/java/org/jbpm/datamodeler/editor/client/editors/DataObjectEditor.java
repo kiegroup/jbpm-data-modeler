@@ -90,6 +90,8 @@ public class DataObjectEditor  extends Composite {
     @UiField(provided = true)
     SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
 
+    final SingleSelectionModel<ObjectPropertyTO> selectionModel = new SingleSelectionModel<ObjectPropertyTO>();
+
     private DataModelTO dataModel;
     
     private DataObjectTO dataObject;
@@ -215,8 +217,6 @@ public class DataObjectEditor  extends Composite {
 
 
         //Init the selection model
-        final SingleSelectionModel<ObjectPropertyTO> selectionModel = new SingleSelectionModel<ObjectPropertyTO>();
-
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
             @Override
@@ -279,6 +279,7 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.getList().addAll(dataObjectProperties);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
+        selectionModel.clear();
     }
 
     public void addDataObjectProperty(ObjectPropertyTO objectProperty) {

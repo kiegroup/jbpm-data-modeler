@@ -21,11 +21,14 @@ import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -72,6 +75,8 @@ public class DataModelBrowser extends Composite {
     @UiField(provided = true)
     SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
 
+    SingleSelectionModel<DataObjectTO> selectionModel = new SingleSelectionModel<DataObjectTO>();
+
     private DataModelTO dataModel;
 
     private ListDataProvider<DataObjectTO> dataObjectsProvider = new ListDataProvider<DataObjectTO>();
@@ -108,9 +113,6 @@ public class DataModelBrowser extends Composite {
         //Init delete column
 
         ClickableImageResourceCell clickableImageResourceCell = new ClickableImageResourceCell(true);
-        final com.github.gwtbootstrap.client.ui.ButtonCell deleteDataObjectButton = new com.github.gwtbootstrap.client.ui.ButtonCell();
-        deleteDataObjectButton.setType( ButtonType.DEFAULT );
-        deleteDataObjectButton.setIcon( IconType.REMOVE );
         final TooltipCellDecorator<ImageResource> decorator = new TooltipCellDecorator<ImageResource>(clickableImageResourceCell);
         decorator.setText("delete data object");
 
@@ -157,6 +159,26 @@ public class DataModelBrowser extends Composite {
         final TextColumn<DataObjectTO> dataObjectColumn = new TextColumn<DataObjectTO>() {
 
             @Override
+            public void render(Cell.Context context, DataObjectTO object, SafeHtmlBuilder sb) {
+                SafeHtml startDiv = new SafeHtml() {
+                    @Override
+                    public String asString() {
+                        return "<div style=\"cursor: pointer;\">";
+                    }
+                };
+                SafeHtml endDiv = new SafeHtml() {
+                    @Override
+                    public String asString() {
+                        return "</div>";
+                    }
+                };
+
+                sb.append(startDiv);
+                super.render(context, object, sb);
+                sb.append(endDiv);
+            }
+
+            @Override
             public String getValue( final DataObjectTO dataObject) {
                 return dataObject.getName();
             }
@@ -170,8 +192,6 @@ public class DataModelBrowser extends Composite {
         dataObjectsTable.addColumn(dataObjectColumn);
 
         //Init the selection model
-        final SingleSelectionModel<DataObjectTO> selectionModel = new SingleSelectionModel<DataObjectTO>();
-
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
             @Override
@@ -191,6 +211,7 @@ public class DataModelBrowser extends Composite {
 
         dataObjectsProvider.setList(dataObjects);
         dataObjectsProvider.refresh();
+        //selectionModel.clear();
 
         newEntityButton.setIcon(IconType.PLUS_SIGN);
     }
@@ -217,6 +238,28 @@ public class DataModelBrowser extends Composite {
         dataObjectsProvider.getList().add(dataObject);
         dataObjectsProvider.flush();
         dataObjectsProvider.refresh();
+
+        //Workaround, to enable the selection of the last created object.
+        //TODO review this later
+        selectionModel = new SingleSelectionModel<DataObjectTO>();
+        //Init the selection model
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                DataObjectTO selectedObjectTO = selectionModel.getSelectedObject();
+                Command selectCommand = modelEditorPresenter.createSelectCommand(selectedObjectTO);
+                selectCommand.execute();
+            }
+        });
+
+
+        dataObjectsTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
+        dataObjectsTable.setSelectionModel(selectionModel);
+
+        selectionModel.setSelected(dataObject, true);
+        //this method is invoked to ensure that de selection updates
+        selectionModel.getSelectedObject();
     }
 
     public DataModelEditorPresenter getModelEditorPresenter() {
