@@ -50,6 +50,8 @@ public interface DataModel extends ModelElement {
      * @return
      */
     DataObject addDataObject(String packageName, String name);
+    
+    DataObject addDataObject(String className);
 
     DataObject getDataObject(String className);
     

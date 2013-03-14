@@ -39,5 +39,5 @@ public interface DataObject extends ModelElement {
     ObjectProperty addProperty(String name, String className, boolean multiple);
 
     ObjectProperty removeProperty(String name);
-    
+
 }

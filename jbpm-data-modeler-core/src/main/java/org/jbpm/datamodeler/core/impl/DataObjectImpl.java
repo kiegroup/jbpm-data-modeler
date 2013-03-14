@@ -48,7 +48,7 @@ public class DataObjectImpl extends ModelElementImpl implements DataObject {
 
     @Override
     public String getClassName() {
-        return (packageName != null ? packageName+"." : "") + getName();
+        return ( (packageName != null && !"".equals(packageName)) ? packageName+"." : "") + getName();
     }
 
     @Override

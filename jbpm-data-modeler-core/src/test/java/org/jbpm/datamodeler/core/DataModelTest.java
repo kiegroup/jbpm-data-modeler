@@ -17,6 +17,7 @@
 package org.jbpm.datamodeler.core;
 
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
+import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.junit.Test;
 
 import java.util.Iterator;
@@ -35,11 +36,20 @@ public class DataModelTest {
 
         assertNotNull("Data model was not created", dataModel);
 
+        dataModel.setVersion("1.2.1");
         
+        for (int i = 0; i < 6; i++) {
+            dataModel.addAttribute("attribute"+i, i+"");
+        }
+
         for (int i = 0; i < 10; i++) {
             dataObject = dataModel.addDataObject("org.jbpm.datamodeler.test"+i, "DataObject"+i);
             for (int j = 0; j < 5; j++) {
                 property = dataObject.addProperty("property"+j, Integer.class.getName());
+                if (j % 2 == 0) {
+                    property.setMultiple(true);
+                    property.addAttribute("attribute"+j, j+"");
+                }
             }
         }
 
@@ -50,7 +60,12 @@ public class DataModelTest {
         }
 
 
+        XMLSerializerImpl serializer = new XMLSerializerImpl();
+        String xml = serializer.serialize(dataModel);
+        System.out.println(xml);
 
+        DataModel unserial =  serializer.unserialize(xml);
+        int i = 0;
 
 
     }

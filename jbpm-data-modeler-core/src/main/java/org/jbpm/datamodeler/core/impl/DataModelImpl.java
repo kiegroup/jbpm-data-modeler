@@ -19,10 +19,7 @@ package org.jbpm.datamodeler.core.impl;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DataModelImpl extends ModelElementImpl implements DataModel {
 
@@ -74,5 +71,20 @@ public class DataModelImpl extends ModelElementImpl implements DataModel {
         DataObject dataObject = ModelFactoryImpl.getElementFactoryInstance().newDataObject(packageName, name);
         dataObjects.put(dataObject.getClassName(), dataObject);
         return dataObject;
+    }
+
+    @Override
+    public DataObject addDataObject(String className) {
+        StringTokenizer tokenizer = new StringTokenizer(className, ".");
+        StringBuffer packageName = new StringBuffer("");
+        String token = className;
+        while (tokenizer.hasMoreTokens()) {
+            token = tokenizer.nextToken();
+            if (tokenizer.hasMoreTokens()) {
+                if (packageName.length() > 0) packageName.append(".");
+                packageName.append(token);
+            }
+        }
+        return addDataObject(packageName.toString(), token);
     }
 }
