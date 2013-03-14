@@ -37,20 +37,18 @@ public class XMLNode implements Serializable {
 
     private String objectName;
 
-    private Properties attributes;
-    private List children;
+    private Properties attributes = new Properties();
+    private List<XMLNode> children = new ArrayList<XMLNode>();
     private byte[] content;
-    private List warnings;
-    private List warningArguments;
+    private List warnings = new ArrayList();
+    private List warningArguments = new ArrayList();
     private XMLNode parent;
+
+    private static final String INDENT_STR = "    ";
 
     public XMLNode(String objectName, XMLNode parent) {
         this.parent = parent;
         this.objectName = objectName;
-        attributes = new Properties();
-        children = new ArrayList();
-        warnings = new ArrayList();
-        warningArguments = new ArrayList();
     }
 
     public String getObjectName() {
@@ -61,7 +59,7 @@ public class XMLNode implements Serializable {
         return attributes;
     }
 
-    public List getChildren() {
+    public List<XMLNode> getChildren() {
         return children;
     }
 
@@ -110,7 +108,19 @@ public class XMLNode implements Serializable {
     }
 
     public void writeXML(Writer writer, boolean blanks) throws IOException {
-        writer.write(blanks ? "\n" : "");
+        writeXML(writer, blanks, false);
+    }
+
+    public void writeXML(Writer writer, boolean blanks, boolean indent) throws IOException {
+
+        String indentStr = null;
+        if (blanks) {
+            writer.write("\n");
+            if (indent) {
+                indentStr = indentStr(indent());
+                writer.write(indentStr);
+            }
+        }
         writer.write("<");
         writer.write(objectName);
         for (Iterator it = attributes.keySet().iterator(); it.hasNext();) {
@@ -123,13 +133,17 @@ public class XMLNode implements Serializable {
         } else {
             writer.write(">");
             for (int i = 0; i < children.size(); i++) {
-                XMLNode child = (XMLNode) children.get(i);
-                child.writeXML(writer, blanks);
+                XMLNode child = children.get(i);
+                child.writeXML(writer, blanks, indent);
             }
-            if (content != null)
+            if (content != null) {
                 writer.write(Base64.encode(content));
-            else
-                writer.write(blanks ? "\n" : "");
+            } else {
+                if (blanks) {
+                    writer.write("\n");
+                    if (indent) writer.write(indentStr);
+                }
+            }
             writer.write("</");
             writer.write(objectName);
             writer.write(">");
@@ -159,6 +173,13 @@ public class XMLNode implements Serializable {
             }
         }
     }
+    
+    public int indent() {
+        if (getParent() != null) {
+            return 1 + getParent().indent();
+        }
+        return 0;
+    }
 
     public static String escapeXml(String s) {
         s = StringEscapeUtils.escapeXml(s);
@@ -172,4 +193,14 @@ public class XMLNode implements Serializable {
         }
         return dest.toString();
     }
+    
+    public String indentStr(int indent) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("");
+        for (int i = 0; i < indent ; i++) {
+            stringBuffer.append(INDENT_STR);
+        }
+        return stringBuffer.toString();
+    }
+
 }
