@@ -46,10 +46,12 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
         this.className = className;
     }
 
+    @Override
     public String getBag() {
         return bag;
     }
 
+    @Override
     public void setBag(String bag) {
         this.bag = bag;
     }
@@ -58,6 +60,7 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
         return multiple;
     }
 
+    @Override
     public void setMultiple(boolean multiple) {
         this.multiple = multiple;
         if (multiple) {

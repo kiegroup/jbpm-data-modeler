@@ -14,7 +14,7 @@ import java.util.List;
 
 public class DataModelHelper {
 
-    //TODO provide a better implementation or another way to access domain objects from client code
+    //TODO provide a better implementation or another way to access domain objects from GWT client code
     public static DataModel to2Domain(DataModelTO dataModelTO) {
         DataModel dataModel = ModelFactoryImpl.getInstance().newModel(dataModelTO.getName());
         List<DataObjectTO> dataObjects = dataModelTO.getDataObjects();
@@ -22,16 +22,14 @@ public class DataModelHelper {
 
         if (dataObjects != null) {
             for (DataObjectTO dataObjectTO  : dataObjects) {
-                //TODO remove this hardcoding
-                dataObject = dataModel.addDataObject("org.jbpm.datamodeler.test.pojos", dataObjectTO.getName());
+                dataObject = dataModel.addDataObject(dataObjectTO.getPackageName(), dataObjectTO.getName());
                 to2Domain(dataObjectTO, dataObject);
             }
         }
-
         return dataModel;
     }
 
-    //TODO provide a better implementation or another way to access domain objects from client code
+    //TODO provide a better implementation or another way to access domain objects from GWT client code
     public static DataModelTO domain2To(DataModel dataModel) {
         DataModelTO dataModelTO = new DataModelTO(dataModel.getName());
         List<DataObject> dataObjects = new ArrayList<DataObject>();
@@ -42,15 +40,15 @@ public class DataModelHelper {
         if (dataObjects != null) {
             for (DataObject dataObject  : dataObjects) {
                 dataObjectTO = new DataObjectTO(dataObject.getName());
+                dataObjectTO.setPackageName(dataObject.getPackageName());
                 domain2To(dataObject, dataObjectTO);
                 dataModelTO.getDataObjects().add(dataObjectTO);
             }
         }
-
         return dataModelTO;
     }
 
-    //TODO provide a better implementation or another way to access domain objects from client code
+    //TODO provide a better implementation or another way to access domain objects from GWT client code
     public static void domain2To(DataObject dataObject, DataObjectTO dataObjectTO) {
         dataObjectTO.setName(dataObject.getName());
         List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
@@ -59,20 +57,20 @@ public class DataModelHelper {
         List<ObjectPropertyTO> propertiesTO = new ArrayList<ObjectPropertyTO>();
         if (properties != null) {
             for (ObjectProperty property : properties) {
-                propertiesTO.add(new ObjectPropertyTO(property.getName(), property.getClassName()));
+                propertiesTO.add(new ObjectPropertyTO(property.getName(), property.getClassName(), property.isMultiple()));
             }
         }
         dataObjectTO.setProperties(propertiesTO);
     }
 
-    //TODO provide a better implementation or another way to access domain objects from client code
+    //TODO provide a better implementation or another way to access domain objects from GWT client code
     public static void to2Domain(DataObjectTO dataObjectTO, DataObject dataObject) {
         dataObject.setName(dataObjectTO.getName());
         List<ObjectPropertyTO> properties = dataObjectTO.getProperties();
 
         if (properties != null) {
             for (ObjectPropertyTO propertyTO : properties) {
-                dataObject.addProperty(propertyTO.getName(), propertyTO.getClassName());
+                dataObject.addProperty(propertyTO.getName(), propertyTO.getClassName(), propertyTO.isMultiple());
             }
         }
     }

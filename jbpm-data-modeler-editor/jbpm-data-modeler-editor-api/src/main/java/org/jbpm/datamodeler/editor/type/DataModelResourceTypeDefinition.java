@@ -26,7 +26,6 @@ public class DataModelResourceTypeDefinition
 
     @Override
     public String getSuffix() {
-        //return "model.mdl";
         return "datamodel";
     }
 

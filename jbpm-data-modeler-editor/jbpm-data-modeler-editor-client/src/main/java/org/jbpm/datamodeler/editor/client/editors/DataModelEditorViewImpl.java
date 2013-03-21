@@ -28,9 +28,11 @@ import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import java.util.List;
 
 @Dependent
 @Templated(value = "DataModelEditorViewImpl.html")
@@ -121,6 +123,11 @@ public class DataModelEditorViewImpl extends Composite
         browserPanel.add(dataModelBrowser);
         dataObjectPanel.add(dataObjectEditor);
         propertiesPanel.add(propertyEditor);
+    }
+
+    @Override
+    public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
+        dataObjectEditor.setBaseTypes(baseTypes);
     }
 
 }

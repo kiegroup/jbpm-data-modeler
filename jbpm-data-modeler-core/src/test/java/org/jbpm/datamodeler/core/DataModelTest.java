@@ -19,6 +19,8 @@ package org.jbpm.datamodeler.core;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
@@ -27,9 +29,11 @@ import static org.junit.Assert.assertNotNull;
 
 public class DataModelTest {
     
+    private static final Logger logger = LoggerFactory.getLogger(DataModelTest.class);
     
     @Test
     public void modelTest() throws Exception {
+
         DataModel dataModel = ModelFactoryImpl.getInstance().newModel("Model1");
         DataObject dataObject;
         ObjectProperty property;
@@ -42,6 +46,7 @@ public class DataModelTest {
             dataModel.addAttribute("attribute"+i, i+"");
         }
 
+        logger.debug("Creating data model");
         for (int i = 0; i < 10; i++) {
             dataObject = dataModel.addDataObject("org.jbpm.datamodeler.test"+i, "DataObject"+i);
             for (int j = 0; j < 5; j++) {
@@ -56,17 +61,16 @@ public class DataModelTest {
         Iterator<DataObject> it = dataModel.getDataObjects().iterator();
         while (it.hasNext()) {
             dataObject = it.next();
-            System.out.println(dataObject.getClassName());
+            logger.debug("created data object: " + dataObject);
         }
 
 
+        logger.debug("Serializing data model");
         XMLSerializerImpl serializer = new XMLSerializerImpl();
         String xml = serializer.serialize(dataModel);
-        System.out.println(xml);
+        logger.debug("Resulting serialization: \n" + xml);
 
-        DataModel unserial =  serializer.unserialize(xml);
-        int i = 0;
-
+        DataModel unserial =  serializer.deserialize(xml);
 
     }
 }

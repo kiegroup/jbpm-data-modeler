@@ -32,9 +32,15 @@ public class ModelFactoryImpl implements ModelFactory, ModelElementFactory {
     }
 
     @Override
+    public DataModel newModel(String name, String format) {
+        return new DataModelImpl(name, format);
+    }
+
+    @Override
     public DataModel newModel(String name) {
         return new DataModelImpl(name, CURRENT_FORMAT);
     }
+    
 
     @Override
     public DataObject newDataObject(String packageName, String name) {

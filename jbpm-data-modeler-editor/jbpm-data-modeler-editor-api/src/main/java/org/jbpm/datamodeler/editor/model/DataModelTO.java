@@ -29,6 +29,8 @@ public class DataModelTO implements Serializable {
     private String name;
 
     private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
+    
+    private String defaultPackage;
 
     public DataModelTO() {
     }
@@ -51,6 +53,14 @@ public class DataModelTO implements Serializable {
 
     public void setDataObjects(List<DataObjectTO> dataObjects) {
         this.dataObjects = dataObjects;
+    }
+
+    public String getDefaultPackage() {
+        return defaultPackage;
+    }
+
+    public void setDefaultPackage(String defaultPackage) {
+        this.defaultPackage = defaultPackage;
     }
 }
 

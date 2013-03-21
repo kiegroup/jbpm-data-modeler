@@ -18,17 +18,20 @@ package org.jbpm.datamodeler.xml;
 
 import org.jbpm.datamodeler.core.DataModel;
 
-import java.io.Reader;
+import java.io.InputStream;
 import java.io.Writer;
 
+/**
+ * Provides xml serialization for data models.
+ */
 public interface XMLSerializer {
     
     String serialize(DataModel dataModel) throws SerializerException;
 
     void serialize(DataModel dataModel, Writer writer) throws SerializerException;
 
-    DataModel unserialize(String xml) throws SerializerException;
+    DataModel deserialize(String xml) throws SerializerException;
 
-    DataModel unserialize(Reader reader) throws SerializerException;
+    DataModel deserialize(InputStream reader) throws SerializerException;
 
 }

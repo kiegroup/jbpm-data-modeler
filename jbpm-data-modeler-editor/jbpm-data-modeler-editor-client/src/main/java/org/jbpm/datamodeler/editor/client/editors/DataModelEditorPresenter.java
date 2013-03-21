@@ -20,10 +20,12 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.annotations.*;
@@ -33,14 +35,14 @@ import org.uberfire.client.workbench.widgets.menu.MenuFactory;
 import org.uberfire.client.workbench.widgets.menu.MenuItem;
 import org.uberfire.client.workbench.widgets.menu.Menus;
 import org.uberfire.shared.mvp.PlaceRequest;
-import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
-
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
 
 
 @Dependent
@@ -67,6 +69,8 @@ public class DataModelEditorPresenter {
 
         void deleteDataObjectProperty(ObjectPropertyTO property, int index);
 
+        void setBaseTypes(List<PropertyTypeTO> baseTypes);
+
     }
 
     @Inject
@@ -83,10 +87,10 @@ public class DataModelEditorPresenter {
     private Caller<DataModelerService> modelerService;
 
     private Menus menus;
-
+    
     @WorkbenchPartTitle
     public String getTitle() {
-        return "Data model editor [ " + (path != null ? path.getFileName() : "") + " ]";
+        return Constants.INSTANCE.modelEditor_screen_name() + " [" + (path != null ? path.getFileName() : "") + "]";
     }
 
     @WorkbenchPartView
@@ -123,6 +127,7 @@ public class DataModelEditorPresenter {
 
                 //TODO implement the required controls to ensure the name valid, etc.
                 DataObjectTO dataObject = new DataObjectTO(text);
+                dataObject.setPackageName(dataModel.getDefaultPackage());;
                 dataModel.getDataObjects().add(dataObject);
                 view.addDataObject(dataObject);
                 notification.fire(new NotificationEvent("Data object: " + text + " was created"));
@@ -169,13 +174,13 @@ public class DataModelEditorPresenter {
         };
     }
 
-    public Command createAddDataObjectPropertyCommand(final DataObjectTO dataObject, final String propertyName, final String propertyType) {
+    public Command createAddDataObjectPropertyCommand(final DataObjectTO dataObject, final String propertyName, final String propertyType, final boolean multiple) {
 
         return new Command() {
             @Override
             public void execute() {
                 //TODO implement the required controls to ensure the property can be created
-                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType);
+                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple);
                 dataObject.getProperties().add(property);
                 view.addDataObjectProperty(property);
             }
@@ -206,14 +211,15 @@ public class DataModelEditorPresenter {
 
     @OnSave
     public void onSave() {
-        Window.alert("onSave");
         modelerService.call(new RemoteCallback<Object>() {
-            @Override
-            public void callback(Object response) {
+                @Override
+                public void callback(Object response) {
 
 
-            }
-        }).saveModel(dataModel, path);
+                }
+            },
+            new DataModelerErrorCallback("An error was produced during data model saving.")
+        ).saveModel(dataModel, path);
     }
 
     @OnStart
@@ -223,19 +229,49 @@ public class DataModelEditorPresenter {
         makeMenuBar();
 
         this.path = path;
-        modelerService.call(new RemoteCallback<DataModelTO>() {
 
-            @Override
-            public void callback(DataModelTO dataModel) {
-                setDataModel(dataModel);
-                view.setDataModel(dataModel);
-                notification.fire(new NotificationEvent("Model was loaded from server: " + dataModel.getName() + " at time: " + new java.util.Date()));
-            }
+        modelerService.call(
+                new RemoteCallback<List<PropertyTypeTO>>() {
 
-        }).loadModel(path);
-                
+                    @Override
+                    public void callback(List<PropertyTypeTO> baseTypes) {
+                        view.setBaseTypes(baseTypes);
+                    }
+                },
+                new DataModelerErrorCallback("An error was produced when property types was loaded from server.")
+        ).getBasePropertyTypes();
+
+        modelerService.call(
+                new RemoteCallback<DataModelTO>() {
+
+                    @Override
+                    public void callback(DataModelTO dataModel) {
+                        setDataModel(dataModel);
+                        view.setDataModel(dataModel);
+                        notification.fire(new NotificationEvent("Model was loaded from server: " + dataModel.getName() + " at time: " + new java.util.Date()));
+                    }
+
+                    },
+                new DataModelerErrorCallback("An error was produced when the requested data model was loaded from server.")
+        ).loadModel(path);
     }
-    
+
+    /**
+     * This method generates the model by creating the output pojos to de sources directory.
+     */
+    void onGenerate() {
+
+        modelerService.call(new RemoteCallback<Object>() {
+            @Override
+            public void callback(Object response) {
+
+
+            }
+        },
+                new DataModelerErrorCallback("An error was produced during data model generation.")
+        ).generateModel(dataModel, path);
+    }
+
     @OnReveal
     public void onReveal() {
         //Window.alert("onReveal");
@@ -248,7 +284,7 @@ public class DataModelEditorPresenter {
 
     private void makeMenuBar() {
         menus = MenuFactory
-                    .newTopLevelMenu("File")
+                    .newTopLevelMenu(Constants.INSTANCE.modelEditor_menu_file())
                     .withItems( getItems() )
                     .endMenu().build();
     }
@@ -261,13 +297,6 @@ public class DataModelEditorPresenter {
         //TODO take a look at guvnor editors to see if class org.kie.guvnor.commons.ui.client.menu.FileMenuBuilder
         //can be used
 
-        org.uberfire.client.mvp.Command validateCommand = new org.uberfire.client.mvp.Command() {
-            @Override
-            public void execute() {
-                Window.alert("Validate model");
-            }
-        };
-
         org.uberfire.client.mvp.Command saveCommand = new org.uberfire.client.mvp.Command() {
             @Override
             public void execute() {
@@ -275,17 +304,25 @@ public class DataModelEditorPresenter {
             }
         };
 
-        if ( validateCommand != null ) {
-            menuItems.add(newSimpleItem("Validate")
-                    .respondsWith(validateCommand)
+        org.uberfire.client.mvp.Command generateCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                onGenerate();
+            }
+        };
+
+        if ( generateCommand != null ) {
+            menuItems.add(newSimpleItem(Constants.INSTANCE.modelEditor_menu_generate())
+                    .respondsWith(generateCommand)
                     .endMenu().build().getItems().get(0));
         }
 
         if ( saveCommand != null ) {
-            menuItems.add(newSimpleItem("Save")
+            menuItems.add(newSimpleItem(Constants.INSTANCE.modelEditor_menu_save())
                     .respondsWith(saveCommand)
                     .endMenu().build().getItems().get(0));
         }
+
 
         return menuItems;
     }

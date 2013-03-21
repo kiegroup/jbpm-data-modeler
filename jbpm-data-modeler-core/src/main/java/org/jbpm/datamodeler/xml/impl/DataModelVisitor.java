@@ -17,9 +17,8 @@
 package org.jbpm.datamodeler.xml.impl;
 
 import org.jbpm.datamodeler.core.*;
-import org.jbpm.datamodeler.xml.XMLNode;
+import org.jbpm.datamodeler.xml.util.XMLNode;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 

@@ -20,55 +20,41 @@ import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.jbpm.datamodeler.core.ObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
+import java.io.*;
 import java.util.Properties;
 
-
 /**
- * Simple code generation engine
+ * Simple velocity based code generation engine.
  */
 public class GenerationEngine {
-    public static final String INITIAL_TEMPLATE = "initial.vm";
-    public static final String TEMPLATE_PATH = "templates";
-
-    private static final GenerationEngine singleton = new GenerationEngine();
-    private VelocityEngine velocityEngine = new VelocityEngine();
+    
     private static final Logger logger = LoggerFactory.getLogger(GenerationEngine.class);
+
+    private static GenerationEngine singleton;
+
+    private VelocityEngine velocityEngine = new VelocityEngine();
+
     private static boolean inited = false;
 
-    private GenerationListener generationListener;
-
-
-    /**
-     * Returns an instance of the GenerationEngine
-     *
-     * @return
-     */
     public static GenerationEngine getInstance() {
+        if (singleton == null) {
+            singleton = new GenerationEngine();
+            singleton.init();
+        }
         return singleton;
     }
 
     /**
      * Initializes the code generation engine
      */
-    public void init() {
-
+    private void init() {
         if (!inited) {
             // Init velocity engine
             Properties properties = new Properties();
-
-            //properties.setProperty("file.resource.loader.path", templatesPath);
-            //properties.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-            //        "org.apache.velocity.runtime.log.SimpleLog4JLogSystem");
-            //properties.setProperty("runtime.log.logsystem.log4j.category", "velocity");
-
             properties.setProperty("resource.loader", "class");
             properties.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
             properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
@@ -77,123 +63,126 @@ public class GenerationEngine {
             velocityEngine.init(properties);
             inited = true;
         }
-
     }
 
     /**
-     * Shutdowns the code generation engine
-     */
-
-    public void stop() {
-        // Shutdowns the code generation engine
-    }
-
-    /**
-     * Runs generation
+     * Runs the code generation.
      *
-     * @param generationContext
+     * @param generationContext Context information for the generation.
+     *
      * @throws Exception
+     *
      */
-    public void generateAllTemplates(GenerationContext generationContext) throws Exception {
+    public void generate(GenerationContext generationContext) throws Exception {
+
         VelocityContext context = buildContext(generationContext);
+        String templatesPath = generationContext.getTemplatesPath();
+        String initialTemplate = generationContext.getInitialTemplate();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Starting code generation with templatesPath: " + templatesPath + ", initialTemplate: " + initialTemplate);
+        }
+        // Always start by the initial template
+        String templatePath = getFullVelocityPath(templatesPath, initialTemplate);
+        if (logger.isDebugEnabled()) logger.debug("Initial templatePath: " + templatePath);
 
         StringWriter writer = new StringWriter();
-
-        // Add generation tools
-        List<String> templatesIds = generationContext.getTemplateSet();
-        for (String templatesId : templatesIds) {
-            generationContext.setCurrentTemplate(templatesId);
-
-            context.put("templateId", templatesId);
-
-            logger.info("Generating template '" + templatesId + "'....");
-
-            // Always start by the initial template
-            String templatePath = getFullVelocityPath(templatesId, null);
-
-            logger.debug(" ... Initial template: " + templatePath);
-
-            Template t = velocityEngine.getTemplate(templatePath);
-
-            t.merge(context, writer);
-
-            //System.out.println(" ... Initial output: " + writer.toString() + "\n\n");
-        }
+        Template t = velocityEngine.getTemplate(templatePath);
+        t.merge(context, writer);
     }
 
     /**
-     * Fills the context with common variables
+     * Creates a VelocityContext and inject common variables into it.
      *
-     * @param generationContext
-     * @return
+     * @param generationContext Generation context provided by user.
+     *
+     * @return A properly initialized VelocityContext.
      */
     protected VelocityContext buildContext(GenerationContext generationContext) {
         VelocityContext context = new VelocityContext();
 
-        // Add main objects to template conects
+        // Add main objects to velocity context
         context.put("engine", this);
         context.put("context", generationContext);
-        context.put("model", generationContext.getDataModel());
+        context.put("dataModel", generationContext.getDataModel());
         context.put("nameTool", new GenerationTools());
+        generationContext.setVelocityContext(context);
 
         return context;
     }
 
     /**
-     * Invoked from templates, generates a file by invoking a template and writing it to the relative output path
+     * Invoked from template files when a new asset has to be generated.
      *
-     * @param generationContext
-     * @param template
-     * @param outputPath
+     * @param generationContext The context currently executing.
+     *
+     * @param template The template id to use.
+     *
+     * @param filePath The file to be generated.
+     *
      * @throws java.io.IOException
+     *
      */
-    public void generateAsset(GenerationContext generationContext, String template, String outputPath) throws IOException {
-        StringWriter writer = new StringWriter();
+    public void generateAsset(GenerationContext generationContext, String template, String filePath) throws IOException {
 
-        String templatePath = getFullVelocityPath(generationContext.getCurrentTemplate(), template);
+        //read the template to use
+        String templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
         VelocityContext context = buildContext(generationContext);
-        Template t = velocityEngine.getTemplate(templatePath);
+        Template t = velocityEngine.getTemplate(templatePath);  //obs, templates are already cached by Velocity
 
+        //generate asset content.
+        StringWriter writer = new StringWriter();
+        generationContext.setCurrentOutput(writer);
         t.merge(context, writer);
 
-        File fout = new File(generationContext.getOutputPath(), outputPath);
+        if (generationContext.getOutputPath() != null) {
+            //generate the java file in the filesystem only if the output path was set in the generation context.
+            File fout = new File(generationContext.getOutputPath(), filePath);
+            fout.getParentFile().mkdirs();
+            FileOutputStream fos = new FileOutputStream(fout, false);
+            IOUtils.write(writer.toString(), fos);
+        }
 
-        fout.getParentFile().mkdirs();
-        FileOutputStream fos = new FileOutputStream(fout, false);
-
-        System.out.println("Writing " + fout.getAbsolutePath());
-
-        IOUtils.write(writer.toString(), fos);
-
-        //TODO all this stuff will be refactored, at the moment we provide a
-        //simple implementation in order to put the modeler running quickly
-        
-        if (generationListener != null) {
-            generationListener.assetGenerated(outputPath, writer.toString());
+        if (generationContext.getGenerationListener() != null) {
+            generationContext.getGenerationListener().assetGenerated(filePath, writer.toString());
         }
     }
 
+    public void generateAttribute(GenerationContext generationContext, ObjectProperty attribute, String template) throws IOException {
+        generateSubTemplate(generationContext, template);
+    }
+
+    public void generateSetterGetter(GenerationContext generationContext, ObjectProperty attribute, String template) throws IOException {
+        generateSubTemplate(generationContext, template);
+    }
+
+    public void generateEquals(GenerationContext generationContext, String template) throws IOException {
+        generateSubTemplate(generationContext, template);
+    }
+
+    public void generateHashCode(GenerationContext generationContext, String template) throws IOException {
+        generateSubTemplate(generationContext, template);
+    }
+
+    public void generateSubTemplate(GenerationContext generationContext, String template) throws IOException {
+        //read the template to use
+        String templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
+        Template t = velocityEngine.getTemplate(templatePath);
+
+        //generate equals
+        t.merge(generationContext.getVelocityContext(), generationContext.getCurrentOutput());
+    }
+
     /**
-     * Returns the path that a given template has, from the templateSet ID and the templateID
+     * Returns the path for a given template name and that a given template.
      *
-     * @param templateSetId
-     * @param template
-     * @return
+     * @param templatesPath Templates path location.
+     *
+     * @param template The template name.
+     *
+     * @return a full path to the given template.
      */
-    protected String getFullVelocityPath(String templateSetId, String template) {
-
-        String templateName = template == null ? INITIAL_TEMPLATE : (template + ".vm");
-        // Always start by the initial.vm template
-        String templatePath = "/" + TEMPLATE_PATH + "/" + templateSetId + "/" + templateName;
-        return templatePath;
-
-    }
-
-    public GenerationListener getGenerationListener() {
-        return generationListener;
-    }
-
-    public void setGenerationListener(GenerationListener generationListener) {
-        this.generationListener = generationListener;
+    private String getFullVelocityPath(String templatesPath, String template) {
+        return "/" + templatesPath + "/" + template + ".vm";
     }
 }

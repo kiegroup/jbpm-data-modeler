@@ -16,14 +16,13 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,18 +32,16 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
-import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
+import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -102,7 +99,7 @@ public class DataObjectEditor  extends Composite {
 
     private DataModelEditorPresenter modelEditorPresenter;
 
-
+    private List<PropertyTypeTO> baseTypes;
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -193,8 +190,8 @@ public class DataObjectEditor  extends Composite {
         final TextColumn<ObjectPropertyTO> propertyTypeColumn = new TextColumn<ObjectPropertyTO>() {
 
             @Override
-            public String getValue( final ObjectPropertyTO objectProperty) {
-                return objectProperty.getClassName();
+            public String getValue(final ObjectPropertyTO objectProperty) {
+                return propertyTypeDisplay(objectProperty);
             }
         };
 
@@ -239,31 +236,40 @@ public class DataObjectEditor  extends Composite {
 
         newPropertyIsMultiple.setVisible(false);
         newPropertyBasicType.setValue(true);
-
-        //TODO init this list well, the datatypes must be loaded from the DataModelerService, etc.
-        newPropertyType.addItem("Integer", "java.lang.Integer");
-        newPropertyType.addItem("String", "java.lang.String");
-        newPropertyType.addItem("Date", "java.util.Date");
-        newPropertyType.addItem("Boolean", "java.lang.Boolean");
-
         newPropertyButton.setIcon(IconType.PLUS_SIGN);
+    }
 
+    private void populateBaseTypes() {
+        newPropertyType.clear();
+        for (PropertyTypeTO type : baseTypes) {
+            newPropertyType.addItem(type.getName(), type.getClassName());
+        }
+    }
+
+    private void populateObjectTypes() {
+        List<DataObjectTO> dataObjects = dataModel.getDataObjects();
+        newPropertyType.clear();
+        for (DataObjectTO dataObject : dataObjects) {
+            newPropertyType.addItem(dataObject.getName(), dataObject.getClassName());
+        }        
     }
 
     @UiHandler("newPropertyButton")
     void newPropertyClick(ClickEvent event) {
-        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue());
+        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue(), newPropertyIsMultiple.getValue());
         createPropertyCommand.execute();
     }
 
     @UiHandler("newPropertyDataObjectType")
     void dataObjectTypeSelected(ClickEvent event) {
         newPropertyIsMultiple.setVisible(true);
+        populateObjectTypes();
     }
 
     @UiHandler("newPropertyBasicType")
     void basicTypeSelected(ClickEvent event) {
         newPropertyIsMultiple.setVisible(false);
+        populateBaseTypes();
     }
 
     public void setDataModel(DataModelTO dataModel) {
@@ -298,4 +304,16 @@ public class DataObjectEditor  extends Composite {
         this.modelEditorPresenter = modelEditorPresenter;
     }
 
+    public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
+        this.baseTypes = baseTypes;
+        populateBaseTypes();
+    }
+    
+    private String propertyTypeDisplay(ObjectPropertyTO propertyTO) {
+        String className = propertyTO.getClassName();
+        if (propertyTO.isMultiple()) {
+            className += "[1..N]";
+        }
+        return className;
+    }
 }

@@ -26,17 +26,14 @@ import java.util.List;
 public class DataObjectTO implements Serializable {
     
     private String name;
+    
+    private String packageName;
+    
+    private String className;
 
     private List<ObjectPropertyTO> properties = new ArrayList<ObjectPropertyTO>();
 
     public DataObjectTO() {
-    }
-
-    public DataObjectTO(int i) {
-        this.name = "DataObject"+i;
-        for (int prop = 0; prop < i; prop++) {
-            properties.add(new ObjectPropertyTO(name + "property" + prop, "java.lang.String"));
-        }
     }
 
     public DataObjectTO(String name) {
@@ -52,11 +49,44 @@ public class DataObjectTO implements Serializable {
         this.name = name;
     }
 
+    public String getClassName() {
+        return ( (packageName != null && !"".equals(packageName)) ? packageName+"." : "") + getName();
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
     public List<ObjectPropertyTO> getProperties() {
         return properties;
     }
 
     public void setProperties(List<ObjectPropertyTO> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DataObjectTO that = (DataObjectTO) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 }

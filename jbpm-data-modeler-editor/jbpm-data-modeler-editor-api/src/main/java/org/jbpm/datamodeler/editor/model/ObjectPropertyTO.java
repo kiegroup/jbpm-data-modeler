@@ -27,14 +27,17 @@ public class ObjectPropertyTO implements Serializable {
 
     private String name;
 
+    private boolean multiple = false;
+
     public ObjectPropertyTO() {
     }
 
-    public ObjectPropertyTO(String name, String className) {
+    public ObjectPropertyTO(String name, String className, boolean multiple) {
         this.name = name;
         this.className = className;
+        this.multiple = multiple;
     }
-
+    
     public String getClassName() {
         return className;
     }
@@ -49,5 +52,13 @@ public class ObjectPropertyTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isMultiple() {
+        return multiple;
+    }
+
+    public void setMultiple(boolean multiple) {
+        this.multiple = multiple;
     }
 }

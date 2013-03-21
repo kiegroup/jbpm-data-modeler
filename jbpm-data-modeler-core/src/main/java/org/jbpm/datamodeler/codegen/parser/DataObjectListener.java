@@ -2,10 +2,14 @@ package org.jbpm.datamodeler.codegen.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class DataObjectListener extends JavaBaseListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataObjectListener.class);
 
     JavaParser parser;
 
@@ -85,11 +89,11 @@ public class DataObjectListener extends JavaBaseListener {
 
         for (JavaParser.ClassOrInterfaceModifierContext modifier : modifiers) {
             if ((annotation = modifier.annotation()) != null) {
-                System.out.println("A: " + annotation.annotationName().Identifier());
-                System.out.println("A1: " + annotation.getText());
+                logger.debug("A: " + annotation.annotationName().Identifier());
+                logger.debug("A1: " + annotation.getText());
 
             } else {
-                System.out.println("B:" + modifier.getText());
+                logger.debug("B:" + modifier.getText());
             }
         }
 
@@ -101,12 +105,11 @@ public class DataObjectListener extends JavaBaseListener {
         printCurrentToken("enterMemberDeclaration", ctx);
 
         if (ctx.methodDeclaration() != null) {
-            System.out.println("starting method declaration, at the moment we ignore methods");
+            if (logger.isDebugEnabled()) logger.debug("Starting method declaration, at the moment we ignore methods");
         } else {
-            System.out.println("starting field declaration");
             String type = ctx.type().getText();
 
-            System.out.println("type: " + type);
+            if (logger.isDebugEnabled()) logger.debug("Starting field declaration, type: " + type);
 
             DataObjectPropertyToken newProperty = new DataObjectPropertyToken();
             newProperty.setType(type);
@@ -118,9 +121,9 @@ public class DataObjectListener extends JavaBaseListener {
 
     public void exitMemberDeclaration(JavaParser.MemberDeclarationContext ctx) {
         if (ctx.methodDeclaration() != null) {
-            System.out.println("closing starting method declaration");
+            if (logger.isDebugEnabled()) logger.debug("Closing starting method declaration");
         } else {
-            System.out.println("closing field declaration");
+            if (logger.isDebugEnabled()) logger.debug("Closing field declaration");
             declaringProperty = false;
         }
     }
@@ -135,9 +138,9 @@ public class DataObjectListener extends JavaBaseListener {
     }
 
     void printCurrentToken(String flag,  ParserRuleContext ctx) {
-        //TODO: use loggers
+
         TokenStream tokens = parser.getTokenStream(); // need parser to get tokens
         String text = tokens.getText(ctx);
-        System.out.println(flag + ":" + text);
+        if (logger.isDebugEnabled()) logger.debug(flag + ":" + text);
     }
 }

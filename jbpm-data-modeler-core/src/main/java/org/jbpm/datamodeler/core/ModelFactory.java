@@ -18,6 +18,8 @@ package org.jbpm.datamodeler.core;
 
 public interface ModelFactory {
 
-    public DataModel newModel(String name);
+    DataModel newModel(String name);
+
+    DataModel newModel(String name, String format);
 
 }

@@ -1,5 +1,6 @@
 package org.jbpm.datamodeler.editor.backend.server;
 
+import org.drools.compiler.lang.descr.QueryDescr;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.datamodeler.codegen.GenerationContext;
 import org.jbpm.datamodeler.codegen.GenerationEngine;
@@ -9,22 +10,28 @@ import org.jbpm.datamodeler.codegen.parser.DataObjectPropertyToken;
 import org.jbpm.datamodeler.codegen.parser.DataObjectToken;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
+import org.jbpm.datamodeler.core.PropertyType;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
+import org.jbpm.datamodeler.core.impl.PropertyTypeFactoryImpl;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
+import org.jbpm.datamodeler.editor.service.ServiceException;
 import org.jbpm.datamodeler.xml.SerializerException;
 import org.jbpm.datamodeler.xml.XMLSerializer;
 import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.project.service.ProjectService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -32,10 +39,14 @@ import java.util.StringTokenizer;
 @ApplicationScoped
 public class DataModelerServiceImpl implements DataModelerService {
 
-    private static final String SOURCE_JAVA_PATH      = "src/main/java";
-    private static final String SOURCE_RESOURCES_PATH = "src/main/resources";
+    private static final Logger logger = LoggerFactory.getLogger(DataModelerServiceImpl.class);
+
+    private static final String MAIN_JAVA_PATH = "src/main/java";
+    private static final String MAIN_RESOURCES_PATH = "src/main/resources";
     private static final String TEST_JAVA_PATH        = "src/test/java";
     private static final String TEST_RESOURCES_PATH   = "src/test/resources";
+
+    private static final String DEFAULT_GUVNOR_PKG = "defaultpkg";
 
     @Inject
     @Named("ioStrategy")
@@ -53,37 +64,27 @@ public class DataModelerServiceImpl implements DataModelerService {
     @Override
     public DataModelTO loadModel(Path path) {
 
-        //TODO provide final implementation
-        System.out.println("read this path: " + path);
+        if (logger.isDebugEnabled()) logger.debug("Reading data model from path: " + path);
+
         DataModel dataModel = null;
         try {
 
             final String content = ioService.readAllString( paths.convert( path ) );
+            if (logger.isDebugEnabled()) logger.debug("The file content is: \n" + content);
 
-            System.out.println("the file content is: " + content);
             XMLSerializer serializer = new XMLSerializerImpl();
-            dataModel = serializer.unserialize(content);
+            dataModel = serializer.deserialize(content);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            String defaultPackageName = calculateDefaultPackageName(path);
+            DataModelTO dataModelTO = DataModelHelper.domain2To(dataModel);
+            dataModelTO.setDefaultPackage(defaultPackageName);
+
+            return dataModelTO;
+
+        } catch (SerializerException e) {
+            logger.error("Data model couldn't be deserialized from file due to the following errors. path: " + path, e);
+            throw new ServiceException("Data model: " + path + ", couldn't be loaded due to the following error. " + e);
         }
-
-        //READ the pojos from the kie filesystem in order to synchronize the model.
-        Path projectPath = projectService.resolveProject(path);
-        updateModel(dataModel, paths.convert(projectPath));
-
-        /*
-        //TODO: implement the correct model loading
-        
-        DataModelTO dataModel = new DataModelTO(path.getFileName());
-        List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
-        for (int i=0; i< 10 ; i++) {
-            dataObjects.add(new DataObjectTO(i));
-        }
-        dataModel.setDataObjects(dataObjects);
-        */
-
-        return DataModelHelper.domain2To(dataModel);
     }
 
     @Override
@@ -91,61 +92,94 @@ public class DataModelerServiceImpl implements DataModelerService {
 
         //TODO provide final implementation
         try {
+
+            if (logger.isDebugEnabled()) logger.debug("Saving data model: " + dataModel.getName() + " into path: " + path);
+
             //convert to the domain model
             DataModel dataModelDomain = DataModelHelper.to2Domain(dataModel);
 
             XMLSerializer serializer = new XMLSerializerImpl();
             String content = serializer.serialize(dataModelDomain);
 
+            if (logger.isDebugEnabled()) logger.debug("Data model was serialized to: \n" + content);
             //Write the serialized model to the file
             ioService.write(paths.convert(path), content);
 
-            //By now we generate the pojos here.
-            GenerationContext generationContext = new GenerationContext(dataModelDomain);
-            generationContext.addTemplateSet("POJOS");
-            generationContext.setOutputPath("/tmp");
-            generationContext.setPackageName("org.jboss.test");
+        } catch (Exception e) {
+            //TODO propagate the proper exception to client
+            logger.error("The following error was produced during data model saving", e);
+        }
+    }
 
-            //get the route to the root directory. (the main pom.xml directory)
+    @Override
+    public void generateModel(DataModelTO dataModel, final Path path) {
+        
+        try {
+            //convert to domain model
+            DataModel dataModelDomain = DataModelHelper.to2Domain(dataModel);
+
+            //get the path to project root directory (the main pom.xml directory) and calculate
+            //the java sources path
             Path projectPath = projectService.resolveProject(path);
             org.kie.commons.java.nio.file.Path output = ensureProjectJavaPath(paths.convert(projectPath));
 
-            GenerationEngine generationEngine = GenerationEngine.getInstance();
+            GenerationContext generationContext = new GenerationContext(dataModelDomain);
             ServiceGenerationListener generationListener = new ServiceGenerationListener(output);
-            generationEngine.setGenerationListener(generationListener);
-            generationEngine.init();
-            generationEngine.generateAllTemplates(generationContext);
+            generationContext.setGenerationListener(generationListener);
+
+            //This output path is only for testing purposes, TODO REMOVE IT!
+            generationContext.setOutputPath("/tmp");
+
+            
+            GenerationEngine generationEngine = GenerationEngine.getInstance();
+            generationEngine.generate(generationContext);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("An error was produced during data model generation, dataModel: " + dataModel + ", path: " + path, e);
+            throw new ServiceException("Data model: " + dataModel.getName() + ", couldn't be generated due to the following error. " + e);
         }
     }
-    
+
     @Override
     public Path createModel(Path context, String fileName) {
 
-        //TODO provide final implementation
+        //TODO provide error handling, what happens if the file creation fails.
+
+        if (logger.isDebugEnabled()) logger.debug("Creating data model with the following parameters, path: " + context + ", fileName: " + fileName);
+
         //kie path to store the created file.
         org.kie.commons.java.nio.file.Path kiePath = paths.convert( context ).resolve( fileName );
 
+        //create a default empty model.
         DataModel dataModel = ModelFactoryImpl.getInstance().newModel(fileName);
         
         XMLSerializer serializer = new XMLSerializerImpl();
-        String serializedModel = "empty";
+        String serializedModel;
         
         try {
             serializedModel = serializer.serialize(dataModel);
+
+            ioService.createFile(kiePath);
+
+            ioService.write(kiePath, serializedModel);
+
+            Path path = paths.convert(kiePath, false);
+            return path;
+            
         } catch (SerializerException e) {
-            e.printStackTrace();
+            logger.error("The following error was produced during data model creation.", e);
         }
 
-        ioService.createFile(kiePath);
+        return null;
+    }
+
+    public List<PropertyTypeTO> getBasePropertyTypes() {
+        List<PropertyTypeTO> types = new ArrayList<PropertyTypeTO>();
         
-        ioService.write(kiePath, serializedModel);
-
-        final Path path = paths.convert(kiePath, false);
-
-        return path;
+        for (PropertyType baseType : PropertyTypeFactoryImpl.getInstance().getBasePropertyTypes()) {
+            types.add(new PropertyTypeTO(baseType.getName(), baseType.getClassName()));
+        }
+        return types;
     }
 
     public class ServiceGenerationListener implements GenerationListener {
@@ -255,7 +289,7 @@ public class DataModelerServiceImpl implements DataModelerService {
         //The Path must be within a Project's src/main/resources or src/test/resources path
         boolean resolved = false;
         org.kie.commons.java.nio.file.Path path = paths.convert( resource ).normalize();
-        final org.kie.commons.java.nio.file.Path srcResourcesPath = paths.convert( projectRoot ).resolve( SOURCE_RESOURCES_PATH );
+        final org.kie.commons.java.nio.file.Path srcResourcesPath = paths.convert( projectRoot ).resolve(MAIN_RESOURCES_PATH);
         final org.kie.commons.java.nio.file.Path testResourcesPath = paths.convert( projectRoot ).resolve( TEST_RESOURCES_PATH );
 
         if ( path.startsWith( srcResourcesPath ) ) {
@@ -323,5 +357,17 @@ public class DataModelerServiceImpl implements DataModelerService {
         }
         filePath = filePath.resolve(dataObject.getName() + ".java");
         return filePath;
+    }
+
+    private String calculateDefaultPackageName(Path resourceFilePath) {
+        String packageName = null;
+
+        packageName = projectService.resolvePackageName(resourceFilePath);
+
+        if (packageName == null || DEFAULT_GUVNOR_PKG.equals(packageName)) {
+            return "";
+        } else {
+            return packageName;
+        }
     }
 }

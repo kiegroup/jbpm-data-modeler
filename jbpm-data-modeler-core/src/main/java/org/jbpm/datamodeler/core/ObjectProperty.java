@@ -30,4 +30,6 @@ public interface ObjectProperty extends ModelElement {
     void setMultiple(boolean multiple);
 
     String getBag();
+    
+    void setBag(String bag);
 }

@@ -16,8 +16,10 @@
 
 package org.jbpm.datamodeler.codegen;
 
+import org.jbpm.datamodeler.core.ObjectProperty;
+
 /**
- * Helper tools to generate names easily from templates
+ * Helper tools to generate names easily from org.jbpm.datamodeler.template
  */
 public class GenerationTools {
 
@@ -84,5 +86,36 @@ public class GenerationTools {
 
     public String toJavaVar(String name) {
         return toJavaName(name, false);
+    }
+
+    public String getFilePath(String packageName, String simpleClassName, String extension) {
+        if( packageName != null) {
+            packageName = "/" + packageName.replace(".", "/");
+        } else {
+            packageName = "";
+        }
+
+        return packageName + "/" + toFileName(simpleClassName) + "." + extension;
+    }
+
+    public String toFileName(String name) {
+        return name.replaceAll("\\s", "");
+    }
+
+    public String resolveAttributeType(ObjectProperty attribute) {
+        StringBuffer type = new StringBuffer("");
+        if (attribute.isMultiple()) {
+            if (attribute.getBag() != null && !"".equals(attribute.getBag())) {
+                type.append(attribute.getBag());
+            } else {
+                type.append("java.util.List");
+            }
+            type.append("<");
+        }
+        type.append(attribute.getClassName());
+        if (attribute.isMultiple()) {
+            type.append(">");
+        }
+        return type.toString();
     }
 }

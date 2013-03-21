@@ -11,7 +11,6 @@
         <version>6.0.0-SNAPSHOT</version>
     </parent>
 
-
     <groupId>org.jbpm</groupId>
     <artifactId>jbpm-data-modeler</artifactId>
     <packaging>pom</packaging>
@@ -67,41 +66,25 @@
 
     <dependencies>
 
-        <!-- external libraries -->
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- enable slf4 for all modules -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
         </dependency>
 
+        <!-- configure slfj4 binding to logback log system for test units -->
 
-        <!-- community libraries -->
         <dependency>
-            <groupId>org.uberfire</groupId>
-            <artifactId>uberfire-backend-api</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

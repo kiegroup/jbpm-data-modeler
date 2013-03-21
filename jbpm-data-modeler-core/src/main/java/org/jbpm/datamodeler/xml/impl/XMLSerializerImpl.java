@@ -16,37 +16,39 @@
 
 package org.jbpm.datamodeler.xml.impl;
 
+import org.apache.xerces.parsers.DOMParser;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
+import org.jbpm.datamodeler.core.ModelElement;
+import org.jbpm.datamodeler.core.ObjectProperty;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.xml.SerializerException;
-import org.jbpm.datamodeler.xml.XMLNode;
+import org.jbpm.datamodeler.xml.util.XMLNode;
 import org.jbpm.datamodeler.xml.XMLSerializer;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.*;
-
-import org.apache.xerces.parsers.DOMParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.*;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class XMLSerializerImpl implements XMLSerializer {
 
+    private static final Logger logger = LoggerFactory.getLogger(XMLSerializerImpl.class);
+
     private static String XML_VERSION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+
+    public static XMLSerializer getInstance() {
+        return new XMLSerializerImpl();
+    }
 
     @Override
     public String serialize(DataModel dataModel) throws SerializerException {
@@ -63,101 +65,36 @@ public class XMLSerializerImpl implements XMLSerializer {
             visitor.visitDataModel(dataModel);
             visitor.getRootNode().writeXML(writer, true, true);
         } catch (Exception e) {
+            logger.error("An error was produced during a data model serialization.", e);
             throw new SerializerException(e.getMessage(), e);
         }
     }
 
-    public String serialize2(DataModel dataModel) {
-        StringWriter writer = new StringWriter();
-        serialize2(dataModel, writer);
-        
-        return writer.toString();
-    }
-
-    public void serialize2(DataModel dataModel, Writer writer) {
-
-        //TODO provide final implementation
-        try {
-
-            DataModelMock modelMock = new DataModelMock();
-            modelMock.setName(dataModel.getName());
-            modelMock.setPackageName("");
-    
-            for (DataObject dataObject : dataModel.getDataObjects()) {
-                modelMock.getDataObjects().add(dataObject.getName());
-                modelMock.setPackageName(dataObject.getPackageName());
-            }
-    
-            JAXBContext jaxbContext = JAXBContext.newInstance(DataModelMock.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-    
-            jaxbMarshaller.marshal(modelMock, writer);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public DataModel unserializeOLD(String xml) throws SerializerException {
-        //TODO provide final implementation
-
-        StringReader reader = new StringReader(xml);
-        return unserialize(reader);
-    }
-
-    public DataModel unserializeOLD(Reader reader) throws SerializerException {
-        //TODO provide final implementation
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(DataModelMock.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            DataModelMock mock = (DataModelMock) jaxbUnmarshaller.unmarshal(reader);
-
-            DataModel dataModel = ModelFactoryImpl.getInstance().newModel(mock.getName());
-
-
-            for (String dataObjectName : mock.getDataObjects()) {
-                dataModel.addDataObject(mock.getPackageName(), dataObjectName);
-            }
-            return dataModel;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new SerializerException(e.getMessage(), e);
-        }
-
-    }
-
     @Override
-    public DataModel unserialize(Reader xml) throws SerializerException {
-        //TODO provide final implementation
-        return null;
-    }
-    
-    @Override
-    public DataModel unserialize(String xml) throws SerializerException {
-        //TODO provide final implementation
-
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(xml.getBytes());
+    public DataModel deserialize(InputStream inputStream) throws SerializerException {
         try {
-            Document doc = load(byteArrayInputStream);
+            Document doc = loadXML(inputStream);
             XMLNode root = initTree(doc);
             return fromXMLNode(root);
         } catch (Exception e) {
-
+            logger.error("An error was produced during a data model deserialization.", e);
+            throw new SerializerException(e.getMessage(), e);
         }
-        StringReader reader = new StringReader(xml);
-        return null;
+    }
+    
+    @Override
+    public DataModel deserialize(String xml) throws SerializerException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(xml.getBytes());
+        return deserialize(byteArrayInputStream);
     }
 
-    protected Document load(InputStream is) throws IOException, ParserConfigurationException, SAXException, SAXNotRecognizedException {
-        URL schemaUrl = getClass().getResource("../DataModel.xsd");
+    protected Document loadXML(InputStream is) throws IOException, ParserConfigurationException, SAXException {
+        URL schemaUrl = getClass().getResource("/org/jbpm/datamodeler/xml/DataModel.xsd");
 
         if (schemaUrl == null) {
-            //log.fatal("Could not find [repositoryExport.xsd]. Used [" + getClass().getClassLoader() + "] class loader in the search.");
-            return null;
+            //the .xsd file was not found.
+            logger.error("Xsd file DataModel.xsd was not found, the data model can't be parsed from the input source.");
+            throw new IOException("Xsd file DataModel.xsd was not found, the data model can't be parsed from the input source.");
         }
 
         String schema = schemaUrl.toString();
@@ -182,17 +119,19 @@ public class XMLSerializerImpl implements XMLSerializer {
 
         //Set the error handler
         parser.setErrorHandler(new ErrorHandler() {
-            public void error(SAXParseException exception) throws SAXParseException {
-                throw exception;
+            public void error(SAXParseException e) throws SAXParseException {
+                logger.error("Parser error was produced.", e);
+                throw e;
             }
 
-            public void fatalError(SAXParseException exception) throws SAXParseException {
-                throw exception;
+            public void fatalError(SAXParseException e) throws SAXParseException {
+                logger.error("Parser fatal error was produced.", e);
+                throw e;
             }
 
-            public void warning(SAXParseException exception) {
-                /*getWarnings().add(exception.getMessage());
-                getWarningArguments().add(new Object[]{exception});*/
+            public void warning(SAXParseException e) {
+                //by the moment we simply log warnings
+                logger.warn("Parser warning was produced.", e);
             }
         });
 
@@ -206,10 +145,12 @@ public class XMLSerializerImpl implements XMLSerializer {
         //Parse the XML document
         parser.parse(new InputSource(new ByteArrayInputStream(bos.toByteArray())));
 
-        Document doc = parser.getDocument();
-        return doc;
+        return parser.getDocument();
     }
 
+    /**
+     * Calculate the XMLNodes tree.
+     */
     protected XMLNode initTree(Document doc) {
         NodeList nlist = doc.getChildNodes();
         Node rootNode = null;
@@ -218,34 +159,72 @@ public class XMLSerializerImpl implements XMLSerializer {
             if (DataModelVisitor.NODE_DATA_MODEL.equals(item.getNodeName()))
                 rootNode = item;
         }
-        XMLNode node;
 
+        XMLNode node;
         node = new XMLNode("?", null);
         node.loadFromXMLNode(rootNode);
 
         return node;
     }
 
-    private DataModel fromXMLNode(XMLNode xmlNode) {
-        DataModel dataModel = ModelFactoryImpl.getInstance().newModel(xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_NAME));
-        dataModel.setVersion(xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_VERSION));
+    /**
+     *
+     * @param xmlNode Root of the XMLNodes that defines the data model.
+     *
+     * @return The data model corresponding to the XMLNodes tree.
+     */
+    protected DataModel fromXMLNode(XMLNode xmlNode) {
+        
+        String format = xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_FORMAT);
+        String version = xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_VERSION);
+        String name = xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_NAME);
+
+        DataModel dataModel = ModelFactoryImpl.getInstance().newModel(name, format);
+        dataModel.setVersion(version);
 
         List<XMLNode> children = xmlNode.getChildren();
-        for (XMLNode node : children) {
-            if (DataModelVisitor.NODE_ATTRIBUTE.equals(node.getObjectName())) {
-                //procesar un atributo
-            } else if (DataModelVisitor.NODE_DATA_OBJECT.equals(node.getObjectName())) {
-                addDataObjectFromNode(dataModel, node);
+        for (XMLNode child : children) {
+            if (DataModelVisitor.NODE_ATTRIBUTE.equals(child.getObjectName())) {
+                addAttributeFromNode(dataModel, child);
+            } else if (DataModelVisitor.NODE_DATA_OBJECT.equals(child.getObjectName())) {
+                addDataObjectFromNode(dataModel, child);
             }
         }
-
         return dataModel;
-                
     }
 
-    private void addDataObjectFromNode(DataModel dataModel, XMLNode node) {
+    protected void addDataObjectFromNode(DataModel dataModel, XMLNode node) {
         String className = node.getAttributes().getProperty(DataModelVisitor.ATTR_CLASS_NAME);
         DataObject dataObject = dataModel.addDataObject(className);
-                
+
+        List<XMLNode> children = node.getChildren();
+        for (XMLNode child : children) {
+            if (DataModelVisitor.NODE_ATTRIBUTE.equals(child.getObjectName())) {
+                addAttributeFromNode(dataObject, child);
+            } else if (DataModelVisitor.NODE_PROPERTY.equals(child.getObjectName())) {
+                addObjectPropertyFromNode(dataObject, child);
+            }
+        }
     }
+
+    protected void addObjectPropertyFromNode(DataObject dataObject, XMLNode node) {
+        String name = node.getAttributes().getProperty(DataModelVisitor.ATTR_NAME);
+        String className = node.getAttributes().getProperty(DataModelVisitor.ATTR_CLASS_NAME);
+        String bag = node.getAttributes().getProperty(DataModelVisitor.ATTR_BAG);
+        String multiple = node.getAttributes().getProperty(DataModelVisitor.ATTR_MULTIPLE);
+        ObjectProperty property = dataObject.addProperty(name, className);
+
+        boolean isMultiple = multiple != null ? Boolean.parseBoolean(multiple) : false;
+        property.setMultiple(isMultiple);
+        if (property.isMultiple()) {
+            property.setBag(bag);
+        }
+    }
+
+    protected void addAttributeFromNode(ModelElement element, XMLNode node) {
+        String name = node.getAttributes().getProperty(DataModelVisitor.ATTR_NAME);
+        String value = node.getAttributes().getProperty(DataModelVisitor.ATTR_VALUE);
+        element.addAttribute(name, value);
+    }
+
 }
