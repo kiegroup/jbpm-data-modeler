@@ -103,7 +103,10 @@ public class DataModelEditorViewImpl extends Composite
 
     @Override
     public void selectDataObjectProperty(ObjectPropertyTO selectedProperty) {
-        propertyEditor.loadProperties("Properties (" + selectedProperty.getName() +")", selectedProperty.getName(), selectedProperty.getClassName());
+        //TODO provide final implementation
+        propertyEditor.loadProperties("Properties (" + (selectedProperty != null ? selectedProperty.getName() : "") +")",
+                (selectedProperty != null ? selectedProperty.getName() : ""),
+                (selectedProperty != null ? selectedProperty.getClassName() : ""));
     }
 
     @Override

@@ -127,7 +127,7 @@ public class DataModelEditorPresenter {
 
                 //TODO implement the required controls to ensure the name valid, etc.
                 DataObjectTO dataObject = new DataObjectTO(text);
-                dataObject.setPackageName(dataModel.getDefaultPackage());;
+                dataObject.setPackageName(dataModel.getDefaultPackage());
                 dataModel.getDataObjects().add(dataObject);
                 view.addDataObject(dataObject);
                 notification.fire(new NotificationEvent("Data object: " + text + " was created"));

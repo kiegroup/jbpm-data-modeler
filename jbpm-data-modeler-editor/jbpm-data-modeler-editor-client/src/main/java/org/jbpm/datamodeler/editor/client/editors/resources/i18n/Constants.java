@@ -27,6 +27,8 @@ public interface Constants extends Messages {
     
     public String modelBrowser_createDataObject();
 
+    public String modelBrowser_action_deleteDataObject();
+
     public String objectEditor_objectUnknown();
     
     public String objectEditor_createProperty();
@@ -44,6 +46,7 @@ public interface Constants extends Messages {
     public String objectEditor_dataObjectType();
     
     public String objectEditor_multiple();
-    
+
+    public String objectEditor_action_deleteProperty();
 
 }

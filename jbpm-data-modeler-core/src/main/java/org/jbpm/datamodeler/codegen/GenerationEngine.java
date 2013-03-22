@@ -98,7 +98,7 @@ public class GenerationEngine {
      *
      * @return A properly initialized VelocityContext.
      */
-    protected VelocityContext buildContext(GenerationContext generationContext) {
+    private VelocityContext buildContext(GenerationContext generationContext) {
         VelocityContext context = new VelocityContext();
 
         // Add main objects to velocity context
@@ -168,13 +168,11 @@ public class GenerationEngine {
         //read the template to use
         String templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
         Template t = velocityEngine.getTemplate(templatePath);
-
-        //generate equals
         t.merge(generationContext.getVelocityContext(), generationContext.getCurrentOutput());
     }
 
     /**
-     * Returns the path for a given template name and that a given template.
+     * Returns the path for a given template name.
      *
      * @param templatesPath Templates path location.
      *

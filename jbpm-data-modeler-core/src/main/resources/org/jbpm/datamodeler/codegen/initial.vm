@@ -4,7 +4,7 @@
 
 ## Iterate over the data model and generate the pojo for each data object
 
-## Injected context parameters by caller
+## Injected context parameters by caller are:
 
 ## engine    -> GenerationEngine
 ## context   -> GenerationContext

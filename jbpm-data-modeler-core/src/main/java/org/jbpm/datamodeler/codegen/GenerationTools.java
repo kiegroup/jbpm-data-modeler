@@ -19,7 +19,7 @@ package org.jbpm.datamodeler.codegen;
 import org.jbpm.datamodeler.core.ObjectProperty;
 
 /**
- * Helper tools to generate names easily from org.jbpm.datamodeler.template
+ * Helper tools to generate names easily from code generation engine.
  */
 public class GenerationTools {
 

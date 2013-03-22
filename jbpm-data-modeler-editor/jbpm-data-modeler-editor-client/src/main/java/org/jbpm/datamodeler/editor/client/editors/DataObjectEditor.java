@@ -18,12 +18,18 @@ package org.jbpm.datamodeler.editor.client.editors;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -32,6 +38,7 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -44,6 +51,7 @@ import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -104,7 +112,6 @@ public class DataObjectEditor  extends Composite {
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
 
-
         objectName.setText(Constants.INSTANCE.objectEditor_objectUnknown());
         dataObjectPropertiesProvider.setList(dataObjectProperties);
 
@@ -112,28 +119,29 @@ public class DataObjectEditor  extends Composite {
 
         dataObjectPropertiesTable.setEmptyTableWidget(new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.objectEditor_emptyTable()));
 
-
         //Init delete column
-        Column<ObjectPropertyTO, ImageResource> deletePropertyColumn = new Column<ObjectPropertyTO, ImageResource>(new ClickableImageResourceCell(true)) {
+        ClickableImageResourceCell clickableImageResourceCell = new ClickableImageResourceCell(true);
+        final TooltipCellDecorator<ImageResource> decorator = new TooltipCellDecorator<ImageResource>(clickableImageResourceCell);
+        decorator.setText(Constants.INSTANCE.objectEditor_action_deleteProperty());
 
+        final Column<ObjectPropertyTO, ImageResource> deletePropertyColumnImg = new Column<ObjectPropertyTO, ImageResource>(decorator) {
             @Override
-            public ImageResource getValue(ObjectPropertyTO objectProperty) {
+            public ImageResource getValue( final ObjectPropertyTO global ) {
                 return ImagesResources.INSTANCE.Delete();
             }
         };
 
-        deletePropertyColumn.setFieldUpdater(new FieldUpdater<ObjectPropertyTO, ImageResource>() {
+        deletePropertyColumnImg.setFieldUpdater( new FieldUpdater<ObjectPropertyTO, ImageResource>() {
+            public void update( final int index,
+                                final ObjectPropertyTO property,
+                                final ImageResource value ) {
 
-            @Override
-            public void update(final int index,
-                               final ObjectPropertyTO objectProperty,
-                               final ImageResource value) {
-
-                Command deleteCommand = modelEditorPresenter.createDeleteCommand(dataObject, objectProperty, index);
+                Command deleteCommand = modelEditorPresenter.createDeleteCommand(dataObject, property, index);
                 deleteCommand.execute();
             }
-        });
+        } );
 
+        /// bbb
         /*
         final com.github.gwtbootstrap.client.ui.ButtonCell deletePropertyButton = new com.github.gwtbootstrap.client.ui.ButtonCell();
         deletePropertyButton.setType( ButtonType.DEFAULT );
@@ -159,12 +167,33 @@ public class DataObjectEditor  extends Composite {
         } );
         */
 
-        dataObjectPropertiesTable.addColumn(deletePropertyColumn);
-        dataObjectPropertiesTable.setColumnWidth(deletePropertyColumn, 20, Style.Unit.PX);
+        //dataObjectPropertiesTable.addColumn(deletePropertyColumn);
+        dataObjectPropertiesTable.addColumn(deletePropertyColumnImg);
+        dataObjectPropertiesTable.setColumnWidth(deletePropertyColumnImg, 20, Style.Unit.PX);
 
 
         //Init property name column
         final TextColumn<ObjectPropertyTO> propertyNameColumn = new TextColumn<ObjectPropertyTO>() {
+
+            @Override
+            public void render(Cell.Context context, ObjectPropertyTO object, SafeHtmlBuilder sb) {
+                SafeHtml startDiv = new SafeHtml() {
+                    @Override
+                    public String asString() {
+                        return "<div style=\"cursor: pointer;\">";
+                    }
+                };
+                SafeHtml endDiv = new SafeHtml() {
+                    @Override
+                    public String asString() {
+                        return "</div>";
+                    }
+                };
+
+                sb.append(startDiv);
+                super.render(context, object, sb);
+                sb.append(endDiv);
+            }
 
             @Override
             public String getValue( final ObjectPropertyTO objectProperty) {
@@ -176,15 +205,8 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesTable.addColumn(propertyNameColumn, Constants.INSTANCE.objectEditor_columnName());
 
         ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyNameColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
-        propertyNameColHandler.setComparator(propertyNameColumn, new Comparator<ObjectPropertyTO>() {
-
-            @Override
-            public int compare(ObjectPropertyTO o1, ObjectPropertyTO o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
+        propertyNameColHandler.setComparator(propertyNameColumn, new ObjectPropertyComparator("name"));
         dataObjectPropertiesTable.addColumnSortHandler(propertyNameColHandler);
-
 
         //Init property type column
         final TextColumn<ObjectPropertyTO> propertyTypeColumn = new TextColumn<ObjectPropertyTO>() {
@@ -193,39 +215,43 @@ public class DataObjectEditor  extends Composite {
             public String getValue(final ObjectPropertyTO objectProperty) {
                 return propertyTypeDisplay(objectProperty);
             }
+
+
+            @Override
+            public void onBrowserEvent(Cell.Context context, Element elem,
+                                       ObjectPropertyTO object, NativeEvent event) {
+                super.onBrowserEvent(context, elem, object, event);
+                if ("click".equals(event.getType())) {
+                    //call your click event handler here
+                    Window.alert("click en: " + object.getName());
+                }
+            }
         };
 
         propertyTypeColumn.setSortable(true);
         dataObjectPropertiesTable.addColumn(propertyTypeColumn, Constants.INSTANCE.objectEditor_columnType());
 
         ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyTypeColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
-        propertyTypeColHandler.setComparator(propertyTypeColumn, new Comparator<ObjectPropertyTO>() {
-
-            @Override
-            public int compare(ObjectPropertyTO o1, ObjectPropertyTO o2) {
-                return o1.getName() .compareTo(o2.getClassName());
-            }
-        });
+        propertyTypeColHandler.setComparator(propertyTypeColumn, new ObjectPropertyComparator("className"));
         dataObjectPropertiesTable.addColumnSortHandler(propertyTypeColHandler);
 
 
         dataObjectPropertiesTable.getColumnSortList().push(propertyTypeColumn);
         dataObjectPropertiesTable.getColumnSortList().push(propertyNameColumn);
 
-
         //Init the selection model
+        dataObjectPropertiesTable.setSelectionModel(selectionModel);
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                ObjectPropertyTO selectedPropertyTO = selectionModel.getSelectedObject();
+                ObjectPropertyTO selectedPropertyTO = ((SingleSelectionModel<ObjectPropertyTO>)dataObjectPropertiesTable.getSelectionModel()).getSelectedObject();
                 Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
                 selectCommand.execute();
             }
         });
 
         dataObjectPropertiesTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
-        dataObjectPropertiesTable.setSelectionModel(selectionModel);
 
 
         //pager.setDisplay(dataObjectPropertiesTable);
@@ -280,12 +306,50 @@ public class DataObjectEditor  extends Composite {
         this.dataObject = dataObject;
         objectName.setText(dataObject.getName());
 
+        //We create a new selection model due to a bug found in GWT when we change f.e. from one data object with 9 rows
+        // to one with 3 rows and the table was sorted.
+        //Several tests has been done and the final workaround (not too bad) we found is to
+        // 1) sort the table again
+        // 2) create a new selection model
+        // 3) populate the table with new items
+        // 3) select the first row
+        dataObjectPropertiesTable.getColumnSortList().push(dataObjectPropertiesTable.getColumn(0));
+        SingleSelectionModel selectionModel2 = new SingleSelectionModel<ObjectPropertyTO>();
+        dataObjectPropertiesTable.setSelectionModel(selectionModel2);
+
+        selectionModel2.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                ObjectPropertyTO selectedPropertyTO = ((SingleSelectionModel<ObjectPropertyTO>)dataObjectPropertiesTable.getSelectionModel()).getSelectedObject();
+                Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
+                selectCommand.execute();
+            }
+        });
+
+        ArrayList<ObjectPropertyTO> sortBuffer = new ArrayList<ObjectPropertyTO>();
+        sortBuffer.addAll(dataObject.getProperties());
+        Collections.sort(sortBuffer, new ObjectPropertyComparator("name"));
+
         dataObjectProperties = dataObject.getProperties();
         dataObjectPropertiesProvider.getList().clear();
-        dataObjectPropertiesProvider.getList().addAll(dataObjectProperties);
+        dataObjectPropertiesProvider.getList().addAll(sortBuffer);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
-        selectionModel.clear();
+
+        dataObjectPropertiesTable.getColumnSortList().push(dataObjectPropertiesTable.getColumn(0));
+
+        if (dataObjectProperties.size() > 0) {
+            dataObjectPropertiesTable.setKeyboardSelectedRow(0);
+            selectionModel2.setSelected(sortBuffer.get(0), true);
+        }
+
+        //set the first row selected again. Sounds crazy, but's part of the workaround, don't remove this line.
+        if (dataObjectProperties.size() > 0) {
+            dataObjectPropertiesTable.setKeyboardSelectedRow(0);
+        }
+
+        ColumnSortEvent.fire(dataObjectPropertiesTable, dataObjectPropertiesTable.getColumnSortList());
     }
 
     public void addDataObjectProperty(ObjectPropertyTO objectProperty) {

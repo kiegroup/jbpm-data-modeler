@@ -114,7 +114,7 @@ public class DataModelBrowser extends Composite {
 
         ClickableImageResourceCell clickableImageResourceCell = new ClickableImageResourceCell(true);
         final TooltipCellDecorator<ImageResource> decorator = new TooltipCellDecorator<ImageResource>(clickableImageResourceCell);
-        decorator.setText("delete data object");
+        decorator.setText(Constants.INSTANCE.modelBrowser_action_deleteDataObject());
 
         final Column<DataObjectTO, ImageResource> deleteDataObjectColumnImg = new Column<DataObjectTO, ImageResource>(decorator) {
             @Override
@@ -211,7 +211,6 @@ public class DataModelBrowser extends Composite {
 
         dataObjectsProvider.setList(dataObjects);
         dataObjectsProvider.refresh();
-        //selectionModel.clear();
 
         newEntityButton.setIcon(IconType.PLUS_SIGN);
     }
@@ -239,27 +238,10 @@ public class DataModelBrowser extends Composite {
         dataObjectsProvider.flush();
         dataObjectsProvider.refresh();
 
-        //Workaround, to enable the selection of the last created object.
-        //TODO review this later
-        selectionModel = new SingleSelectionModel<DataObjectTO>();
-        //Init the selection model
-        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+        int index = dataObjectsProvider.getList().size();
+        index = index > 0 ? (index-1) : 0;
 
-            @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
-                DataObjectTO selectedObjectTO = selectionModel.getSelectedObject();
-                Command selectCommand = modelEditorPresenter.createSelectCommand(selectedObjectTO);
-                selectCommand.execute();
-            }
-        });
-
-
-        dataObjectsTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
-        dataObjectsTable.setSelectionModel(selectionModel);
-
-        selectionModel.setSelected(dataObject, true);
-        //this method is invoked to ensure that de selection updates
-        selectionModel.getSelectedObject();
+        dataObjectsTable.setKeyboardSelectedRow(index);
     }
 
     public DataModelEditorPresenter getModelEditorPresenter() {
