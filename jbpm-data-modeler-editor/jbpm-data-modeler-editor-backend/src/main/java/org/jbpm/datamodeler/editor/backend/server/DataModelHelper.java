@@ -4,7 +4,9 @@ package org.jbpm.datamodeler.editor.backend.server;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.ObjectProperty;
+import org.jbpm.datamodeler.core.PropertyTypeFactory;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
+import org.jbpm.datamodeler.core.impl.PropertyTypeFactoryImpl;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -55,9 +57,11 @@ public class DataModelHelper {
         properties.addAll(dataObject.getProperties().values());
 
         List<ObjectPropertyTO> propertiesTO = new ArrayList<ObjectPropertyTO>();
+        PropertyTypeFactory typeFactory = PropertyTypeFactoryImpl.getInstance();
+
         if (properties != null) {
             for (ObjectProperty property : properties) {
-                propertiesTO.add(new ObjectPropertyTO(property.getName(), property.getClassName(), property.isMultiple()));
+                propertiesTO.add(new ObjectPropertyTO(property.getName(), property.getClassName(), property.isMultiple(), typeFactory.isBasePropertyType(property.getClassName())));
             }
         }
         dataObjectTO.setProperties(propertiesTO);

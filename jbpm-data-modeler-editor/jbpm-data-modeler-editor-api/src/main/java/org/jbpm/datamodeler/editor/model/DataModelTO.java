@@ -54,6 +54,13 @@ public class DataModelTO implements Serializable {
     public void setDataObjects(List<DataObjectTO> dataObjects) {
         this.dataObjects = dataObjects;
     }
+    
+    public DataObjectTO getDataObjectByClassName(String className) {
+        for (DataObjectTO dataObject : dataObjects) {
+            if (dataObject.getClassName() != null && dataObject.getClassName().equals(className)) return dataObject;
+        }
+        return null;
+    }
 
     public String getDefaultPackage() {
         return defaultPackage;

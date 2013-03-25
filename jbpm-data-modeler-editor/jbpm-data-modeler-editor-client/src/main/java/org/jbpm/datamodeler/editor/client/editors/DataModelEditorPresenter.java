@@ -154,6 +154,19 @@ public class DataModelEditorPresenter {
         };
     }
 
+    public Command createSelectTypeCommand(final String className) {
+        return new Command() {
+            @Override
+            public void execute() {
+                DataObjectTO dataObject = dataModel.getDataObjectByClassName(className);
+                if (dataObject != null) {
+                    //TODO update the breadcrumb
+                    view.selectDataObject(dataObject);
+                }
+            }
+        };
+    }
+
     public Command createSelectCommand(final ObjectPropertyTO selectedProperty) {
         return new Command() {
             @Override
@@ -174,13 +187,13 @@ public class DataModelEditorPresenter {
         };
     }
 
-    public Command createAddDataObjectPropertyCommand(final DataObjectTO dataObject, final String propertyName, final String propertyType, final boolean multiple) {
+    public Command createAddDataObjectPropertyCommand(final DataObjectTO dataObject, final String propertyName, final String propertyType, final boolean multiple, final boolean baseType) {
 
         return new Command() {
             @Override
             public void execute() {
                 //TODO implement the required controls to ensure the property can be created
-                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple);
+                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple, baseType);
                 dataObject.getProperties().add(property);
                 view.addDataObjectProperty(property);
             }

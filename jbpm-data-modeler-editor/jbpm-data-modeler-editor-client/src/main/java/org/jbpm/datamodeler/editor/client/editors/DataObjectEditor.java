@@ -216,16 +216,6 @@ public class DataObjectEditor  extends Composite {
                 return propertyTypeDisplay(objectProperty);
             }
 
-
-            @Override
-            public void onBrowserEvent(Cell.Context context, Element elem,
-                                       ObjectPropertyTO object, NativeEvent event) {
-                super.onBrowserEvent(context, elem, object, event);
-                if ("click".equals(event.getType())) {
-                    //call your click event handler here
-                    Window.alert("click en: " + object.getName());
-                }
-            }
         };
 
         propertyTypeColumn.setSortable(true);
@@ -261,8 +251,24 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.refresh();
 
         newPropertyIsMultiple.setVisible(false);
+        newPropertyIsMultiple.setValue(false);
         newPropertyBasicType.setValue(true);
         newPropertyButton.setIcon(IconType.PLUS_SIGN);
+
+
+
+        ///property type navegable
+
+        final Column<ObjectPropertyTO, String> propertyTypeColumnNavigable = new Column<ObjectPropertyTO, String>(new PropertyTypeCell(true, this))  {
+
+            @Override
+            public String getValue(final ObjectPropertyTO objectProperty) {
+                return propertyTypeDisplay(objectProperty);
+            }
+
+        };
+        dataObjectPropertiesTable.addColumn(propertyTypeColumnNavigable);
+
     }
 
     private void populateBaseTypes() {
@@ -282,7 +288,8 @@ public class DataObjectEditor  extends Composite {
 
     @UiHandler("newPropertyButton")
     void newPropertyClick(ClickEvent event) {
-        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue(), newPropertyIsMultiple.getValue());
+
+        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue(), newPropertyIsMultiple.getValue(), newPropertyBasicType.getValue());
         createPropertyCommand.execute();
     }
 
@@ -295,6 +302,7 @@ public class DataObjectEditor  extends Composite {
     @UiHandler("newPropertyBasicType")
     void basicTypeSelected(ClickEvent event) {
         newPropertyIsMultiple.setVisible(false);
+        newPropertyIsMultiple.setValue(false);
         populateBaseTypes();
     }
 
@@ -306,7 +314,7 @@ public class DataObjectEditor  extends Composite {
         this.dataObject = dataObject;
         objectName.setText(dataObject.getName());
 
-        //We create a new selection model due to a bug found in GWT when we change f.e. from one data object with 9 rows
+        //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
         // to one with 3 rows and the table was sorted.
         //Several tests has been done and the final workaround (not too bad) we found is to
         // 1) sort the table again
@@ -366,6 +374,10 @@ public class DataObjectEditor  extends Composite {
 
     public void setModelEditorPresenter(DataModelEditorPresenter modelEditorPresenter) {
         this.modelEditorPresenter = modelEditorPresenter;
+    }
+
+    public DataModelEditorPresenter getModelEditorPresenter() {
+        return modelEditorPresenter;
     }
 
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {

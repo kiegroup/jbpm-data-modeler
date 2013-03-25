@@ -97,6 +97,7 @@ public class DataModelEditorViewImpl extends Composite
 
     @Override
     public void selectDataObject(DataObjectTO dataObject) {
+        dataModelBrowser.selectDataObject(dataObject);
         dataObjectEditor.setDataObject(dataObject);
         propertyEditor.loadProperties("Properties (" + dataObject.getName() + ")", dataObject.getName(), "");
     }
