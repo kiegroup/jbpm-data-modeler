@@ -1,24 +1,20 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Window;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.gwt.dom.client.BrowserEvents.CLICK;
-import static com.google.gwt.dom.client.BrowserEvents.KEYDOWN;
 
 public class PropertyTypeCell extends TextCell {
 
@@ -42,9 +38,7 @@ public class PropertyTypeCell extends TextCell {
     @Override
     public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event, ValueUpdater<String> stringValueUpdater) {
 
-        Window.alert("cliqueando: " + context);
         ObjectPropertyTO property = (ObjectPropertyTO)context.getKey();
-        
         if (DOM.eventGetType((Event) event) == Event.ONCLICK && !property.isBaseType()) {
             Command command = editor.getModelEditorPresenter().createSelectTypeCommand(property.getClassName());
             command.execute();

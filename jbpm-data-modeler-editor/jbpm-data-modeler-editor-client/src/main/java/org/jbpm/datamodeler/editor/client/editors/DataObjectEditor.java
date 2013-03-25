@@ -173,6 +173,7 @@ public class DataObjectEditor  extends Composite {
 
 
         //Init property name column
+
         final TextColumn<ObjectPropertyTO> propertyNameColumn = new TextColumn<ObjectPropertyTO>() {
 
             @Override
@@ -201,6 +202,7 @@ public class DataObjectEditor  extends Composite {
             }
         };
 
+
         propertyNameColumn.setSortable(true);
         dataObjectPropertiesTable.addColumn(propertyNameColumn, Constants.INSTANCE.objectEditor_columnName());
 
@@ -209,6 +211,7 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesTable.addColumnSortHandler(propertyNameColHandler);
 
         //Init property type column
+        /*
         final TextColumn<ObjectPropertyTO> propertyTypeColumn = new TextColumn<ObjectPropertyTO>() {
 
             @Override
@@ -217,7 +220,15 @@ public class DataObjectEditor  extends Composite {
             }
 
         };
+        */
+        final Column<ObjectPropertyTO, String> propertyTypeColumn = new Column<ObjectPropertyTO, String>(new PropertyTypeCell(true, this))  {
 
+            @Override
+            public String getValue(final ObjectPropertyTO objectProperty) {
+                return propertyTypeDisplay(objectProperty);
+            }
+
+        };
         propertyTypeColumn.setSortable(true);
         dataObjectPropertiesTable.addColumn(propertyTypeColumn, Constants.INSTANCE.objectEditor_columnType());
 
@@ -254,20 +265,6 @@ public class DataObjectEditor  extends Composite {
         newPropertyIsMultiple.setValue(false);
         newPropertyBasicType.setValue(true);
         newPropertyButton.setIcon(IconType.PLUS_SIGN);
-
-
-
-        ///property type navegable
-
-        final Column<ObjectPropertyTO, String> propertyTypeColumnNavigable = new Column<ObjectPropertyTO, String>(new PropertyTypeCell(true, this))  {
-
-            @Override
-            public String getValue(final ObjectPropertyTO objectProperty) {
-                return propertyTypeDisplay(objectProperty);
-            }
-
-        };
-        dataObjectPropertiesTable.addColumn(propertyTypeColumnNavigable);
 
     }
 
