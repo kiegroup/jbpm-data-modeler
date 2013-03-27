@@ -101,8 +101,18 @@ public class ShowcaseEntryPoint {
 
                             }
                         } )
+                        /*
+                        .endMenu().newTopLevelMenu( "Other test stuf" )
+                        .respondsWith( new Command() {
+                        @Override
+                            public void execute() {
+                                placeManager.goTo( new DefaultPlaceRequest( "testPerspective" ) );
+
+                            }
+                        } )*/
                         .endMenu()
                         .build();
+
 
         menubar.aggregateWorkbenchMenus( menus );
     }

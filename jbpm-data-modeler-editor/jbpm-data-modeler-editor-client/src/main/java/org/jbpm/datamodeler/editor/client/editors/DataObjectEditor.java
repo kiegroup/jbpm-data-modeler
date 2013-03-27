@@ -16,9 +16,8 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -27,6 +26,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -40,6 +40,8 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -67,6 +69,9 @@ public class DataObjectEditor  extends Composite {
 
     @UiField
     VerticalPanel mainPanel;
+
+    @UiField (provided = true)
+    Breadcrumbs dataObjectNavigation = new DataObjectBreadcrums(5);
 
     @UiField
     Label objectName;
@@ -307,7 +312,7 @@ public class DataObjectEditor  extends Composite {
         this.dataModel = dataModel;
     }
 
-    public void setDataObject(DataObjectTO dataObject) {
+    public void setDataObject(DataObjectTO dataObject, boolean cleanBreadcrumbs) {
         this.dataObject = dataObject;
         objectName.setText(dataObject.getName());
 
@@ -355,6 +360,8 @@ public class DataObjectEditor  extends Composite {
         }
 
         ColumnSortEvent.fire(dataObjectPropertiesTable, dataObjectPropertiesTable.getColumnSortList());
+
+        addBreadcrumb(dataObject, cleanBreadcrumbs);
     }
 
     public void addDataObjectProperty(ObjectPropertyTO objectProperty) {
@@ -381,7 +388,12 @@ public class DataObjectEditor  extends Composite {
         this.baseTypes = baseTypes;
         populateBaseTypes();
     }
-    
+
+    public void addBreadcrumb(DataObjectTO dataObject, boolean clear) {
+        if (clear) dataObjectNavigation.clear();
+        ((DataObjectBreadcrums)dataObjectNavigation).add(dataObject, modelEditorPresenter.createSelectCommand(dataObject, false));
+    }
+
     private String propertyTypeDisplay(ObjectPropertyTO propertyTO) {
         String className = propertyTO.getClassName();
         if (propertyTO.isMultiple()) {

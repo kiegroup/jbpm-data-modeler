@@ -55,7 +55,7 @@ public class DataModelEditorViewImpl extends Composite
     private Anchor editorTitle = new Anchor();
 
     @Inject
-    private PropertyEditor propertyEditor;
+    private TabbedPropertyEditor tabbedPropertyEditor;
 
     @Inject
     private DataModelBrowser dataModelBrowser;
@@ -92,20 +92,22 @@ public class DataModelEditorViewImpl extends Composite
 
     @Override
     public void modelSelected() {
-        propertyEditor.loadProperties("Propiedades del modelo", "","");
+        //TODO complete this implementation when the properties editor is ready
+        tabbedPropertyEditor.modelProperties.loadProperties("Model properties", "","");
     }
 
     @Override
-    public void selectDataObject(DataObjectTO dataObject) {
+    public void selectDataObject(DataObjectTO dataObject, boolean clearBreadcrums) {
         dataModelBrowser.selectDataObject(dataObject);
-        dataObjectEditor.setDataObject(dataObject);
-        propertyEditor.loadProperties("Properties (" + dataObject.getName() + ")", dataObject.getName(), "");
+        dataObjectEditor.setDataObject(dataObject, clearBreadcrums);
+        //TODO complete this implementation when the properties editor is ready
+        tabbedPropertyEditor.objectProperties.loadProperties("Data Object properties (" + dataObject.getName() + ")", dataObject.getName(), "");
     }
 
     @Override
     public void selectDataObjectProperty(ObjectPropertyTO selectedProperty) {
-        //TODO provide final implementation
-        propertyEditor.loadProperties("Properties (" + (selectedProperty != null ? selectedProperty.getName() : "") +")",
+        //TODO complete this implementation when the properties editor is ready
+        tabbedPropertyEditor.fieldProperties.loadProperties("Field properties (" + (selectedProperty != null ? selectedProperty.getName() : "") +")",
                 (selectedProperty != null ? selectedProperty.getName() : ""),
                 (selectedProperty != null ? selectedProperty.getClassName() : ""));
     }
@@ -126,7 +128,7 @@ public class DataModelEditorViewImpl extends Composite
         
         browserPanel.add(dataModelBrowser);
         dataObjectPanel.add(dataObjectEditor);
-        propertiesPanel.add(propertyEditor);
+        propertiesPanel.add(tabbedPropertyEditor);
     }
 
     @Override

@@ -83,6 +83,8 @@ public class DataModelBrowser extends Composite {
 
     private DataModelEditorPresenter modelEditorPresenter;
 
+    private boolean skipNextOnChange = false;
+
     public DataModelBrowser(DataModelEditorPresenter modelEditorPresenter) {
         this.modelEditorPresenter = modelEditorPresenter;
     }
@@ -194,9 +196,12 @@ public class DataModelBrowser extends Composite {
 
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                DataObjectTO selectedObjectTO = selectionModel.getSelectedObject();
-                Command selectCommand = modelEditorPresenter.createSelectCommand(selectedObjectTO);
-                selectCommand.execute();
+                if (!skipNextOnChange) {
+                    DataObjectTO selectedObjectTO = selectionModel.getSelectedObject();
+                    Command selectCommand = modelEditorPresenter.createSelectCommand(selectedObjectTO, true);
+                    selectCommand.execute();
+                }
+                skipNextOnChange = false;
             }
         });
 
@@ -253,6 +258,9 @@ public class DataModelBrowser extends Composite {
     public void selectDataObject(DataObjectTO dataObject) {
         int index = dataObjectsProvider.getList().indexOf(dataObject);
         if (index >= 0) {
+            //when the selected object is set programatically an onSelectionChange event is produced
+            //but we want to avoid this redundant (in this case) event because the object has already been selected.
+            skipNextOnChange = true;
             selectionModel.setSelected(dataObject, true);
             dataObjectsTable.setKeyboardSelectedRow(index);
         }

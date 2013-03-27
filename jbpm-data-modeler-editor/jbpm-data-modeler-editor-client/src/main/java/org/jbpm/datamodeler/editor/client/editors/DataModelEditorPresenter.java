@@ -61,7 +61,7 @@ public class DataModelEditorPresenter {
 
         void modelSelected();
 
-        void selectDataObject(DataObjectTO dataObject);
+        void selectDataObject(DataObjectTO dataObject, boolean clearBreadcrums);
 
         void selectDataObjectProperty(ObjectPropertyTO selectedProperty);
 
@@ -114,7 +114,7 @@ public class DataModelEditorPresenter {
                 //TODO implement the required controls to ensure the requested object can be deleted
                 dataModel.getDataObjects().remove(dataObjectTO);
                 view.deleteDataObject(dataObjectTO, index);
-                notification.fire(new NotificationEvent("Data object: " + dataObjectTO.getName() + " was deleted"));
+                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObjectTO.getName())));
             }
         };
     }
@@ -130,7 +130,7 @@ public class DataModelEditorPresenter {
                 dataObject.setPackageName(dataModel.getDefaultPackage());
                 dataModel.getDataObjects().add(dataObject);
                 view.addDataObject(dataObject);
-                notification.fire(new NotificationEvent("Data object: " + text + " was created"));
+                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(text)));
             }
         };
     }
@@ -145,11 +145,11 @@ public class DataModelEditorPresenter {
         };
     }
 
-    public Command createSelectCommand(final DataObjectTO selectedObject) {
+    public Command createSelectCommand(final DataObjectTO selectedObject, final boolean clearBreadcrums) {
         return new Command() {
             @Override
             public void execute() {
-                view.selectDataObject(selectedObject);
+                view.selectDataObject(selectedObject, clearBreadcrums);
             }
         };
     }
@@ -160,8 +160,7 @@ public class DataModelEditorPresenter {
             public void execute() {
                 DataObjectTO dataObject = dataModel.getDataObjectByClassName(className);
                 if (dataObject != null) {
-                    //TODO update the breadcrumb
-                    view.selectDataObject(dataObject);
+                    view.selectDataObject(dataObject, false);
                 }
             }
         };
@@ -261,7 +260,7 @@ public class DataModelEditorPresenter {
                     public void callback(DataModelTO dataModel) {
                         setDataModel(dataModel);
                         view.setDataModel(dataModel);
-                        notification.fire(new NotificationEvent("Model was loaded from server: " + dataModel.getName() + " at time: " + new java.util.Date()));
+                        notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_loaded(dataModel.getName())));
                     }
 
                     },
@@ -277,8 +276,7 @@ public class DataModelEditorPresenter {
         modelerService.call(new RemoteCallback<Object>() {
             @Override
             public void callback(Object response) {
-
-
+                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_generated()));
             }
         },
                 new DataModelerErrorCallback("An error was produced during data model generation.")

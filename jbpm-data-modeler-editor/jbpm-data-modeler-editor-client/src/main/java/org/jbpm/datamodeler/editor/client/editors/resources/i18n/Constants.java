@@ -19,6 +19,14 @@ public interface Constants extends Messages {
 
     public String modelEditor_menu_generate();
 
+    public String modelEditor_notification_dataObject_created(String name);
+
+    public String modelEditor_notification_dataObject_deleted(String name);
+
+    public String modelEditor_notification_dataModel_generated();
+
+    public String modelEditor_notification_dataModel_loaded(String name);
+
     public String modelBrowser_modelUnknown();
 
     public String modelBrowser_emptyTable();

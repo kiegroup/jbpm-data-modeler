@@ -5,14 +5,11 @@
 
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
 
-    <ui:style>
-
-    </ui:style>
-
     <gwt:HTMLPanel>
 
             <b:Column size="12">
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
+                    <b:Breadcrumbs divider=">" ui:field="dataObjectNavigation"/>
 
                     <gwt:HTMLPanel>
                         <div class="well" style="margin-top:20px;">
@@ -48,10 +45,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="span3">
+                                            <td class="span3" colspan="2">
                                                 <b:RadioButton ui:field="newPropertyDataObjectType" name="typeMode" text="{i18n.objectEditor_dataObjectType}"/>
                                             </td>
-                                            <td colspan="2">
+                                            <td colspan="1">
                                             </td>
                                         </tr>
                                     </table>
