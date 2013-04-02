@@ -34,22 +34,30 @@ public class DataObjectBreadcrums extends Breadcrumbs {
 
     public void add(DataObjectTO dataObject, final Command command) {
 
-        if (buffer.size() >= size) {
-            //remove first element
-            buffer.remove(0);
+        boolean exists = false;
+        if (buffer.size() > 0) {
+            BufferElement lastItem = buffer.get(buffer.size() - 1);
+            exists = lastItem.getDataObject().equals(dataObject);
         }
 
-        //create the new widget
-        NavLink navLink = new NavLink(dataObject.getName());
-        navLink.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                command.execute();
+        if (!exists) {
+            if (buffer.size() >= size) {
+                //remove first element
+                buffer.remove(0);
             }
-        });
-        buffer.add(new BufferElement(dataObject, navLink));
 
-        rebuild();
+            //create the new widget
+            NavLink navLink = new NavLink(dataObject.getName());
+            navLink.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    command.execute();
+                }
+            });
+            buffer.add(new BufferElement(dataObject, navLink));
+
+            rebuild();
+        }
     }
 
     private void rebuild() {
