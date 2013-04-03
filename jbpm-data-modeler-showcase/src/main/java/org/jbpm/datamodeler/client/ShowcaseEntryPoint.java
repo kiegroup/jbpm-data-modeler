@@ -101,7 +101,7 @@ public class ShowcaseEntryPoint {
 
                             }
                         } )
-                        /*
+
                         .endMenu().newTopLevelMenu( "Other test stuf" )
                         .respondsWith( new Command() {
                         @Override
@@ -109,7 +109,8 @@ public class ShowcaseEntryPoint {
                                 placeManager.goTo( new DefaultPlaceRequest( "testPerspective" ) );
 
                             }
-                        } )*/
+                        } )
+
                         .endMenu()
                         .build();
 
