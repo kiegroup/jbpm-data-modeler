@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.jbpm.datamodeler.core.ObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +56,15 @@ public class GenerationEngine {
         if (!inited) {
             // Init velocity engine
             Properties properties = new Properties();
+
             properties.setProperty("resource.loader", "class");
             properties.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
             properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+
+            //TODO REVIEW THIS
+            properties.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, "org.apache.velocity.runtime.log.JdkLogChute");
+
+
 
             // init velocity engine
             velocityEngine.init(properties);
