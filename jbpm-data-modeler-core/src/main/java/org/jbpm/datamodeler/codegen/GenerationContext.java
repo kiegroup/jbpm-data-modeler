@@ -32,7 +32,7 @@ public class GenerationContext {
     /**
      * Path to the template set that will be used by default.
      */
-    private static final String DEFAULT_TEMPLATES_PAHT = "org/jbpm/datamodeler/codegen";
+    private static final String DEFAULT_TEMPLATES_PATH = "org/jbpm/datamodeler/codegen";
     
     private static final String DEFAULT_INITIAL_TEMPLATE = "initial";
 
@@ -73,7 +73,7 @@ public class GenerationContext {
     public GenerationContext(DataModel dataModel, boolean defaultTemplates) {
         this.dataModel = dataModel;
         if (defaultTemplates) {
-            setTemplatesPath(DEFAULT_TEMPLATES_PAHT);
+            setTemplatesPath(DEFAULT_TEMPLATES_PATH);
             setInitialTemplate(DEFAULT_INITIAL_TEMPLATE);
         }
     }
