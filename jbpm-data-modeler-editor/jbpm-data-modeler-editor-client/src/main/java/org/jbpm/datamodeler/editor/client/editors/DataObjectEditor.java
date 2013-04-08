@@ -308,6 +308,10 @@ public class DataObjectEditor  extends Composite {
         populateBaseTypes();
     }
 
+    public void notifyDataModelChanged() {
+        populateObjectTypes();
+    }
+
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
     }
