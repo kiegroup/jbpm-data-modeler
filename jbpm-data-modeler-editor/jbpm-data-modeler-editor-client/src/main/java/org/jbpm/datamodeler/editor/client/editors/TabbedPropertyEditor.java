@@ -29,13 +29,13 @@ public class TabbedPropertyEditor extends Composite {
     private Tab fieldTab = new Tab();
     
     @Inject
-    public PropertyEditor modelProperties;
+    public PropertyEditor2 modelProperties;
 
     @Inject
-    public PropertyEditor objectProperties;
+    public PropertyEditor2 objectProperties;
 
     @Inject
-    public PropertyEditor fieldProperties;
+    public PropertyEditor2 fieldProperties;
 
     public TabbedPropertyEditor() {
     }

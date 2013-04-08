@@ -30,8 +30,8 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 @Dependent
-@Templated(value = "PropertyEditor.html")
-public class PropertyEditor extends Composite {
+@Templated(value = "PropertyEditor2.html")
+public class PropertyEditor2 extends Composite {
 
     @DataField
     private Label dataObjectPropertiesLabel = new Label("Nada seleccionado");
@@ -47,7 +47,7 @@ public class PropertyEditor extends Composite {
     @DataField
     private TextBox documentation;
 
-    public PropertyEditor() {
+    public PropertyEditor2() {
     }
 
     @EventHandler("button")

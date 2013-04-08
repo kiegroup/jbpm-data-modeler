@@ -47,6 +47,8 @@
 
     <inherits name="org.jbpm.datamodeler.editor.DatamodelerEditorAPI"/>
 
+    <inherits name="org.kie.guvnor.decoratedgrid.GuvnorDecoratedGridWidget" />
+
     <source path="client"/>
 
 </module>
