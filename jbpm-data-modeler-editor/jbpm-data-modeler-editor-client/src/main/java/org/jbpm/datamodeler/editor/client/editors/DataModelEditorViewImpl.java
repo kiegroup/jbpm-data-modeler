@@ -84,11 +84,13 @@ public class DataModelEditorViewImpl extends Composite
     @Override
     public void deleteDataObject(DataObjectTO dataObject, int index) {
         dataModelBrowser.deleteDataObject(dataObject, index);
+        dataObjectEditor.notifyDataModelChanged();
     }
 
     @Override
     public void addDataObject(DataObjectTO dataObject) {
         dataModelBrowser.addDataObject(dataObject);
+        dataObjectEditor.notifyDataModelChanged();
     }
 
     @Override
