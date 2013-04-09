@@ -31,8 +31,8 @@
                         <gwt:VerticalPanel styleName="row-fluid">
                             <gwt:TextBox ui:field="newPropertyName" styleName="span6"></gwt:TextBox>
                             <gwt:HTMLPanel>
-                                <div class="well span6">
-                                    <table class="row-fluid">
+                                <div class="well span7">
+                                    <table class="row-fluid span7">
                                         <tr>
                                             <td class="span3">
                                                 <b:RadioButton ui:field="newPropertyBasicType" name="typeMode" text="{i18n.objectEditor_basicType}" />
