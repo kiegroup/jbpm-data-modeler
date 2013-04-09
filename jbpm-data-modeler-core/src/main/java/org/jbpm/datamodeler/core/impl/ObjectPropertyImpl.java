@@ -74,4 +74,9 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
     public boolean isMultiple() {
         return multiple;
     }
+
+    @Override
+    public boolean isBaseType() {
+        return PropertyTypeFactoryImpl.getInstance().isBasePropertyType(getClassName());
+    }
 }

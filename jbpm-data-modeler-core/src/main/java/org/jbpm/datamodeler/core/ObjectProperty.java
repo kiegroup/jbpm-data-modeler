@@ -29,6 +29,8 @@ public interface ObjectProperty extends ModelElement {
 
     void setMultiple(boolean multiple);
 
+    boolean isBaseType();
+
     String getBag();
     
     void setBag(String bag);

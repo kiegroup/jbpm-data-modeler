@@ -122,10 +122,15 @@ public class DataModelVisitor {
                 if (attrName != null && !"".equals(attrName)) {
                     attributeElement = new XMLNode(NODE_ATTRIBUTE, node);
                     attributeElement.addAttribute(ATTR_NAME, attr.getName());
-                    attributeElement.addAttribute(ATTR_VALUE, attr.getValue());
+                    attributeElement.addAttribute(ATTR_VALUE, attrValueToString(attr.getValue()));
                     node.addChild(attributeElement);
                 }
             }
         }
+    }
+    
+    private String attrValueToString(Object value) {
+        if (value != null) return value.toString();
+        return "";
     }
 }

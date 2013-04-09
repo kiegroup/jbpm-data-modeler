@@ -22,9 +22,9 @@ public class AttributeImpl implements Attribute {
 
     private String name;
     
-    private String value;
+    private Object value;
 
-    public AttributeImpl(String name, String value) {
+    public AttributeImpl(String name, Object value) {
         this.name = name;
         this.value = value;
     }
@@ -40,14 +40,12 @@ public class AttributeImpl implements Attribute {
     }
 
     @Override
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
     @Override
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
-
-
 }

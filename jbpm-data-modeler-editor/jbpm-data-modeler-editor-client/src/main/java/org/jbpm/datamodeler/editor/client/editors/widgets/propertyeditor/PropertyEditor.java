@@ -85,10 +85,10 @@ public class PropertyEditor extends Composite {
             }
         };
 
-        cellTable.addColumn(nameColumn, "name");
-        cellTable.addColumn(valueColumn, "value");
+        cellTable.addColumn(nameColumn, "Name");
+        cellTable.addColumn(valueColumn, "Value");
         //TODO complete the layout and presentation of this column
-        cellTable.addColumn(errorColumn, "errors");
+        cellTable.addColumn(errorColumn);
 
         cellTableValues.addDataDisplay(cellTable);
         propertiesPanel.add(cellTable);
@@ -96,71 +96,83 @@ public class PropertyEditor extends Composite {
         initTestStuff();
     }
 
-    void addPropertyEditorListener(PropertyEditorListener listener) {
+    public void addPropertyEditorListener(PropertyEditorListener listener) {
         //TODO evalutate the posibility to use a list of listeners
         if (config != null) {
             config.setPropertyEditorListener(listener);
         }
     }
 
+    public void setProperties(List<PropertyEditorValue> properties) {
+        //Init a new property set to edit.
+        cellTableValues.getList().clear();
+        cellTableValues.getList().addAll(properties);
+        cellTableValues.flush();
+        cellTableValues.refresh();
+    }
+
     void initTestStuff() {
         //TODO remove this method
 
-        final List<PropertyEditorValue> values = new ArrayList<PropertyEditorValue>();
-        values.add(new PropertyEditorValue("campoString1", "valor1"));
-        values.add(new PropertyEditorValue("campoBoolean1", Boolean.TRUE));
-        values.add(new PropertyEditorValue("campoDate1", new Date()));
-        values.add(new PropertyEditorValue("campoString2", "valor2"));
-        values.add(new PropertyEditorValue("campoBoolean2", Boolean.FALSE));
-        values.add(new PropertyEditorValue("campoDate2", new Date()));
-        values.add(new PropertyEditorValue("color", "amarillo"));
+        boolean dale = false;
 
-        List<String> colors = new ArrayList<String>();
-        colors.add("blanco");
-        colors.add("rojo");
-        colors.add("amarillo");
-        colors.add("negro");
+        if (dale) {
+            final List<PropertyEditorValue> values = new ArrayList<PropertyEditorValue>();
+            values.add(new PropertyEditorValue("campoString1", "valor1"));
+            values.add(new PropertyEditorValue("campoBoolean1", Boolean.TRUE));
+            values.add(new PropertyEditorValue("campoDate1", new Date()));
+            values.add(new PropertyEditorValue("campoString2", "valor2"));
+            values.add(new PropertyEditorValue("campoBoolean2", Boolean.FALSE));
+            values.add(new PropertyEditorValue("campoDate2", new Date()));
+            values.add(new PropertyEditorValue("color", "amarillo"));
 
-        SelectionCell colorSelectorCell = new SelectionCell(colors);
+            List<String> colors = new ArrayList<String>();
+            colors.add("blanco");
+            colors.add("rojo");
+            colors.add("amarillo");
+            colors.add("negro");
 
-        config.setCell("color", colorSelectorCell);
+            SelectionCell colorSelectorCell = new SelectionCell(colors);
+
+            config.setCell("color", colorSelectorCell);
 
 
-        cellTableValues.setList(values);
-        cellTableValues.refresh();
+            cellTableValues.setList(values);
+            cellTableValues.refresh();
 
-        config.setPropertyEditorListener(new PropertyEditorListener() {
-            @Override
-            public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
-                //Window.alert("doBeforePropertyChange: " + propertyName + " pendingValue: " + pendingValue + ", currentValue: " + currentValue);
+            config.setPropertyEditorListener(new PropertyEditorListener() {
+                @Override
+                public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
+                    //Window.alert("doBeforePropertyChange: " + propertyName + " pendingValue: " + pendingValue + ", currentValue: " + currentValue);
 
-                if ("kaka".equals(pendingValue) || "hola".equals(pendingValue) || "negro".equals(pendingValue)) {
-                    errors.add(new PropertyChangeError("Wrong value: " + pendingValue));
-                    return false;
-                }
-                
-                if (pendingValue instanceof Date) {
-                    if (((Date) pendingValue).getTime() < (new Date()).getTime()) {
-                        errors.add(new PropertyChangeError("La fecha elegida no puede ser menor"));
-                        errors.add(new PropertyChangeError(" que la fecha actual."));
+                    if ("kaka".equals(pendingValue) || "hola".equals(pendingValue) || "negro".equals(pendingValue)) {
+                        errors.add(new PropertyChangeError("Wrong value: " + pendingValue));
                         return false;
                     }
-                }
 
-                if ("edad".equals(propertyName)) {
-                    if ( ((BigInteger)pendingValue).intValue() > 100) {
-                        errors.add(new PropertyChangeError("La edad no puede ser mayor que 100!"));
-                        return false;
+                    if (pendingValue instanceof Date) {
+                        if (((Date) pendingValue).getTime() < (new Date()).getTime()) {
+                            errors.add(new PropertyChangeError("La fecha elegida no puede ser menor"));
+                            errors.add(new PropertyChangeError(" que la fecha actual."));
+                            return false;
+                        }
                     }
-                }
-                return true;
-            }
 
-            @Override
-            public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
-                //Window.alert("value change event: property: " + propertyName + ", newValue: " + newValue + ", oldValue: " + currentValue);
-            }
-        });
+                    if ("edad".equals(propertyName)) {
+                        if ( ((BigInteger)pendingValue).intValue() > 100) {
+                            errors.add(new PropertyChangeError("La edad no puede ser mayor que 100!"));
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                @Override
+                public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
+                    //Window.alert("value change event: property: " + propertyName + ", newValue: " + newValue + ", oldValue: " + currentValue);
+                }
+            });
+        }
 
         Button showProperties = new Button("Show properties");        
         showProperties.addClickHandler(new ClickHandler() {
@@ -168,7 +180,7 @@ public class PropertyEditor extends Composite {
             public void onClick(ClickEvent event) {
                 PopupPanel popup = new PopupPanel(true, true);
                 VerticalPanel vp = new VerticalPanel();
-                for (PropertyEditorValue value : values) {
+                for (PropertyEditorValue value : cellTableValues.getList()) {
                     vp.add(new Label(value.getName() + "-> value: " + value.getValue() + ", oldValue: " + value.getOldValue() + ", pendingValue: " + value.getPendingValue() + ", hasErrors: " + value.isHasError()));
                 }
                 popup.add(vp);
@@ -177,4 +189,5 @@ public class PropertyEditor extends Composite {
         });
         propertiesPanel.add(showProperties);
     }
+
 }

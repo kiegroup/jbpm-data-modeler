@@ -26,7 +26,7 @@ public interface ModelElement {
 
     Map<String, Attribute> getAttributes();
 
-    Attribute addAttribute(String name, String value);
+    Attribute addAttribute(String name, Object value);
     
     Attribute removeAttribute(String name);
 

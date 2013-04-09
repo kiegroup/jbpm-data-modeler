@@ -17,10 +17,12 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
+import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyChangeError;
+import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditor;
+import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditorListener;
 import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
@@ -71,6 +73,7 @@ public class DataModelEditorPresenter {
 
         void setBaseTypes(List<PropertyTypeTO> baseTypes);
 
+        void refreshObjectEditor();
     }
 
     @Inject
@@ -78,8 +81,6 @@ public class DataModelEditorPresenter {
 
     @Inject
     private Event<NotificationEvent> notification;
-
-    private DataModelTO dataModel;
     
     private Path path;
 
@@ -87,6 +88,9 @@ public class DataModelEditorPresenter {
     private Caller<DataModelerService> modelerService;
 
     private Menus menus;
+
+    @Inject
+    private DataModelEditorSelectionModel selectionModel;
     
     @WorkbenchPartTitle
     public String getTitle() {
@@ -99,11 +103,11 @@ public class DataModelEditorPresenter {
     }
 
     public DataModelTO getDataModel() {
-        return dataModel;
+        return selectionModel.getSelectedModel();
     }
 
     public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
+        selectionModel.setSelectedModel(dataModel);
     }
 
     public Command createDeleteCommand(final DataObjectTO dataObjectTO, final int index) {
@@ -112,7 +116,7 @@ public class DataModelEditorPresenter {
             public void execute() {
 
                 //TODO implement the required controls to ensure the requested object can be deleted
-                dataModel.getDataObjects().remove(dataObjectTO);
+                getDataModel().getDataObjects().remove(dataObjectTO);
                 view.deleteDataObject(dataObjectTO, index);
                 notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObjectTO.getName())));
             }
@@ -127,9 +131,10 @@ public class DataModelEditorPresenter {
 
                 //TODO implement the required controls to ensure the name valid, etc.
                 DataObjectTO dataObject = new DataObjectTO(text);
-                dataObject.setPackageName(dataModel.getDefaultPackage());
-                dataModel.getDataObjects().add(dataObject);
+                dataObject.setPackageName(getDataModel().getDefaultPackage());
+                getDataModel().getDataObjects().add(dataObject);
                 view.addDataObject(dataObject);
+                selectionModel.setSelectedObject(dataObject);
                 notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(text)));
             }
         };
@@ -150,6 +155,7 @@ public class DataModelEditorPresenter {
             @Override
             public void execute() {
                 view.selectDataObject(selectedObject, clearBreadcrums);
+                selectionModel.setSelectedObject(selectedObject);
             }
         };
     }
@@ -158,7 +164,7 @@ public class DataModelEditorPresenter {
         return new Command() {
             @Override
             public void execute() {
-                DataObjectTO dataObject = dataModel.getDataObjectByClassName(className);
+                DataObjectTO dataObject = getDataModel().getDataObjectByClassName(className);
                 if (dataObject != null) {
                     view.selectDataObject(dataObject, false);
                 }
@@ -171,6 +177,7 @@ public class DataModelEditorPresenter {
             @Override
             public void execute() {
                 view.selectDataObjectProperty(selectedProperty);
+                selectionModel.setSelectedProperty(selectedProperty);
             }
         };
     }
@@ -195,8 +202,75 @@ public class DataModelEditorPresenter {
                 ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple, baseType);
                 dataObject.getProperties().add(property);
                 view.addDataObjectProperty(property);
+                selectionModel.setSelectedProperty(property);
             }
         };
+    }
+    
+    public PropertyEditorListener getDataModelEditorListener() {
+        return new PropertyEditorListener() {
+
+            @Override
+            public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
+
+                //TODO Implement validation for model properties
+                return true;
+            }
+
+            @Override
+            public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
+                //TODO Implement model property change
+                //Window.alert("model property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
+            }
+        };
+    }
+
+    public PropertyEditorListener getDataObjectEditorListener() {
+        return new PropertyEditorListener() {
+            @Override
+            public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
+                //TODO Implement validation for data objects properties
+                return true;
+            }
+
+            @Override
+            public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
+                //TODO Implement model property change
+                //Window.alert("data object property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
+            }
+        };
+    }
+
+    public PropertyEditorListener getDataObjectFieldEditorListener() {
+        return new PropertyEditorListener() {
+
+            @Override
+            public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
+                //TODO Implement validation for the properties of a data object
+                //ej...
+                if ("name".equals(propertyName) && ("void".equals(pendingValue) || "int".equals(pendingValue) || "boolean".equals(pendingValue)) ) {
+                    errors.add(new PropertyChangeError("Invalid name"));
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
+                //TODO Implement change for a data object property
+                //Window.alert("data object field property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
+                changeSelectedDataObjectFieldProperty(propertyName, newValue, currentValue);
+            }
+        };
+    }
+
+    private void changeSelectedDataObjectFieldProperty(String propertyName, Object newValue, Object currentValue) {
+        //TODO improve this
+        if ("name".equals(propertyName)) {
+            selectionModel.getSelectedProperty().setName((String)newValue);
+        }
+        view.refreshObjectEditor();
     }
 
     @IsDirty
@@ -231,7 +305,7 @@ public class DataModelEditorPresenter {
                 }
             },
             new DataModelerErrorCallback("An error was produced during data model saving.")
-        ).saveModel(dataModel, path);
+        ).saveModel(getDataModel(), path);
     }
 
     @OnStart
@@ -278,9 +352,10 @@ public class DataModelEditorPresenter {
             public void callback(Object response) {
                 notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_generated()));
             }
-        },
-                new DataModelerErrorCallback("An error was produced during data model generation.")
-        ).generateModel(dataModel, path);
+
+            },
+            new DataModelerErrorCallback("An error was produced during data model generation.")
+        ).generateModel(getDataModel(), path);
     }
 
     @OnReveal

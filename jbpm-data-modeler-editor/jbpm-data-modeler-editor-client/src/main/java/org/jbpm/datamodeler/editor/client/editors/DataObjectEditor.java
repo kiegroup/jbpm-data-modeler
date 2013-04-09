@@ -16,17 +16,16 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -38,10 +37,7 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -54,7 +50,6 @@ import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -210,6 +205,8 @@ public class DataObjectEditor  extends Composite {
 
         propertyNameColumn.setSortable(true);
         dataObjectPropertiesTable.addColumn(propertyNameColumn, Constants.INSTANCE.objectEditor_columnName());
+        //dataObjectPropertiesTable.setColumnWidth(propertyNameColumn, 100, Style.Unit.PX);
+
 
         ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyNameColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
         propertyNameColHandler.setComparator(propertyNameColumn, new ObjectPropertyComparator("name"));
@@ -236,6 +233,8 @@ public class DataObjectEditor  extends Composite {
         };
         propertyTypeColumn.setSortable(true);
         dataObjectPropertiesTable.addColumn(propertyTypeColumn, Constants.INSTANCE.objectEditor_columnType());
+        //dataObjectPropertiesTable.setColumnWidth(propertyTypeColumn, 100, Style.Unit.PX);
+
 
         ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyTypeColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
         propertyTypeColHandler.setComparator(propertyTypeColumn, new ObjectPropertyComparator("className"));
@@ -368,6 +367,7 @@ public class DataObjectEditor  extends Composite {
         dataObjectPropertiesProvider.getList().add(objectProperty);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
+        dataObjectPropertiesTable.setKeyboardSelectedRow(dataObjectPropertiesProvider.getList().size() - 1);
     }
 
     public void deleteDataObjectProperty(ObjectPropertyTO objectProperty, int index) {
@@ -392,6 +392,10 @@ public class DataObjectEditor  extends Composite {
     public void addBreadcrumb(DataObjectTO dataObject, boolean clear) {
         if (clear) dataObjectNavigation.clear();
         ((DataObjectBreadcrums)dataObjectNavigation).add(dataObject, modelEditorPresenter.createSelectCommand(dataObject, false));
+    }
+
+    public void refresh() {
+        dataObjectPropertiesProvider.refresh();
     }
 
     private String propertyTypeDisplay(ObjectPropertyTO propertyTO) {

@@ -69,6 +69,13 @@ public class DataObjectTO implements Serializable {
         return properties;
     }
 
+    public ObjectPropertyTO getProperty(String name) {
+        for (ObjectPropertyTO property : properties) {
+            if (property.getName().equals(name)) return property;
+        }
+        return null;
+    }
+
     public void setProperties(List<ObjectPropertyTO> properties) {
         this.properties = properties;
     }

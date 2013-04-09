@@ -22,8 +22,8 @@ public interface Attribute {
 
     void setName(String name);
 
-    String getValue();
+    Object getValue();
 
-    void setValue(String value);
+    void setValue(Object value);
 
 }

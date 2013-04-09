@@ -26,6 +26,12 @@ public class PropertyEditorValue {
         this.value = value;
     }
 
+    public PropertyEditorValue(String name, Object value, String type) {
+        this.name = name;
+        this.value = value;
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }

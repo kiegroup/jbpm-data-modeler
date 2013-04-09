@@ -19,7 +19,6 @@ package org.jbpm.datamodeler.codegen;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
-import org.junit.Before;
 
 import java.math.BigDecimal;
 import java.util.Date;
