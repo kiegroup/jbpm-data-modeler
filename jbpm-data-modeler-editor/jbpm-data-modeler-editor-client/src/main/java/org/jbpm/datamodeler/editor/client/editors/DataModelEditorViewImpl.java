@@ -79,6 +79,10 @@ public class DataModelEditorViewImpl extends Composite
         dataObjectEditor.setModelEditorPresenter(presenter);
 
         tabbedPropertyEditor.setDataModel(dataModel);
+
+        if (dataModel != null && dataModel.getDataObjects().size() > 0) {
+            presenter.createSelectCommand(dataModel.getDataObjects().get(0), true).execute();
+        }
     }
 
     @Override
