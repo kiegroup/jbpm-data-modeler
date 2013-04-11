@@ -16,23 +16,7 @@
 
 package org.jbpm.datamodeler.backend.server.impl;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.jboss.errai.bus.server.annotations.Service;
-import org.uberfire.backend.FileExplorerRootService;
-import org.uberfire.backend.Root;
-import org.uberfire.backend.vfs.ActiveFileSystems;
-import org.uberfire.backend.vfs.Path;
-import org.uberfire.shared.mvp.impl.PathPlaceRequest;
-
-import static java.util.Collections.*;
-
+/*
 @Service
 @ApplicationScoped
 public class FileExplorerRootServiceImpl
@@ -78,3 +62,4 @@ public class FileExplorerRootServiceImpl
     }
 
 }
+*/

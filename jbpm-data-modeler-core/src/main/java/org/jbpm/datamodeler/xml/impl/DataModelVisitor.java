@@ -64,13 +64,13 @@ public class DataModelVisitor {
         Set<DataObject> dataObjects = dataModel.getDataObjects();
         if (dataObjects != null) {
             for (DataObject dataObject : dataObjects) {
-                visitDataObject(dataObject);
+                visitDataObject(dataObject, true);
             }
         }
         return currentNode;
     }
 
-    private Object visitDataObject(DataObject dataObject) throws Exception {
+    private Object visitDataObject(DataObject dataObject, boolean fullSerialization) throws Exception {
         XMLNode dataObjectNode = new XMLNode(NODE_DATA_OBJECT, currentNode);
         dataObjectNode.addAttribute(ATTR_CLASS_NAME, dataObject.getClassName());
         dataObjectNode.addAttribute(ATTR_SUPER_CLASS, dataObject.getSuperClassName());
@@ -79,12 +79,15 @@ public class DataModelVisitor {
         visitAttributes(dataObjectNode, dataObject);
         currentNode.addChild(dataObjectNode);
 
-        //add the object properties
-        currentNode = dataObjectNode;
-        Map<String, ObjectProperty> properties = dataObject.getProperties();
-        if (properties != null) {
-            for (ObjectProperty property : properties.values()) {
-                visitDataObjectProperty(property);
+        if (fullSerialization) {
+            //add the object properties
+            currentNode = dataObjectNode;
+
+            Map<String, ObjectProperty> properties = dataObject.getProperties();
+            if (properties != null) {
+                for (ObjectProperty property : properties.values()) {
+                    visitDataObjectProperty(property);
+                }
             }
         }
 

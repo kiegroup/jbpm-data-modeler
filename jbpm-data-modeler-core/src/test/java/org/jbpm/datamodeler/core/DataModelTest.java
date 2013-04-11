@@ -26,7 +26,6 @@ import java.util.Iterator;
 
 import static org.junit.Assert.assertNotNull;
 
-
 public class DataModelTest {
     
     private static final Logger logger = LoggerFactory.getLogger(DataModelTest.class);

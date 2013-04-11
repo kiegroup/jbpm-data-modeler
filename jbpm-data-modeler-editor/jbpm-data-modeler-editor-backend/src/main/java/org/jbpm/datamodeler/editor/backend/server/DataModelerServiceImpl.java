@@ -1,6 +1,5 @@
 package org.jbpm.datamodeler.editor.backend.server;
 
-import org.drools.compiler.lang.descr.QueryDescr;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.jbpm.datamodeler.codegen.GenerationContext;
 import org.jbpm.datamodeler.codegen.GenerationEngine;
@@ -23,12 +22,16 @@ import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.project.service.ProjectService;
+import org.kie.guvnor.services.metadata.MetadataService;
+import org.kie.guvnor.services.metadata.model.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.client.workbench.widgets.events.ResourceAddedEvent;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
@@ -58,33 +61,13 @@ public class DataModelerServiceImpl implements DataModelerService {
     @Inject
     private ProjectService projectService;
 
+    @Inject
+    private Event<ResourceAddedEvent> resourceAddedEvent;
+
+    @Inject
+    private MetadataService metadataService;
+
     public DataModelerServiceImpl() {
-    }
-
-    @Override
-    public DataModelTO loadModel(Path path) {
-
-        if (logger.isDebugEnabled()) logger.debug("Reading data model from path: " + path);
-
-        DataModel dataModel = null;
-        try {
-
-            final String content = ioService.readAllString( paths.convert( path ) );
-            if (logger.isDebugEnabled()) logger.debug("The file content is: \n" + content);
-
-            XMLSerializer serializer = new XMLSerializerImpl();
-            dataModel = serializer.deserialize(content);
-
-            String defaultPackageName = calculateDefaultPackageName(path);
-            DataModelTO dataModelTO = DataModelHelper.domain2To(dataModel);
-            dataModelTO.setDefaultPackage(defaultPackageName);
-
-            return dataModelTO;
-
-        } catch (SerializerException e) {
-            logger.error("Data model couldn't be deserialized from file due to the following errors. path: " + path, e);
-            throw new ServiceException("Data model: " + path + ", couldn't be loaded due to the following error. " + e);
-        }
     }
 
     @Override
@@ -108,6 +91,41 @@ public class DataModelerServiceImpl implements DataModelerService {
         } catch (Exception e) {
             //TODO propagate the proper exception to client
             logger.error("The following error was produced during data model saving", e);
+        }
+    }
+
+    @Override
+    public DataModelTO loadModel(Path path) {
+
+        if (logger.isDebugEnabled()) logger.debug("Reading data model from path: " + path);
+
+        DataModel dataModel = null;
+        try {
+
+            //TODO remove this Test invocation
+            Metadata metadata = metadataService.getMetadata(path);
+
+            final String content = ioService.readAllString( paths.convert( path ) );
+            if (logger.isDebugEnabled()) logger.debug("The file content is: \n" + content);
+
+            XMLSerializer serializer = new XMLSerializerImpl();
+            dataModel = serializer.deserialize(content);
+
+            //READ the pojos from the kie filesystem in order to synchronize the model.
+
+            Path projectPath = projectService.resolveProject(path);
+            updateModel(dataModel, paths.convert(projectPath));
+
+
+            String defaultPackageName = calculateDefaultPackageName(path);
+            DataModelTO dataModelTO = DataModelHelper.domain2To(dataModel);
+            dataModelTO.setDefaultPackage(defaultPackageName);
+
+            return dataModelTO;
+
+        } catch (SerializerException e) {
+            logger.error("Data model couldn't be deserialized from file due to the following errors. path: " + path, e);
+            throw new ServiceException("Data model: " + path + ", couldn't be loaded due to the following error. " + e);
         }
     }
 
@@ -163,8 +181,17 @@ public class DataModelerServiceImpl implements DataModelerService {
 
             ioService.write(kiePath, serializedModel);
 
+
             Path path = paths.convert(kiePath, false);
+
+            //Signal creation to interested parties
+            //de esta forma noticariamos pero hay que ver porque no funciona, posilemente falte
+            //algun inherit en el modulo GWT
+            //resourceAddedEvent.fire( new ResourceAddedEvent( path ) );
+
             return path;
+
+
             
         } catch (SerializerException e) {
             logger.error("The following error was produced during data model creation.", e);
@@ -364,8 +391,8 @@ public class DataModelerServiceImpl implements DataModelerService {
 
         packageName = projectService.resolvePackageName(resourceFilePath);
 
-        if (packageName == null || DEFAULT_GUVNOR_PKG.equals(packageName)) {
-            return "";
+        if (packageName == null) {
+            return DEFAULT_GUVNOR_PKG;
         } else {
             return packageName;
         }
