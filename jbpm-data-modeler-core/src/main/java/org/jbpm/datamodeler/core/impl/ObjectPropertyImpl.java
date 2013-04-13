@@ -18,7 +18,9 @@ package org.jbpm.datamodeler.core.impl;
 
 import org.jbpm.datamodeler.core.ObjectProperty;
 
-public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProperty {
+public class ObjectPropertyImpl extends AbstractHasAttributes implements ObjectProperty {
+
+    private String name;
 
     private String className;
     
@@ -26,12 +28,8 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
     
     private boolean multiple;
 
-    public ObjectPropertyImpl() {
-        addAttribute(EQUALS_ATTR, "false");
-    }
-
     public ObjectPropertyImpl(String name, String className, boolean multiple) {
-        super(name);
+        this.name = name;
         this.className = className;
         setMultiple(multiple);
     }
@@ -41,7 +39,6 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
         return className;
     }
 
-    @Override
     public void setClassName(String className) {
         this.className = className;
     }
@@ -79,4 +76,15 @@ public class ObjectPropertyImpl extends ModelElementImpl implements ObjectProper
     public boolean isBaseType() {
         return PropertyTypeFactoryImpl.getInstance().isBasePropertyType(getClassName());
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

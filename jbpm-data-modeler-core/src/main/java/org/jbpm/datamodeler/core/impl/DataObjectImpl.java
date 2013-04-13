@@ -22,18 +22,29 @@ import org.jbpm.datamodeler.core.ObjectProperty;
 import java.util.HashMap;
 import java.util.Map;
 
+public class DataObjectImpl extends AbstractHasAttributes implements DataObject {
 
-public class DataObjectImpl extends ModelElementImpl implements DataObject {
+    private String name;
 
     private String packageName;
     
     private String superClassName;
-    
+
     private Map<String, ObjectProperty> properties = new HashMap<String, ObjectProperty>();
 
     public DataObjectImpl(String packageName, String name) {
-        super(name);
+        this.setName(name);
         this.packageName = packageName;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -78,7 +89,7 @@ public class DataObjectImpl extends ModelElementImpl implements DataObject {
 
     @Override
     public ObjectProperty addProperty(String name, String className, boolean multiple) {
-        ObjectProperty property = ModelFactoryImpl.getElementFactoryInstance().newProperty(name, className, multiple);
+        ObjectProperty property = new ObjectPropertyImpl(name, className, multiple);
         properties.put(name, property);
         return property;
     }

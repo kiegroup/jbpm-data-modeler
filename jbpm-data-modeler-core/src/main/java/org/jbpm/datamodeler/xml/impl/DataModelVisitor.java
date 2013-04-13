@@ -59,7 +59,8 @@ public class DataModelVisitor {
         currentNode.addAttribute(ATTR_MODEL_FORMAT, dataModel.getFormat());
         currentNode.addAttribute(ATTR_MODEL_VERSION, dataModel.getVersion());
 
-        visitAttributes(currentNode, dataModel);
+        //TODO check this
+        //visitAttributes(currentNode, dataModel);
 
         Set<DataObject> dataObjects = dataModel.getDataObjects();
         if (dataObjects != null) {
@@ -76,7 +77,8 @@ public class DataModelVisitor {
         dataObjectNode.addAttribute(ATTR_SUPER_CLASS, dataObject.getSuperClassName());
 
         //add the attributes for this object
-        visitAttributes(dataObjectNode, dataObject);
+        //TODO check this
+        //visitAttributes(dataObjectNode, dataObject);
         currentNode.addChild(dataObjectNode);
 
         if (fullSerialization) {
@@ -107,7 +109,8 @@ public class DataModelVisitor {
         }
         currentNode.addChild(propertyNode);
 
-        visitAttributes(propertyNode, property);
+        //TODO check this
+        //visitAttributes(propertyNode, property);
 
         return propertyNode;
     }
@@ -125,7 +128,8 @@ public class DataModelVisitor {
                 if (attrName != null && !"".equals(attrName)) {
                     attributeElement = new XMLNode(NODE_ATTRIBUTE, node);
                     attributeElement.addAttribute(ATTR_NAME, attr.getName());
-                    attributeElement.addAttribute(ATTR_VALUE, attrValueToString(attr.getValue()));
+                    //TODO check this
+                    //attributeElement.addAttribute(ATTR_VALUE, attrValueToString(attr.getValue()));
                     node.addChild(attributeElement);
                 }
             }

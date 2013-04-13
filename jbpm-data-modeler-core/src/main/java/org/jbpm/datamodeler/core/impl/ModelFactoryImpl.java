@@ -53,7 +53,8 @@ public class ModelFactoryImpl implements ModelFactory, ModelElementFactory {
     }
 
     @Override
-    public Attribute newAttribute(String name, Object value) {
-        return new AttributeImpl(name, value);
+    public Attribute newAttribute(AttributeDefinition attributeDefinition) {
+        Attribute attribute = new AttributeImpl(attributeDefinition);
+        return attribute;
     }
 }

@@ -16,14 +16,24 @@
 
 package org.jbpm.datamodeler.core;
 
+import java.util.Map;
+
 public interface Attribute {
 
+    /**
+     * Shortcut to the AttributeDefinition name.
+     * 
+     * @return return the same value as getAttributeDefinition().getName();
+     *
+     */
     String getName();
 
-    void setName(String name);
+    Object getValue(String paramName);
 
-    Object getValue();
+    Map<String, Object> getValues();
 
-    void setValue(Object value);
+    void setValue(String paramName, Object value);
+    
+    AttributeDefinition getAttributeDefinition();
 
 }

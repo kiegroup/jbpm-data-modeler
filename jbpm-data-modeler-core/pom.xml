@@ -48,6 +48,11 @@
             <version>2.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.kie.commons</groupId>
+            <artifactId>kie-commons-io</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

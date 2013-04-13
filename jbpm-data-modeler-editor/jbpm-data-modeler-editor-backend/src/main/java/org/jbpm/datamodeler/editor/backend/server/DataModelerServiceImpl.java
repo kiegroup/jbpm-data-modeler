@@ -89,8 +89,8 @@ public class DataModelerServiceImpl implements DataModelerService {
             ioService.write(paths.convert(path), content);
 
         } catch (Exception e) {
-            //TODO propagate the proper exception to client
             logger.error("The following error was produced during data model saving", e);
+            throw new ServiceException("Data model: " + path + ", couldn't be saved due to the following error. " + e);
         }
     }
 

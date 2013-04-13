@@ -16,6 +16,8 @@
 
 package org.jbpm.datamodeler.core;
 
+import org.jbpm.datamodeler.core.impl.AttributeImpl;
+import org.jbpm.datamodeler.driver.impl.MockAttributeDefinition;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.junit.Test;
@@ -33,6 +35,7 @@ public class DataModelTest {
     @Test
     public void modelTest() throws Exception {
 
+
         DataModel dataModel = ModelFactoryImpl.getInstance().newModel("Model1");
         DataObject dataObject;
         ObjectProperty property;
@@ -42,7 +45,7 @@ public class DataModelTest {
         dataModel.setVersion("1.2.1");
         
         for (int i = 0; i < 6; i++) {
-            dataModel.addAttribute("attribute"+i, i+"");
+            //dataModel.addAttribute("attribute"+i, i+"");
         }
 
         logger.debug("Creating data model");
@@ -52,7 +55,10 @@ public class DataModelTest {
                 property = dataObject.addProperty("property"+j, Integer.class.getName());
                 if (j % 2 == 0) {
                     property.setMultiple(true);
-                    property.addAttribute("attribute"+j, j+"");
+
+                    AttributeImpl attr = new AttributeImpl(new MockAttributeDefinition("@attribute"+j, "attribute"+j, "attribute"+j));
+
+                    property.addAttribute(attr);
                 }
             }
         }

@@ -16,36 +16,11 @@
 
 package org.jbpm.datamodeler.core.impl;
 
-import org.jbpm.datamodeler.core.Attribute;
+import org.jbpm.datamodeler.core.AttributeDefinition;
 
-public class AttributeImpl implements Attribute {
+public class AttributeImpl extends AbstractAttribute {
 
-    private String name;
-    
-    private Object value;
-
-    public AttributeImpl(String name, Object value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public Object getValue() {
-        return value;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        this.value = value;
+    public AttributeImpl(AttributeDefinition attributeDefinition) {
+        super(attributeDefinition);
     }
 }

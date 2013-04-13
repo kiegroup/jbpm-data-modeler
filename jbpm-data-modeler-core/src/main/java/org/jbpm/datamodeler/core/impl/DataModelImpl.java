@@ -21,16 +21,18 @@ import org.jbpm.datamodeler.core.DataObject;
 
 import java.util.*;
 
-public class DataModelImpl extends ModelElementImpl implements DataModel {
+public class DataModelImpl implements DataModel {
 
     Map<String, DataObject> dataObjects = new HashMap<String, DataObject>();
+
+    String name;
+
+    String format;
     
     String version;
-    
-    String format;
 
     public DataModelImpl(String name, String format) {
-        super(name);
+        this.name = name;
         this.format = format;
     }
 
@@ -68,7 +70,7 @@ public class DataModelImpl extends ModelElementImpl implements DataModel {
 
     @Override
     public DataObject addDataObject(String packageName, String name) {
-        DataObject dataObject = ModelFactoryImpl.getElementFactoryInstance().newDataObject(packageName, name);
+        DataObject dataObject = new DataObjectImpl(packageName, name);
         dataObjects.put(dataObject.getClassName(), dataObject);
         return dataObject;
     }
@@ -86,5 +88,15 @@ public class DataModelImpl extends ModelElementImpl implements DataModel {
             }
         }
         return addDataObject(packageName.toString(), token);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 }

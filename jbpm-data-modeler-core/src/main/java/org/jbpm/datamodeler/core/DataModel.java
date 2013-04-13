@@ -18,7 +18,7 @@ package org.jbpm.datamodeler.core;
 
 import java.util.Set;
 
-public interface DataModel extends ModelElement {
+public interface DataModel extends HasName {
 
     /**
      * This is an internal value that specifies the format used for the model. In the future this

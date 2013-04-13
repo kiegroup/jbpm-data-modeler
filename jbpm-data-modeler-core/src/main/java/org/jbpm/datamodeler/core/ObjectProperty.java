@@ -17,13 +17,7 @@
 package org.jbpm.datamodeler.core;
 
 
-public interface ObjectProperty extends ModelElement {
-    
-    String EQUALS_ATTR = "equals";
-
-    String getClassName();
-
-    void setClassName(String className);
+public interface ObjectProperty extends HasName, HasClassName, HasAttributes {
 
     boolean isMultiple();
 
@@ -34,4 +28,5 @@ public interface ObjectProperty extends ModelElement {
     String getBag();
     
     void setBag(String bag);
+
 }

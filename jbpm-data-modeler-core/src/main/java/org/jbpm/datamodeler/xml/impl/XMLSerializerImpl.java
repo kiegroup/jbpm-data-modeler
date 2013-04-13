@@ -185,7 +185,8 @@ public class XMLSerializerImpl implements XMLSerializer {
         List<XMLNode> children = xmlNode.getChildren();
         for (XMLNode child : children) {
             if (DataModelVisitor.NODE_ATTRIBUTE.equals(child.getObjectName())) {
-                addAttributeFromNode(dataModel, child);
+                //TODO check this
+                //addAttributeFromNode(dataModel, child);
             } else if (DataModelVisitor.NODE_DATA_OBJECT.equals(child.getObjectName())) {
                 addDataObjectFromNode(dataModel, child);
             }
@@ -200,7 +201,8 @@ public class XMLSerializerImpl implements XMLSerializer {
         List<XMLNode> children = node.getChildren();
         for (XMLNode child : children) {
             if (DataModelVisitor.NODE_ATTRIBUTE.equals(child.getObjectName())) {
-                addAttributeFromNode(dataObject, child);
+                //TODO check this
+                //addAttributeFromNode(dataObject, child);
             } else if (DataModelVisitor.NODE_PROPERTY.equals(child.getObjectName())) {
                 addObjectPropertyFromNode(dataObject, child);
             }

@@ -18,13 +18,8 @@ package org.jbpm.datamodeler.core;
 
 import java.util.Map;
 
-public interface DataObject extends ModelElement {
+public interface DataObject extends HasName, HasPackage, HasClassName, HasAttributes {
 
-    String getPackageName();
-
-    void setPackageName(String packageName);
-
-    String getClassName();
 
     boolean hasSuperClass();
 
