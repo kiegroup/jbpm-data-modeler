@@ -2,6 +2,7 @@ package org.jbpm.datamodeler.codegen.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
+import org.jbpm.datamodeler.codegen.parser.tokens.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,8 @@ public class DataObjectListener extends JavaBaseListener {
     private boolean declaringClassModifiers = true;
 
     private boolean declaringValuePairs = false;
+
+    private boolean declaringClassBody = false;
 
     public DataObjectListener(JavaParser parser) {
         this.parser = parser;
@@ -84,6 +87,7 @@ public class DataObjectListener extends JavaBaseListener {
     @Override
     public void enterClassBodyDeclaration(JavaParser.ClassBodyDeclarationContext ctx) {
         printCurrentToken("enterClassBodyDeclaration", ctx);
+        declaringClassBody = true;
     }
 
     @Override
@@ -196,6 +200,12 @@ public class DataObjectListener extends JavaBaseListener {
         }
     }
 
+    @Override
+    public void enterModifiers(JavaParser.ModifiersContext ctx) {
+
+        super.enterModifiers(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
     AnnotationValuePairToken parseValuePair(String valuePair) {
         logger.debug("Starting AnnotationValuePair parsing for valuePair: " + valuePair);
 
@@ -229,5 +239,7 @@ public class DataObjectListener extends JavaBaseListener {
         String text = tokens.getText(ctx);
         if (logger.isDebugEnabled()) logger.debug(flag + ":" + text);
     }
+
+
 
 }

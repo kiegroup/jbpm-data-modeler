@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectToken;
 
 import java.io.IOException;
 import java.io.StringReader;

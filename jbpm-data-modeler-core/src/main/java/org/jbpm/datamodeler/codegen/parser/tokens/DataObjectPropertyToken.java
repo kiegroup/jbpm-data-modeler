@@ -1,4 +1,4 @@
-package org.jbpm.datamodeler.codegen.parser;
+package org.jbpm.datamodeler.codegen.parser.tokens;
 
 public class DataObjectPropertyToken {
 
