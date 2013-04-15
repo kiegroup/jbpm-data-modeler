@@ -22,7 +22,7 @@ import org.jbpm.datamodeler.core.ObjectProperty;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataObjectImpl extends AbstractHasAttributes implements DataObject {
+public class DataObjectImpl extends AbstractHasAnnotations implements DataObject {
 
     private String name;
 

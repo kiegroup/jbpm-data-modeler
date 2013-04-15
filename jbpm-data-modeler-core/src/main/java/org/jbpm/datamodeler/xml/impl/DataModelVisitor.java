@@ -116,20 +116,20 @@ public class DataModelVisitor {
     }
 
     private void visitAttributes(XMLNode node, ModelElement element) {
-        Map<String, Attribute> attributes = element.getAttributes();
+        Map<String, Annotation> attributes = element.getAttributes();
         XMLNode attributeElement;
         String attrName;
         String attrValue;
 
         if (attributes != null) {
-            for (Attribute attr : attributes.values()) {
+            for (Annotation attr : attributes.values()) {
                 attrName = attr.getName() != null ? attr.getName().trim() : null;
 
                 if (attrName != null && !"".equals(attrName)) {
                     attributeElement = new XMLNode(NODE_ATTRIBUTE, node);
                     attributeElement.addAttribute(ATTR_NAME, attr.getName());
                     //TODO check this
-                    //attributeElement.addAttribute(ATTR_VALUE, attrValueToString(attr.getValue()));
+                    //attributeElement.addAnnotation(ATTR_VALUE, attrValueToString(attr.getValue()));
                     node.addChild(attributeElement);
                 }
             }

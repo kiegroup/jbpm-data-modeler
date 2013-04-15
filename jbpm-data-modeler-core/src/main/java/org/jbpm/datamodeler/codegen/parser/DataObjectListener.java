@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class DataObjectListener extends JavaBaseListener {
 
@@ -15,9 +16,15 @@ public class DataObjectListener extends JavaBaseListener {
 
     private DataObjectToken dataObjectToken = new DataObjectToken();
 
+
     //internal use. At the moment this flag indicates that the parser is reading a property declaration, and not
     //an internal block variable.
     private boolean declaringProperty = false;
+
+    //flag indicating that class definition is being processed
+    private boolean declaringClassModifiers = true;
+
+    private boolean declaringValuePairs = false;
 
     public DataObjectListener(JavaParser parser) {
         this.parser = parser;
@@ -77,9 +84,6 @@ public class DataObjectListener extends JavaBaseListener {
     @Override
     public void enterClassBodyDeclaration(JavaParser.ClassBodyDeclarationContext ctx) {
         printCurrentToken("enterClassBodyDeclaration", ctx);
-
-        String classModifiers = ctx.modifiers().getText();
-        dataObjectToken.setClassModifiers(classModifiers);
     }
 
     @Override
@@ -89,15 +93,20 @@ public class DataObjectListener extends JavaBaseListener {
 
         for (JavaParser.ClassOrInterfaceModifierContext modifier : modifiers) {
             if ((annotation = modifier.annotation()) != null) {
-                logger.debug("A: " + annotation.annotationName().Identifier());
-                logger.debug("A1: " + annotation.getText());
-
+                //this annotations will be processed later
             } else {
-                logger.debug("B:" + modifier.getText());
+                //the modifier is the text itself
+                getDataObjectToken().getClassModifiers().add(new ModifierToken(modifier.getText()));
             }
         }
 
         printCurrentToken("enterClassOrInterfaceModifiers", ctx);
+    }
+
+    @Override
+    public void exitClassOrInterfaceModifiers(JavaParser.ClassOrInterfaceModifiersContext ctx) {
+        printCurrentToken("exitClassOrInterfaceModifiers", ctx);
+        declaringClassModifiers = false;
     }
 
     @Override
@@ -137,10 +146,88 @@ public class DataObjectListener extends JavaBaseListener {
         }
     }
 
+    @Override
+    public void enterAnnotation(JavaParser.AnnotationContext ctx) {
+        printCurrentToken("enterAnnotation", ctx);
+        if (declaringClassModifiers) {
+            //current annotation belongs to the current class
+            getDataObjectToken().getAnnotations().add(new AnnotationToken(null));
+        }
+    }
+
+    @Override
+    public void enterAnnotationName(JavaParser.AnnotationNameContext ctx) {
+        printCurrentToken("enterAnnotationName", ctx);
+        if (declaringClassModifiers) {
+            AnnotationToken currentAnnotation = getDataObjectToken().getLastAnnotation();
+            if (currentAnnotation != null) {
+                currentAnnotation.setName(ctx.getText());
+            }
+        }
+    }
+
+    @Override
+    public void enterElementValuePairs(JavaParser.ElementValuePairsContext ctx) {
+        printCurrentToken("enterElementValuePairs", ctx);
+        declaringValuePairs = true;
+
+    }
+
+    @Override
+    public void exitElementValuePairs(JavaParser.ElementValuePairsContext ctx) {
+        printCurrentToken("exitElementValuePairs", ctx);
+        declaringValuePairs = false;
+    }
+
+    @Override
+    public void enterElementValuePair(JavaParser.ElementValuePairContext ctx) {
+        printCurrentToken("enterElementValuePair", ctx);
+
+        //with current definition we only support value pairs in the form name="value"
+        AnnotationValuePairToken valuePair = parseValuePair(getTokenText(ctx));
+
+        if (declaringClassModifiers && valuePair != null) {
+            AnnotationToken currentAnnotation = getDataObjectToken().getLastAnnotation();
+            if (currentAnnotation != null) {
+                currentAnnotation.getValuePairs().add(valuePair);
+            }
+        } else if (declaringProperty && valuePair != null) {
+
+        }
+    }
+
+    AnnotationValuePairToken parseValuePair(String valuePair) {
+        logger.debug("Starting AnnotationValuePair parsing for valuePair: " + valuePair);
+
+        AnnotationValuePairToken annotationValuePairToken = new AnnotationValuePairToken();
+        StringTokenizer tokenizer = new StringTokenizer(valuePair, "=");
+        if (tokenizer.hasMoreTokens()) {
+            annotationValuePairToken.setName(tokenizer.nextToken());
+            if (tokenizer.hasMoreTokens()) {
+                annotationValuePairToken.setValue(tokenizer.nextToken());
+            } else {
+                annotationValuePairToken = null;
+                logger.warn("valuePair value seems to be mal formed, value is not present");
+            }
+        } else {
+            annotationValuePairToken = null;
+            logger.warn("valuePair seems to be mal formed and couldn't be parsed");
+        }
+                
+        return annotationValuePairToken;        
+    }
+
+
+    String getTokenText(ParserRuleContext ctx) {
+        TokenStream tokens = parser.getTokenStream(); // need parser to get tokens
+        return tokens.getText(ctx);
+    }
+
     void printCurrentToken(String flag,  ParserRuleContext ctx) {
 
         TokenStream tokens = parser.getTokenStream(); // need parser to get tokens
         String text = tokens.getText(ctx);
         if (logger.isDebugEnabled()) logger.debug(flag + ":" + text);
     }
+
 }

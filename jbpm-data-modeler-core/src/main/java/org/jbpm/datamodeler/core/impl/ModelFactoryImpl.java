@@ -53,8 +53,8 @@ public class ModelFactoryImpl implements ModelFactory, ModelElementFactory {
     }
 
     @Override
-    public Attribute newAttribute(AttributeDefinition attributeDefinition) {
-        Attribute attribute = new AttributeImpl(attributeDefinition);
-        return attribute;
+    public Annotation newAttribute(AnnotationDefinition annotationDefinition) {
+        Annotation annotation = new AnnotationImpl(annotationDefinition);
+        return annotation;
     }
 }

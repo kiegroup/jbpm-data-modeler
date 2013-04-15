@@ -16,11 +16,11 @@
 
 package org.jbpm.datamodeler.core.impl;
 
-import org.jbpm.datamodeler.core.AttributeDefinition;
+import org.jbpm.datamodeler.core.AnnotationDefinition;
 
-public class AttributeImpl extends AbstractAttribute {
+public class AnnotationImpl extends AbstractAnnotation {
 
-    public AttributeImpl(AttributeDefinition attributeDefinition) {
-        super(attributeDefinition);
+    public AnnotationImpl(AnnotationDefinition annotationDefinition) {
+        super(annotationDefinition);
     }
 }

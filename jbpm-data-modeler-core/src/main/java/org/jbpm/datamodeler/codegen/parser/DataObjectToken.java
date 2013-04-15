@@ -5,9 +5,9 @@ import java.util.List;
 
 public class DataObjectToken {
 
-    private ArrayList<String> imports = new ArrayList<String>();
+    private List<String> imports = new ArrayList<String>();
 
-    private String classModifiers;
+    private List<ModifierToken> classModifiers = new ArrayList<ModifierToken>();
 
     private String packageName;
 
@@ -19,18 +19,16 @@ public class DataObjectToken {
 
     private List<DataObjectPropertyToken> properties = new ArrayList<DataObjectPropertyToken>();
 
+    private List<AnnotationToken> annotations = new ArrayList<AnnotationToken>();
+
     public DataObjectToken() {
     }
 
-    public String getClassModifiers() {
+    public List<ModifierToken> getClassModifiers() {
         return classModifiers;
     }
 
-    public void setClassModifiers(String classModifiers) {
-        this.classModifiers = classModifiers;
-    }
-
-    public ArrayList<String> getImports() {
+    public List<String> getImports() {
         return imports;
     }
 
@@ -88,5 +86,20 @@ public class DataObjectToken {
     
     public void addImplementedInterface(String interfaceDef) {
         implementedInterfaces.add(interfaceDef);
+    }
+
+    public List<AnnotationToken> getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(List<AnnotationToken> annotations) {
+        this.annotations = annotations;
+    }
+    
+    public AnnotationToken getLastAnnotation() {
+        if (annotations.size() > 0) {
+            return annotations.get(annotations.size()-1);
+        }
+        return null;
     }
 }

@@ -11,5 +11,5 @@ public interface ModelElementFactory {
 
     public ObjectProperty newProperty(String name, String className, boolean multiple);
 
-    public Attribute newAttribute(AttributeDefinition attributeDefinition);
+    public Annotation newAttribute(AnnotationDefinition annotationDefinition);
 }

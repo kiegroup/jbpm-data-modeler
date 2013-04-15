@@ -1,8 +1,8 @@
 package org.jbpm.datamodeler.core.impl;
 
-import org.jbpm.datamodeler.core.AttributeParamDefinition;
+import org.jbpm.datamodeler.core.AnnotationMemberDefinition;
 
-public class AttributeParamDefinitionImpl implements AttributeParamDefinition {
+public class AnnotationMemberDefinitionImpl implements AnnotationMemberDefinition {
 
     private String name;
 
@@ -11,9 +11,17 @@ public class AttributeParamDefinitionImpl implements AttributeParamDefinition {
     private String description;
     
     private String className;
+    
+    private Object defaultValue;
 
-    public AttributeParamDefinitionImpl(String name, String shortDescription, String description, String className) {
+    public AnnotationMemberDefinitionImpl(String name, String className, String shortDescription, String description) {
+        this(name, className, null, shortDescription, description);
+    }
+
+    public AnnotationMemberDefinitionImpl(String name, String className, Object defaultValue, String shortDescription, String description) {
         this.name = name;
+        this.className = className;
+        this.defaultValue = defaultValue;
         this.shortDescription = shortDescription;
         this.description = description;
     }
@@ -52,5 +60,16 @@ public class AttributeParamDefinitionImpl implements AttributeParamDefinition {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public Object defaultValue() {
+        return defaultValue;
+    }
+
+    @Override
+    public boolean isArray() {
+
+        //TODO check this
+        return getClassName() != null && className.endsWith("[]");
     }
 }

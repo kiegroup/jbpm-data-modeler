@@ -1,7 +1,7 @@
 package org.jbpm.datamodeler.core;
 
 
-public interface HasPackage {
+public interface HasPackageName {
 
     String getPackageName();
     

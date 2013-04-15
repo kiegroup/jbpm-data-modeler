@@ -17,9 +17,11 @@
 package org.jbpm.datamodeler.core;
 
 
-public interface ObjectProperty extends HasName, HasClassName, HasAttributes {
+public interface ObjectProperty extends HasName, HasClassName, HasAnnotations {
 
     boolean isMultiple();
+
+    boolean isArray();
 
     void setMultiple(boolean multiple);
 

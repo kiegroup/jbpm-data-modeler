@@ -16,8 +16,8 @@
 
 package org.jbpm.datamodeler.core;
 
-import org.jbpm.datamodeler.core.impl.AttributeImpl;
-import org.jbpm.datamodeler.driver.impl.MockAttributeDefinition;
+import org.jbpm.datamodeler.core.impl.AnnotationImpl;
+import org.jbpm.datamodeler.driver.impl.MockAnnotationDefinition;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class DataModelTest {
         dataModel.setVersion("1.2.1");
         
         for (int i = 0; i < 6; i++) {
-            //dataModel.addAttribute("attribute"+i, i+"");
+            //dataModel.addAnnotation("attribute"+i, i+"");
         }
 
         logger.debug("Creating data model");
@@ -56,9 +56,9 @@ public class DataModelTest {
                 if (j % 2 == 0) {
                     property.setMultiple(true);
 
-                    AttributeImpl attr = new AttributeImpl(new MockAttributeDefinition("@attribute"+j, "attribute"+j, "attribute"+j));
+                    AnnotationImpl attr = new AnnotationImpl(new MockAnnotationDefinition("@attribute"+j, "kaka", "attribute"+j, "attribute"+j));
 
-                    property.addAttribute(attr);
+                    property.addAnnotation(attr);
                 }
             }
         }

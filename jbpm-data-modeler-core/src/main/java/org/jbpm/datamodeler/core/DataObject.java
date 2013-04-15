@@ -18,8 +18,7 @@ package org.jbpm.datamodeler.core;
 
 import java.util.Map;
 
-public interface DataObject extends HasName, HasPackage, HasClassName, HasAttributes {
-
+public interface DataObject extends HasName, HasPackageName, HasClassName, HasAnnotations {
 
     boolean hasSuperClass();
 

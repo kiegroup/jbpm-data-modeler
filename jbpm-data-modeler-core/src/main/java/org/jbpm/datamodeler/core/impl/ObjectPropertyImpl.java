@@ -18,7 +18,7 @@ package org.jbpm.datamodeler.core.impl;
 
 import org.jbpm.datamodeler.core.ObjectProperty;
 
-public class ObjectPropertyImpl extends AbstractHasAttributes implements ObjectProperty {
+public class ObjectPropertyImpl extends AbstractHasAnnotations implements ObjectProperty {
 
     private String name;
 
@@ -65,6 +65,12 @@ public class ObjectPropertyImpl extends AbstractHasAttributes implements ObjectP
         } else {
             setBag(null);
         }
+    }
+
+    @Override
+    public boolean isArray() {
+        //TODO check this
+        return getClassName() != null && className.endsWith("[]");
     }
 
     @Override

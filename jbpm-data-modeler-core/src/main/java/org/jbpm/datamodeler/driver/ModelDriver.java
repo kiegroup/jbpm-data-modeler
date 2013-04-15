@@ -1,8 +1,8 @@
 package org.jbpm.datamodeler.driver;
 
 
-import org.jbpm.datamodeler.core.Attribute;
-import org.jbpm.datamodeler.core.AttributeDefinition;
+import org.jbpm.datamodeler.core.Annotation;
+import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.DataModel;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
@@ -17,15 +17,15 @@ public interface ModelDriver {
 
     void generateModel(IOService ioService, Path root) throws IOException;
 
-    List<AttributeDefinition> getConfiguredAttributes();
+    List<AnnotationDefinition> getConfiguredAttributes();
 
     /**
      * knows how to create an attribute for the given definition
      *
-     * @param attributeDefinition
+     * @param annotationDefinition
      *
      * @return
      */
-    Attribute newAttribute(AttributeDefinition attributeDefinition);
+    Annotation newAttribute(AnnotationDefinition annotationDefinition);
 
 }

@@ -16,7 +16,7 @@
 
 package org.jbpm.datamodeler.core.impl;
 
-import org.jbpm.datamodeler.core.Attribute;
+import org.jbpm.datamodeler.core.Annotation;
 import org.jbpm.datamodeler.core.ModelElement;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public abstract class ModelElementImpl implements ModelElement {
     
     private String name;
     
-    private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+    private Map<String, Annotation> attributes = new HashMap<String, Annotation>();
 
     protected ModelElementImpl() {
     }
@@ -46,17 +46,17 @@ public abstract class ModelElementImpl implements ModelElement {
     }
 
     @Override
-    public Map<String, Attribute> getAttributes() {
+    public Map<String, Annotation> getAttributes() {
         return attributes;
     }
 
     @Override
-    public Attribute addAttribute(String name, Object value) {
+    public Annotation addAttribute(String name, Object value) {
         return null;
     }
 
     @Override
-    public Attribute removeAttribute(String name) {
+    public Annotation removeAttribute(String name) {
         return attributes.remove(name);
     }
 }

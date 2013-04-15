@@ -18,22 +18,20 @@ package org.jbpm.datamodeler.core;
 
 import java.util.Map;
 
-public interface Attribute {
+public interface Annotation extends HasClassName {
 
     /**
-     * Shortcut to the AttributeDefinition name.
-     * 
-     * @return return the same value as getAttributeDefinition().getName();
      *
+     * @return return the same value as getAnnotationDefinition().getName();
      */
     String getName();
 
-    Object getValue(String paramName);
+    Object getValue(String annotationMemberName);
 
     Map<String, Object> getValues();
 
-    void setValue(String paramName, Object value);
+    void setValue(String annotationMemberName, Object value);
     
-    AttributeDefinition getAttributeDefinition();
+    AnnotationDefinition getAnnotationDefinition();
 
 }

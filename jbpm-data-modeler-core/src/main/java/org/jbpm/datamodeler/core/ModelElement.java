@@ -24,10 +24,10 @@ public interface ModelElement {
     
     void setName(String name);
 
-    Map<String, Attribute> getAttributes();
+    Map<String, Annotation> getAttributes();
 
-    Attribute addAttribute(String name, Object value);
+    Annotation addAttribute(String name, Object value);
     
-    Attribute removeAttribute(String name);
+    Annotation removeAttribute(String name);
 
 }

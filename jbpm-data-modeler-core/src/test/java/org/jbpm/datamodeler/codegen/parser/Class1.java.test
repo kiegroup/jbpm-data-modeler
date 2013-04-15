@@ -12,7 +12,7 @@ import java.applet.*;
  * To change this template use File | Settings | File Templates.
  */
 @Portable
-@DataObject(model="DataModel")
+@DataObject(model="DataModel", maxInstances=8, isRecomended=true, owner="walter")
 @Templated(file="index.html")
 public static class  Class1 extends org.jbpm.Class1Parent implements Serializale, Redhatizable {
 
@@ -36,7 +36,7 @@ public static class  Class1 extends org.jbpm.Class1Parent implements Serializale
             System.out.println("Hello world!");
         }
 
-    package java.lang.Boolean enabled;
+    java.lang.Boolean enabled;
 
 }
 

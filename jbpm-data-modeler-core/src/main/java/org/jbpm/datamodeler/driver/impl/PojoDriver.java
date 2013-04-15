@@ -1,9 +1,9 @@
 package org.jbpm.datamodeler.driver.impl;
 
-import org.jbpm.datamodeler.core.Attribute;
-import org.jbpm.datamodeler.core.AttributeDefinition;
+import org.jbpm.datamodeler.core.Annotation;
+import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.DataModel;
-import org.jbpm.datamodeler.core.impl.AttributeImpl;
+import org.jbpm.datamodeler.core.impl.AnnotationImpl;
 import org.jbpm.datamodeler.driver.ModelDriver;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
@@ -25,17 +25,17 @@ public class PojoDriver implements ModelDriver {
     }
 
     @Override
-    public List<AttributeDefinition> getConfiguredAttributes() {
-        List<AttributeDefinition> list = new ArrayList<AttributeDefinition> ();
-        list.add(new EqualsAttributeDefinition());
-        list.add(new RequiredAttributeDefinition());
+    public List<AnnotationDefinition> getConfiguredAttributes() {
+        List<AnnotationDefinition> list = new ArrayList<AnnotationDefinition> ();
+        list.add(new EqualsAnnotationDefinition());
+        list.add(new RequiredAnnotationDefinition());
 
         return list;
     }
 
     @Override
-    public Attribute newAttribute(AttributeDefinition attributeDefinition) {
+    public Annotation newAttribute(AnnotationDefinition annotationDefinition) {
         //check if the definition is valid for this driver
-        return new AttributeImpl(attributeDefinition);
+        return new AnnotationImpl(annotationDefinition);
     }
 }
