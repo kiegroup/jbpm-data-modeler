@@ -400,9 +400,14 @@ public class DataObjectListener extends DataModelerBaseListener {
         AnnotationValuePairToken annotationValuePairToken = new AnnotationValuePairToken();
         StringTokenizer tokenizer = new StringTokenizer(valuePair, "=");
         if (tokenizer.hasMoreTokens()) {
-            annotationValuePairToken.setName(tokenizer.nextToken());
+            //Take care to not introduce blank spaces because of this parsing simplification.
+            String nameToken = tokenizer.nextToken();
+            nameToken = nameToken != null ? nameToken.trim() : null;
+            annotationValuePairToken.setName(nameToken);
             if (tokenizer.hasMoreTokens()) {
-                annotationValuePairToken.setValue(tokenizer.nextToken());
+                String valueToken = tokenizer.nextToken();
+                valueToken = valueToken != null ? valueToken.trim() : null;
+                annotationValuePairToken.setValue(valueToken);
             } else {
                 annotationValuePairToken = null;
                 logger.warn("valuePair value seems to be mal formed, value is not present");

@@ -8,9 +8,4 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DataObject {
-    
-    String model() default "empty model";
-    
-    String name() default "un-named";
-
 }
