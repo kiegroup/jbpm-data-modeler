@@ -1,7 +1,7 @@
 // Generated from Java.g4 by ANTLR 4.0
 
 
-package org.jbpm.datamodeler.codegen.parser;
+package org.jbpm.datamodeler.codegen.parser.grammars.java;
 
 
 import org.antlr.v4.runtime.*;

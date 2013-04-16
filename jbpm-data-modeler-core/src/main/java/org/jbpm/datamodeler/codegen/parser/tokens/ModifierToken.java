@@ -1,25 +1,25 @@
 package org.jbpm.datamodeler.codegen.parser.tokens;
 
-/**
- * Created by IntelliJ IDEA.
- * User: wmedvede
- * Date: 4/13/13
- * Time: 3:56 PM
- * To change this template use File | Settings | File Templates.
- */
-public class ModifierToken {
+public class ModifierToken extends Token {
 
-    private String name;
+    public static final String MODIFIER_TOKEN = "MODIFIER_TOKEN";
 
-    public ModifierToken(String name) {
-        this.name = name;
+    private String modifier;
+
+    public ModifierToken() {
+        super(MODIFIER_TOKEN);
     }
 
-    public String getName() {
-        return name;
+    public ModifierToken(String modifier) {
+        this();
+        this.modifier = modifier;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getModifier() {
+        return modifier;
+    }
+
+    public void setModifier(String modifier) {
+        this.modifier = modifier;
     }
 }

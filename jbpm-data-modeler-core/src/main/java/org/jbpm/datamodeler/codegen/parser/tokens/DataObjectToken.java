@@ -1,13 +1,11 @@
 package org.jbpm.datamodeler.codegen.parser.tokens;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class DataObjectToken {
+public class DataObjectToken extends Token {
 
-    private List<String> imports = new ArrayList<String>();
+    private TokenList<ImportToken> imports = new TokenList<ImportToken>();
 
-    private List<ModifierToken> classModifiers = new ArrayList<ModifierToken>();
+    private TokenList<ModifierToken> classModifiers = new TokenList<ModifierToken>();
 
     private String packageName;
 
@@ -15,24 +13,27 @@ public class DataObjectToken {
 
     private String superClassName;
 
-    private List<String> implementedInterfaces = new ArrayList<String>();
+    private TokenList<ImplementsToken> implementedInterfaces = new TokenList<ImplementsToken>();
 
-    private List<DataObjectPropertyToken> properties = new ArrayList<DataObjectPropertyToken>();
+    private TokenList<DataObjectPropertyToken> properties = new TokenList<DataObjectPropertyToken>();
 
-    private List<AnnotationToken> annotations = new ArrayList<AnnotationToken>();
+    private TokenList<AnnotationToken> annotations = new TokenList<AnnotationToken>();
+    
+    public static final String DATA_OBJECT_TOKEN = "DATA_OBJECT_TOKEN";
 
     public DataObjectToken() {
+        super(DATA_OBJECT_TOKEN);
     }
 
-    public List<ModifierToken> getClassModifiers() {
+    public TokenList<ModifierToken> getClassModifiers() {
         return classModifiers;
     }
 
-    public List<String> getImports() {
+    public TokenList<ImportToken> getImports() {
         return imports;
     }
 
-    public void setImports(ArrayList<String> imports) {
+    public void setImports(TokenList<ImportToken> imports) {
         this.imports = imports;
     }
 
@@ -60,46 +61,31 @@ public class DataObjectToken {
         this.superClassName = superClassName;
     }
 
-    public List<String> getImplementedInterfaces() {
+    public TokenList<ImplementsToken> getImplementedInterfaces() {
         return implementedInterfaces;
     }
 
-    public void setImplementedInterfaces(List<String> implementedInterfaces) {
+    public void setImplementedInterfaces(TokenList<ImplementsToken> implementedInterfaces) {
         this.implementedInterfaces = implementedInterfaces;
     }
 
-    public List<DataObjectPropertyToken> getProperties() {
+    public TokenList<DataObjectPropertyToken> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<DataObjectPropertyToken> properties) {
+    public void setProperties(TokenList<DataObjectPropertyToken> properties) {
         this.properties = properties;
     }
 
-    public void addImport(String importDef) {
-        imports.add(importDef);
-    }
-
-    public void addPropertyToken(DataObjectPropertyToken propertyToken) {
-        properties.add(propertyToken);
-    }
-    
-    public void addImplementedInterface(String interfaceDef) {
+    public void addImplementedInterface(ImplementsToken interfaceDef) {
         implementedInterfaces.add(interfaceDef);
     }
 
-    public List<AnnotationToken> getAnnotations() {
+    public TokenList<AnnotationToken> getAnnotations() {
         return annotations;
     }
 
-    public void setAnnotations(List<AnnotationToken> annotations) {
+    public void setAnnotations(TokenList<AnnotationToken> annotations) {
         this.annotations = annotations;
-    }
-    
-    public AnnotationToken getLastAnnotation() {
-        if (annotations.size() > 0) {
-            return annotations.get(annotations.size()-1);
-        }
-        return null;
     }
 }

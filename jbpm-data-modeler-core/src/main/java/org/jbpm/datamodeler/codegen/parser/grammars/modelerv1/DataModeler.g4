@@ -30,11 +30,11 @@ Java 1.6 grammar derived from:
 
     https://github.com/antlr/examples-v3/blob/master/java/java/Java.g
  */
-grammar Java;
+grammar DataModeler;
 
 @lexer::header {
 
-package org.jbpm.datamodeler.codegen.parser;
+package org.jbpm.datamodeler.codegen.parser.grammars.modelerv1;
 
 }
 
@@ -45,7 +45,7 @@ protected boolean assertIsKeyword = true;
 
 @parser::header {
 
-package org.jbpm.datamodeler.codegen.parser;
+package org.jbpm.datamodeler.codegen.parser.grammars.modelerv1;
 
 }
 
@@ -56,6 +56,8 @@ package org.jbpm.datamodeler.codegen.parser;
 // starting point for parsing a java file
 /* The annotations are separated out to make parsing faster, but must be associated with
    a packageDeclaration or a typeDeclaration (and not an empty one). */
+
+/* WM
 compilationUnit
     :   annotations
         (   packageDeclaration importDeclaration* typeDeclaration*
@@ -63,6 +65,16 @@ compilationUnit
         )
         EOF
     |   packageDeclaration? importDeclaration* typeDeclaration*
+    	EOF
+    ;
+*/
+
+compilationUnit
+    :   annotations
+        (   packageDeclaration importDeclaration* classOrInterfaceDeclaration
+        )
+        EOF
+    |   packageDeclaration? importDeclaration* classOrInterfaceDeclaration
     	EOF
     ;
 
@@ -74,13 +86,21 @@ importDeclaration
     :   'import' 'static'? qualifiedName ('.' '*')? ';'
     ;
 
+/* WM
 typeDeclaration
     :   classOrInterfaceDeclaration
     |   ';'
     ;
+*/
 
+/* WM
 classOrInterfaceDeclaration
     :   classOrInterfaceModifiers (classDeclaration | interfaceDeclaration)
+    ;
+*/
+
+classOrInterfaceDeclaration
+    :   classOrInterfaceModifiers classDeclaration
     ;
 
 classOrInterfaceModifiers
@@ -102,9 +122,15 @@ modifiers
     :   modifier*
     ;
 
+/** WM
 classDeclaration
     :   normalClassDeclaration
     |   enumDeclaration
+    ;
+**/
+
+classDeclaration
+    :   normalClassDeclaration
     ;
 
 normalClassDeclaration
@@ -167,12 +193,20 @@ interfaceBody
     :   '{' interfaceBodyDeclaration* '}'
     ;
 
+/* WM
 classBodyDeclaration
     :   ';'
     |   'static'? block
     |   modifiers memberDecl
     ;
+*/
 
+classBodyDeclaration
+    :   ';'
+    |   modifiers memberDecl
+    ;
+
+/* WM
 memberDecl
     :   genericMethodOrConstructorDecl
     |   memberDeclaration
@@ -180,6 +214,17 @@ memberDecl
     |   Identifier constructorDeclaratorRest
     |   interfaceDeclaration
     |   classDeclaration
+    ;
+*/
+
+//no nested clases, nested interfaces
+memberDecl
+    :   genericMethodOrConstructorDecl
+    |   memberDeclaration
+    |   'void' Identifier voidMethodDeclaratorRest
+    |   Identifier constructorDeclaratorRest
+//    |   interfaceDeclaration
+//    |   classDeclaration
     ;
 
 memberDeclaration
@@ -479,11 +524,21 @@ block
     :   '{' blockStatement* '}'
     ;
 
+/* WM
 blockStatement
     :   localVariableDeclarationStatement
     |   classOrInterfaceDeclaration
     |   statement
     ;
+*/
+
+
+blockStatement
+    :   localVariableDeclarationStatement
+// no class de finitions inside blocks    |   classOrInterfaceDeclaration
+    |   statement
+    ;
+
 
 localVariableDeclarationStatement
     :    localVariableDeclaration ';'

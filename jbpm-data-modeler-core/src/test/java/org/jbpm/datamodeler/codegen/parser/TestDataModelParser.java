@@ -1,6 +1,8 @@
 package org.jbpm.datamodeler.codegen.parser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectPropertyToken;
+import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectToken;
 import org.junit.Before;
 
 import java.io.InputStream;
@@ -15,6 +17,9 @@ public class TestDataModelParser {
     @Before
     public void setUp() throws Exception {
         InputStream inputStream = TestDataModelParser.class.getResourceAsStream("Class1.java.test");
+        //FileInputStream inputStream = new FileInputStream("/home/wmedvede/development/projects/jbpm-data-modeler/jbpm-data-modeler-core/src/test/java/org/jbpm/datamodeler/codegen/parser/Class3.java");
+
+        //InputStream inputStream = TestDataModelParser.class.getResourceAsStream("Class3.java.test");
         ANTLRInputStream antlrInputStream = new ANTLRInputStream(inputStream);
         parser = new DataModelParser(antlrInputStream);
     }

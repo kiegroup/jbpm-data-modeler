@@ -5,6 +5,8 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.jbpm.datamodeler.codegen.parser.grammars.modelerv1.DataModelerLexer;
+import org.jbpm.datamodeler.codegen.parser.grammars.modelerv1.DataModelerParser;
 import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectToken;
 
 import java.io.IOException;
@@ -44,11 +46,11 @@ public class DataModelParser {
         //TODO implement parse error handling
 
         //read the tokens
-        JavaLexer lexer = new JavaLexer(charStream);
+        DataModelerLexer lexer = new DataModelerLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         //parse the tokens to get the AST
-        JavaParser parser = new JavaParser(tokens);
+        DataModelerParser parser = new DataModelerParser(tokens);
         ParserRuleContext tree = parser.compilationUnit();
 
         //create the tree walker to walk the AST

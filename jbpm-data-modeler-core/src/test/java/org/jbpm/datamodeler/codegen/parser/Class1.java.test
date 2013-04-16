@@ -16,8 +16,31 @@ import java.applet.*;
 @Templated(file="index.html")
 public static class  Class1 extends org.jbpm.Class1Parent implements Serializale, Redhatizable {
 
+/*
+inner classes not supported in this version
+class Pepito {
+    int a;
+
+}
+*/
+
+/*
+static blocks not supported in this version
+    static {
+
+        int caka = 0;
+    }
+*/
+
+    public String sayHello() {
+        return "hello";
+    }
+
+
     private Integer cantidad;
-    
+
+    @Nombre
+    @Apellido
     private static String nombre;
     
     protected final int edad = 18;
@@ -26,10 +49,14 @@ public static class  Class1 extends org.jbpm.Class1Parent implements Serializale
         return 5;
     }
 
+/*
+    //@Procesador
     void procesador() {
         int i = 0;
         String r = "la erre";
     }
+*/
+    @List
     private List<Integer> list = new ArrayList<Integer>();
 
         public static void main(String[] args) {
@@ -38,5 +65,26 @@ public static class  Class1 extends org.jbpm.Class1Parent implements Serializale
 
     java.lang.Boolean enabled;
 
-}
+/*
+        void metodo() {
 
+
+  inner clases not supported in this version
+            class Pepito2 {
+                int a;
+            }
+
+
+
+            GenerationListener listener = new GenerationListener() {
+                @Override
+                public void assetGenerated(String fileName, String content) {
+                    //To change body of implemented methods use File | Settings | File Templates.
+                }
+            };
+
+
+        }
+*/
+
+}

@@ -1,22 +1,19 @@
 package org.jbpm.datamodeler.codegen.parser.tokens;
 
-import java.util.ArrayList;
-import java.util.List;
+public class AnnotationToken extends Token {
 
-/**
- * Created by IntelliJ IDEA.
- * User: wmedvede
- * Date: 4/13/13
- * Time: 3:46 PM
- * To change this template use File | Settings | File Templates.
- */
-public class AnnotationToken {
-    
     private String name;
 
-    private List<AnnotationValuePairToken> valuePairs = new ArrayList<AnnotationValuePairToken>();
+    private TokenList<AnnotationValuePairToken> valuePairs = new TokenList<AnnotationValuePairToken>();
+
+    public static final String ANNOTATION_TOKEN = "ANNOTATION_TOKEN";
+
+    public AnnotationToken() {
+        super(ANNOTATION_TOKEN);
+    }
 
     public AnnotationToken(String name) {
+        this();
         this.name = name;
     }
 
@@ -28,11 +25,11 @@ public class AnnotationToken {
         this.name = name;
     }
 
-    public List<AnnotationValuePairToken> getValuePairs() {
+    public TokenList<AnnotationValuePairToken> getValuePairs() {
         return valuePairs;
     }
 
-    public void setValuePairs(List<AnnotationValuePairToken> valuePairs) {
+    public void setValuePairs(TokenList<AnnotationValuePairToken> valuePairs) {
         this.valuePairs = valuePairs;
     }
 }
