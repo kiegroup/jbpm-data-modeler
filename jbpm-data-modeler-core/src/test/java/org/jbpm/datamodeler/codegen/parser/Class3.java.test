@@ -1,0 +1,38 @@
+package org.jbpm.datamodeler.codegen.parser;
+
+import org.jboss.errai.common.client.api.annotations.Portable;
+import org.jbpm.datamodeler.annotations.DataObject;
+import org.jbpm.datamodeler.annotations.Equals;
+import org.jbpm.datamodeler.annotations.IsMethod;
+
+import java.util.Date;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: wmedvede
+ * Date: 4/15/13
+ * Time: 8:25 PM
+ * To change this template use File | Settings | File Templates.
+ */
+
+@Portable
+@DataObject
+public class Class3 extends java.util.Date {
+
+    protected Integer intA;
+
+    @IsMethod(owner = "juancito", methodName = "anotado")
+    private static final void anotado() {
+
+    }
+
+    @Equals
+    public static String strB;
+
+    private Date dateSimple;
+
+    void metodo() {
+
+    }
+
+}
