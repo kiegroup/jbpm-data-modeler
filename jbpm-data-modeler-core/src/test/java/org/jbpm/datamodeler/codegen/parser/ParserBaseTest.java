@@ -42,7 +42,7 @@ public abstract class ParserBaseTest {
     public abstract void loadTestModel();
 
     @Before
-    public void setUp() throws Exception {
+    public void preTest() throws Exception {
         InputStream inputStream = ParserBaseTest.class.getResourceAsStream(fileName);
         ANTLRInputStream antlrInputStream = new ANTLRInputStream(inputStream);
         parser = new DataModelParser(antlrInputStream);
@@ -51,7 +51,7 @@ public abstract class ParserBaseTest {
     }
 
     @org.junit.Test
-    public void testFile() throws Exception {
+    public void doTest() throws Exception {
         dataObjectToken = parser.parse();
 
         assertNotNull("dataObjectToken couldn't be read from file: " + fileName, dataObjectToken);
@@ -66,6 +66,12 @@ public abstract class ParserBaseTest {
         testClassAnnotations();
 
         testProperties();
+
+        postTest();
+    }
+
+    public void postTest() {
+        //override this method if you want to do something with the parse dataObject
     }
 
     public void testImports() {
