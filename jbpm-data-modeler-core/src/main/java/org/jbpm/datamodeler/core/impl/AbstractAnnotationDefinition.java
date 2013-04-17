@@ -4,7 +4,9 @@ import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.AnnotationMemberDefinition;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class AbstractAnnotationDefinition implements AnnotationDefinition {
@@ -18,12 +20,27 @@ public class AbstractAnnotationDefinition implements AnnotationDefinition {
     protected String className;
 
     protected List<AnnotationMemberDefinition> annotationMembers = new ArrayList<AnnotationMemberDefinition> ();
+    
+    protected Map<String, AnnotationMemberDefinition> annotationMemberMap = new HashMap<String, AnnotationMemberDefinition>();
+
+    protected boolean objectAnnotation = false;
+
+    protected boolean propertyAnnotation = false;
 
     protected AbstractAnnotationDefinition(String name, String className, String shortDescription, String description) {
         this.name = name;
         this.className = className;
         this.shortDescription = shortDescription;
         this.description = description;
+    }
+
+    protected AbstractAnnotationDefinition(String name, String className, String shortDescription, String description, boolean objectAnnotation, boolean propertyAnnotation) {
+        this.name = name;
+        this.className = className;
+        this.shortDescription = shortDescription;
+        this.description = description;
+        this.objectAnnotation = objectAnnotation;
+        this.propertyAnnotation = propertyAnnotation;
     }
 
     @Override
@@ -48,6 +65,7 @@ public class AbstractAnnotationDefinition implements AnnotationDefinition {
 
     protected void addMember(AnnotationMemberDefinition annotationMember) {
         annotationMembers.add(annotationMember);
+        annotationMemberMap.put(annotationMember.getName(), annotationMember);
     }
 
     @Override
@@ -58,5 +76,20 @@ public class AbstractAnnotationDefinition implements AnnotationDefinition {
     @Override
     public String getClassName() {
         return className;
+    }
+
+    @Override
+    public boolean isObjectAnnotation() {
+        return objectAnnotation;
+    }
+
+    @Override
+    public boolean isPropertyAnnotation() {
+        return propertyAnnotation;
+    }
+
+    @Override
+    public boolean hasMember(String name) {
+        return annotationMemberMap.containsKey(name);
     }
 }

@@ -19,7 +19,9 @@ package org.jbpm.datamodeler.core.impl;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.ObjectProperty;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DataObjectImpl extends AbstractHasAnnotations implements DataObject {
@@ -29,6 +31,8 @@ public class DataObjectImpl extends AbstractHasAnnotations implements DataObject
     private String packageName;
     
     private String superClassName;
+
+    private List<String> imports = new ArrayList<String>();
 
     private Map<String, ObjectProperty> properties = new HashMap<String, ObjectProperty>();
 
@@ -99,4 +103,8 @@ public class DataObjectImpl extends AbstractHasAnnotations implements DataObject
         return properties.remove(name);
     }
 
+    @Override
+    public List<String> getImports() {
+        return imports;
+    }
 }

@@ -1,7 +1,6 @@
 package org.jbpm.datamodeler.driver;
 
 
-import org.jbpm.datamodeler.core.Annotation;
 import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.DataModel;
 import org.kie.commons.io.IOService;
@@ -13,19 +12,15 @@ import java.util.List;
 
 public interface ModelDriver {
 
+    List<AnnotationDefinition> getConfiguredAnnotations();
+
+    AnnotationDefinition getConfiguredAnnotation(String annotationName);
+
+    AnnotationDriver getAnnotationDriver(String annotationName);
+
     DataModel loadModel(IOService ioService, Collection<Path> rootPaths, boolean recursiveScan) throws IOException;
 
     void generateModel(IOService ioService, Path root) throws IOException;
 
-    List<AnnotationDefinition> getConfiguredAttributes();
-
-    /**
-     * knows how to create an attribute for the given definition
-     *
-     * @param annotationDefinition
-     *
-     * @return
-     */
-    Annotation newAttribute(AnnotationDefinition annotationDefinition);
-
+    DataModel createModel();
 }

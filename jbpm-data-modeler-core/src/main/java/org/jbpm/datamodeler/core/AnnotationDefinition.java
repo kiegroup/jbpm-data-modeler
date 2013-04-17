@@ -39,5 +39,27 @@ public interface AnnotationDefinition extends HasClassName {
      * @return
      */
     List<AnnotationMemberDefinition> getAnnotationMembers();
+
+    /**
+     *
+     * @return true if the annotation applies to objects, false in any other case.
+     */
+    boolean isObjectAnnotation();
+
+
+    /**
+     *
+     * @return true if the annotation applies to properties, false in any other case.
+     */
+    boolean isPropertyAnnotation();
+
+
+    /**
+     *
+     * @param name
+     *
+     * @return true if the annotation has a member with the given name, false in any other case.
+     */
+    boolean hasMember(String name);
        
 }

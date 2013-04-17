@@ -10,6 +10,12 @@ import java.util.*;
 
 public class FileScanner {
 
+    public Collection<ScanResult> scan(IOService ioService, Collection<Path> rootPaths, String fileType, boolean recursiveScan) throws IOException {
+        ArrayList<String> fileTypes = new ArrayList<String>();
+        fileTypes.add(fileType);
+        return scan(ioService, rootPaths, fileTypes, recursiveScan);
+    }
+
     public Collection<ScanResult> scan(IOService ioService, Collection<Path> rootPaths, Collection<String> fileTypes, boolean recursiveScan) throws IOException {
         List<ScanResult> results = new ArrayList<ScanResult>();
         final Map<Path, Path> scannedCache = new HashMap<Path, Path>();

@@ -16,9 +16,12 @@
 
 package org.jbpm.datamodeler.core;
 
+import java.util.List;
 import java.util.Map;
 
 public interface DataObject extends HasName, HasPackageName, HasClassName, HasAnnotations {
+
+    List<String> getImports();
 
     boolean hasSuperClass();
 
