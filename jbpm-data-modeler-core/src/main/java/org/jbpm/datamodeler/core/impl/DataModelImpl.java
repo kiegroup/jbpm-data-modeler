@@ -31,6 +31,10 @@ public class DataModelImpl implements DataModel {
     
     String version;
 
+    public DataModelImpl() {
+
+    }
+
     public DataModelImpl(String name, String format) {
         this.name = name;
         this.format = format;

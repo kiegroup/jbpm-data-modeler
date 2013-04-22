@@ -10,8 +10,10 @@ import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectToken;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.PropertyType;
+import org.jbpm.datamodeler.core.impl.DataModelImpl;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.core.impl.PropertyTypeFactoryImpl;
+import org.jbpm.datamodeler.driver.impl.DataModelOracleDriver;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
@@ -21,6 +23,10 @@ import org.jbpm.datamodeler.xml.XMLSerializer;
 import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Files;
+import org.kie.guvnor.datamodel.events.InvalidateDMOProjectCacheEvent;
+import org.kie.guvnor.datamodel.model.ModelField;
+import org.kie.guvnor.datamodel.oracle.DataModelOracle;
+import org.kie.guvnor.datamodel.service.DataModelService;
 import org.kie.guvnor.project.service.ProjectService;
 import org.kie.guvnor.services.metadata.MetadataService;
 import org.kie.guvnor.services.metadata.model.Metadata;
@@ -29,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.workbench.widgets.events.ResourceAddedEvent;
+import org.uberfire.client.workbench.widgets.events.ResourceOpenedEvent;
+import org.uberfire.client.workbench.widgets.events.ResourceUpdatedEvent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -36,6 +44,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @Service
@@ -62,10 +71,24 @@ public class DataModelerServiceImpl implements DataModelerService {
     private ProjectService projectService;
 
     @Inject
+    private MetadataService metadataService;
+
+    @Inject
+    private DataModelService dataModelService;
+
+
+    @Inject
+    private Event<InvalidateDMOProjectCacheEvent> invalidateDMOProjectCache;
+
+    @Inject
+    private Event<ResourceOpenedEvent> resourceOpenedEvent;
+
+    @Inject
     private Event<ResourceAddedEvent> resourceAddedEvent;
 
     @Inject
-    private MetadataService metadataService;
+    private Event<ResourceUpdatedEvent> resourceUpdatedEvent;
+
 
     public DataModelerServiceImpl() {
     }
@@ -88,6 +111,8 @@ public class DataModelerServiceImpl implements DataModelerService {
             //Write the serialized model to the file
             ioService.write(paths.convert(path), content);
 
+            resourceUpdatedEvent.fire(new ResourceUpdatedEvent(path));
+
         } catch (Exception e) {
             logger.error("The following error was produced during data model saving", e);
             throw new ServiceException("Data model: " + path + ", couldn't be saved due to the following error. " + e);
@@ -108,22 +133,31 @@ public class DataModelerServiceImpl implements DataModelerService {
             final String content = ioService.readAllString( paths.convert( path ) );
             if (logger.isDebugEnabled()) logger.debug("The file content is: \n" + content);
 
-            XMLSerializer serializer = new XMLSerializerImpl();
-            dataModel = serializer.deserialize(content);
+            //XMLSerializer serializer = new XMLSerializerImpl();
+            //dataModel = serializer.deserialize(content);
 
             //READ the pojos from the kie filesystem in order to synchronize the model.
 
             Path projectPath = projectService.resolveProject(path);
-            updateModel(dataModel, paths.convert(projectPath));
+            //updateModel(dataModel, paths.convert(projectPath));
 
-
+            dataModel = new DataModelImpl();
             String defaultPackageName = calculateDefaultPackageName(path);
+            //TODO improve this
+            DataModelOracle dataModelOracle = dataModelService.getDataModel(path);
+            
+            DataModelOracleDriver driver = new DataModelOracleDriver();
+            driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
+
+
             DataModelTO dataModelTO = DataModelHelper.domain2To(dataModel);
             dataModelTO.setDefaultPackage(defaultPackageName);
 
+            printProjectDataModelOracle(path);
+
             return dataModelTO;
 
-        } catch (SerializerException e) {
+        } catch (Exception e) {
             logger.error("Data model couldn't be deserialized from file due to the following errors. path: " + path, e);
             throw new ServiceException("Data model: " + path + ", couldn't be loaded due to the following error. " + e);
         }
@@ -147,6 +181,8 @@ public class DataModelerServiceImpl implements DataModelerService {
 
             //This output path is only for testing purposes, TODO REMOVE IT!
             generationContext.setOutputPath("/tmp");
+
+            invalidateDMOProjectCache.fire( new InvalidateDMOProjectCacheEvent( projectPath ) );
 
             
             GenerationEngine generationEngine = GenerationEngine.getInstance();
@@ -187,7 +223,7 @@ public class DataModelerServiceImpl implements DataModelerService {
             //Signal creation to interested parties
             //de esta forma noticariamos pero hay que ver porque no funciona, posilemente falte
             //algun inherit en el modulo GWT
-            //resourceAddedEvent.fire( new ResourceAddedEvent( path ) );
+            resourceAddedEvent.fire( new ResourceAddedEvent( path ) );
 
             return path;
 
@@ -246,7 +282,20 @@ public class DataModelerServiceImpl implements DataModelerService {
 
             //the last subDirPath is the directory to crate the file.
             destFilePath = subDirPath.resolve(fileName);
+            boolean exists = ioService.exists(destFilePath);
+
             ioService.write(destFilePath, content);
+
+            if (!exists) {
+                logger.debug("A new file was created: " + destFilePath);
+                resourceAddedEvent.fire( new ResourceAddedEvent(paths.convert(destFilePath)));
+            } else {
+                logger.debug("A file was modified: " + destFilePath);
+                resourceUpdatedEvent.fire( new ResourceUpdatedEvent(paths.convert(destFilePath)));
+            }
+
+
+
         }
     }
 
@@ -267,6 +316,50 @@ public class DataModelerServiceImpl implements DataModelerService {
                 updateDataObject(dataObject, javaPath);
             }
         }
+    }
+
+    public void printProjectDataModelOracle(Path projectPath) {
+
+
+
+        if (dataModelService != null) {
+            //DataModelOracle dataModelOracle = dataModelService.getDataModel(projectService.resolveProject(projectPath));
+            DataModelOracle dataModelOracle = dataModelService.getDataModel(projectPath);
+
+            if (dataModelOracle != null) {
+                String[] factTypes = dataModelOracle.getFactTypes();
+                logger.debug("*********************** Project Fact types");
+                for (int i = 0; factTypes != null && i < factTypes.length; i++) {
+                    logger.debug(factTypes[i]);
+                }
+
+                logger.debug("*********************** External Fact types");
+                String externalFactTypes[] = dataModelOracle.getExternalFactTypes();
+                for (int i = 0; externalFactTypes != null && i < externalFactTypes.length; i++) {
+                    logger.debug(externalFactTypes[i]);
+                }
+
+                logger.debug("*********************** All Fact types");
+                String allFactTypes[] = dataModelOracle.getAllFactTypes();
+                for (int i = 0; allFactTypes != null && i < allFactTypes.length; i++) {
+                    logger.debug(allFactTypes[i]);
+                }
+
+                logger.debug("*********************** Project Fact types structure");
+                Map<String, ModelField[]> fields = dataModelOracle.getModelFields();
+                for (int i = 0; factTypes != null && i < factTypes.length; i++) {
+                    logger.debug("******* Fields for: " +  factTypes[i]);
+                    ModelField[] factFields = fields.get(factTypes[i]);
+                    logger.debug("******* fields size: " + (factFields != null ? factFields.length : 0));
+                    for (int j = 0; factFields != null && j < factFields.length; j++) {
+                        logger.debug("******** " + factFields[j]);
+                    }
+                }
+            }
+        } else {
+            logger.error("dataModelService wasn't Injected");
+        }
+
     }
 
     private void updateDataObject(DataObject dataObject, org.kie.commons.java.nio.file.Path javaPath) {

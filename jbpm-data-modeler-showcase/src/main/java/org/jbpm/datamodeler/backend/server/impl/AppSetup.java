@@ -23,13 +23,68 @@ import org.kie.commons.java.nio.file.FileSystemAlreadyExistsException;
 import org.uberfire.backend.repositories.Repository;
 import org.uberfire.backend.repositories.RepositoryService;
 
+import org.kie.commons.services.cdi.Startup;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.net.URI;
 
+
+
+@Singleton
+@Startup
+public class AppSetup {
+
+    private static final String REPO_PLAYGROUND = "jbpm-playground";
+
+
+    private static final String ORIGIN_URL      = "https://github.com/wmedvede/guvnorng-playground.git";
+
+
+    //private static final String ORIGIN_URL      = "https://github.com/guvnorngtestuser1/jbpm-console-ng-playground.git";
+
+
+    private final IOService ioService = new IOServiceDotFileImpl();
+
+    @Produces
+    @Named("ioStrategy")
+    public IOService ioService() {
+        return ioService;
+    }
+
+    @Inject
+    private RepositoryService repositoryService;
+
+    @PostConstruct
+    public void onStartup() {
+
+        Repository repository = repositoryService.getRepository(REPO_PLAYGROUND);
+        if(repository == null) {
+/*
+            final String userName = "guvnorngtestuser1";
+            final String password = "test1234";
+*/
+
+            final String userName = "wmedvede";
+            final String password = "med0077";
+
+            repositoryService.cloneRepository("git", REPO_PLAYGROUND, ORIGIN_URL, userName, password);
+            repository = repositoryService.getRepository(REPO_PLAYGROUND);
+        }
+        try {
+            ioService.newFileSystem(URI.create(repository.getUri()), repository.getEnvironment());
+
+        } catch (FileSystemAlreadyExistsException e) {
+            ioService.getFileSystem(URI.create(repository.getUri()));
+
+        }
+    }
+
+/*
 @ApplicationScoped
 public class AppSetup {
     private static final String REPO_PLAYGROUND = "jbpm-playground";
@@ -75,7 +130,7 @@ public class AppSetup {
         }
 
 
-/*        final String gitURL = "https://github.com/guvnorngtestuser1/guvnorng-playground.git";
+*//*        final String gitURL = "https://github.com/guvnorngtestuser1/guvnorng-playground.git";
         final String userName = "guvnorngtestuser1";
         final String password = "test1234";
         final URI fsURI = URI.create( "git://uf-playground" );
@@ -93,7 +148,7 @@ public class AppSetup {
         } catch ( FileSystemAlreadyExistsException ex ) {
             fs = ioService.getFileSystem( fsURI );
         }
- */
+ *//*
         //      activeFileSystems.addBootstrapFileSystem( FileSystemFactory.newFS( new HashMap<String, String>() {{
         //          put( "default://uf-playground", "uf-playground" );
         //      }}, fs.supportedFileAttributeViews() ) );
@@ -109,6 +164,7 @@ public class AppSetup {
     @Named("ioStrategy")
     public IOService ioService() {
         return ioService;
-    }
+    }*/
+
 
 }
