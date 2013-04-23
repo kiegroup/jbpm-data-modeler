@@ -87,4 +87,36 @@ public class FileScanner {
         }
         return results;
     }
+
+    public Collection<ScanResult> scanDirectories(IOService ioService, Path rootPath, final boolean includeRoot, final boolean recursiveScan/*, final Map<Path, Path> scannedCache*/) throws IOException {
+        final Collection<ScanResult> results = new ArrayList<ScanResult>();
+        final List<Path> childDirectories = new ArrayList<Path>();
+
+        if (rootPath != null) {
+            if (Files.isDirectory(rootPath) /* && !scannedCache.containsKey(rootPath)*/) {
+                //scannedCache.put(rootPath, rootPath);
+                if (includeRoot) results.add(new ScanResult(rootPath));
+
+                final DirectoryStream<Path> foundChildren = ioService.newDirectoryStream( rootPath ,
+                        new DirectoryStream.Filter<Path>() {
+
+                            @Override
+                            public boolean accept( final Path entry ) throws IOException {
+
+                                boolean include = true;
+                                return include;
+    
+                            }
+                        } );
+
+                //finally
+                if (recursiveScan) {
+                    for (Path child : childDirectories) {
+                        results.addAll( scanDirectories(ioService, child, true, recursiveScan/*, scannedCache*/) );
+                    }
+                }
+            }
+        }
+        return results;
+    }
 }
