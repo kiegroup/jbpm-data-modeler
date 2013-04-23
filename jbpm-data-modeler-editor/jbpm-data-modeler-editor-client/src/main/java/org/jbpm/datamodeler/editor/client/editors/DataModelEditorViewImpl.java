@@ -16,12 +16,10 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -48,9 +46,6 @@ public class DataModelEditorViewImpl extends Composite
     @DataField
     private SimplePanel propertiesPanel = new SimplePanel();
 
-    @DataField
-    private Anchor editorTitle = new Anchor();
-
     @Inject
     private TabbedPropertyEditor tabbedPropertyEditor;
 
@@ -65,7 +60,6 @@ public class DataModelEditorViewImpl extends Composite
     private DataObjectTO selectedDataObject;
 
     public DataModelEditorViewImpl() {
-        editorTitle.setText(Constants.INSTANCE.modelEditor_title());
     }
 
     @Override
