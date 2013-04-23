@@ -24,6 +24,8 @@ import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.Propert
 import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditor;
 import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditorListener;
 import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -31,6 +33,7 @@ import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.annotations.*;
+import org.uberfire.client.common.ErrorPopup;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 import org.uberfire.client.workbench.widgets.menu.MenuFactory;
@@ -77,6 +80,9 @@ public class DataModelEditorPresenter {
     }
 
     @Inject
+    private ValidatorService validatorService;
+
+    @Inject
     DataModelEditorView view;
 
     @Inject
@@ -108,34 +114,61 @@ public class DataModelEditorPresenter {
 
     public void setDataModel(DataModelTO dataModel) {
         selectionModel.setSelectedModel(dataModel);
+        validatorService.notifyDataModelSelected(dataModel);
     }
 
     public Command createDeleteCommand(final DataObjectTO dataObjectTO, final int index) {
         return new Command() {
             @Override
             public void execute() {
+                validatorService.isDataObjectDeletable(dataObjectTO, new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ErrorPopup.showMessage("The data object with identifier: " + dataObjectTO.getName() + " cannot be deleted because it is still referenced within the model.");
+                    }
 
-                //TODO implement the required controls to ensure the requested object can be deleted
-                getDataModel().getDataObjects().remove(dataObjectTO);
-                view.deleteDataObject(dataObjectTO, index);
-                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObjectTO.getName())));
+                    @Override
+                    public void onSuccess() {
+                        getDataModel().getDataObjects().remove(dataObjectTO);
+                        view.deleteDataObject(dataObjectTO, index);
+                        validatorService.notifyDataObjectDeleted(dataObjectTO.getClassName());
+                        notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObjectTO.getName())));
+                    }
+                });
             }
         };
     }
 
     public Command createAddDataObjectCommand(final String text) {
-
         return new Command() {
             @Override
             public void execute() {
+                validatorService.isValidIdentifier(text, new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ErrorPopup.showMessage("Invalid data object identifier: " + text + " is not a valid Java identifier");
+                    }
 
-                //TODO implement the required controls to ensure the name valid, etc.
-                DataObjectTO dataObject = new DataObjectTO(text);
-                dataObject.setPackageName(getDataModel().getDefaultPackage());
-                getDataModel().getDataObjects().add(dataObject);
-                view.addDataObject(dataObject);
-                selectionModel.setSelectedObject(dataObject);
-                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(text)));
+                    @Override
+                    public void onSuccess() {
+                        validatorService.isUniqueEntityName(text, getDataModel(), new ValidatorCallback() {
+                            @Override
+                            public void onFailure() {
+                                ErrorPopup.showMessage("A data object with identifier: " + text + " already exists in the model.");
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                DataObjectTO dataObject = new DataObjectTO(text);
+                                dataObject.setPackageName(getDataModel().getDefaultPackage());
+                                getDataModel().getDataObjects().add(dataObject);
+                                view.addDataObject(dataObject);
+                                selectionModel.setSelectedObject(dataObject);
+                                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(text)));
+                            }
+                        });
+                    }
+                });
             }
         };
     }
@@ -189,6 +222,7 @@ public class DataModelEditorPresenter {
                 //TODO implement the required controls to ensure the property can be deleted from the dataObject
                 dataObject.getProperties().remove(property);
                 view.deleteDataObjectProperty(property, index);
+                validatorService.notifyDataObjectUnReferenced(property.getClassName(), dataObject.getClassName());
             }
         };
     }
@@ -198,11 +232,31 @@ public class DataModelEditorPresenter {
         return new Command() {
             @Override
             public void execute() {
-                //TODO implement the required controls to ensure the property can be created
-                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple, baseType);
-                dataObject.getProperties().add(property);
-                view.addDataObjectProperty(property);
-                selectionModel.setSelectedProperty(property);
+                validatorService.isValidIdentifier(propertyName, new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ErrorPopup.showMessage("Invalid data object attribute identifier: " + propertyName + " is not a valid Java identifier");
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        validatorService.isUniqueAttributeName(propertyName, dataObject, new ValidatorCallback() {
+                            @Override
+                            public void onFailure() {
+                                ErrorPopup.showMessage("An attribute with identifier: " + propertyName + " already exists in the data object.");
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple, baseType);
+                                dataObject.getProperties().add(property);
+                                view.addDataObjectProperty(property);
+                                selectionModel.setSelectedProperty(property);
+                                if (!baseType) validatorService.notifyDataObjectReferenced(property.getClassName(), dataObject.getClassName());
+                            }
+                        });
+                    }
+                });
             }
         };
     }
@@ -228,15 +282,42 @@ public class DataModelEditorPresenter {
     public PropertyEditorListener getDataObjectEditorListener() {
         return new PropertyEditorListener() {
             @Override
-            public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
-                //TODO Implement validation for data objects properties
-                return true;
+            public boolean doBeforePropertyChange(final PropertyEditor source, final String propertyName, final Object pendingValue, final Object currentValue, final List<PropertyChangeError> errors) {
+                validatorService.isValidIdentifier(pendingValue.toString(), new ValidatorCallback() {
+                    public boolean returnValue(boolean b) {
+                        return b;
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        errors.add(new PropertyChangeError("Invalid data object identifier: " + pendingValue + " is not a valid Java identifier"));
+                        returnValue(false);
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        validatorService.isUniqueEntityName(pendingValue.toString(), getDataModel(), new ValidatorCallback() {
+                            @Override
+                            public void onFailure() {
+                                errors.add(new PropertyChangeError("A data object with identifier: " + pendingValue + " already exists in the model."));
+                                returnValue(false);
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                returnValue(true);
+                            }
+                        });
+                    }
+                });
+                return false;
             }
 
             @Override
             public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
                 //TODO Implement model property change
                 //Window.alert("data object property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
+                changeSelectedDataObjectProperty(propertyName, newValue, currentValue);
             }
         };
     }
@@ -245,15 +326,43 @@ public class DataModelEditorPresenter {
         return new PropertyEditorListener() {
 
             @Override
-            public boolean doBeforePropertyChange(PropertyEditor source, String propertyName, Object pendingValue, Object currentValue, List<PropertyChangeError> errors) {
+            public boolean doBeforePropertyChange(final PropertyEditor source, final String propertyName, final Object pendingValue, final Object currentValue, final List<PropertyChangeError> errors) {
+                validatorService.isValidIdentifier(pendingValue.toString(), new ValidatorCallback() {
+                    public boolean returnValue(boolean b) {
+                        return b;
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        errors.add(new PropertyChangeError("Invalid data object attribute identifier: " + pendingValue + " is not a valid Java identifier"));
+                        returnValue(false);
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        validatorService.isUniqueEntityName(pendingValue.toString(), getDataModel(), new ValidatorCallback() {
+                            @Override
+                            public void onFailure() {
+                                errors.add(new PropertyChangeError("An attribute with identifier: " + pendingValue + " already exists in the data object."));
+                                returnValue(false);
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                returnValue(true);
+                            }
+                        });
+                    }
+                });
+                return false;
                 //TODO Implement validation for the properties of a data object
                 //ej...
-                if ("name".equals(propertyName) && ("void".equals(pendingValue) || "int".equals(pendingValue) || "boolean".equals(pendingValue)) ) {
-                    errors.add(new PropertyChangeError("Invalid name"));
-                    return false;
-                }
-
-                return true;
+//                if ("name".equals(propertyName) && ("void".equals(pendingValue) || "int".equals(pendingValue) || "boolean".equals(pendingValue)) ) {
+//                    errors.add(new PropertyChangeError("Invalid name"));
+//                    return false;
+//                }
+//
+//                return true;
             }
 
             @Override
@@ -265,10 +374,18 @@ public class DataModelEditorPresenter {
         };
     }
 
+    private void changeSelectedDataObjectProperty(String propertyName, Object newValue, Object currentValue) {
+        //TODO improve this
+        if ("name".equals(propertyName)) {
+            selectionModel.getSelectedObject().setName(newValue.toString());
+        }
+        view.refreshObjectEditor();
+    }
+
     private void changeSelectedDataObjectFieldProperty(String propertyName, Object newValue, Object currentValue) {
         //TODO improve this
         if ("name".equals(propertyName)) {
-            selectionModel.getSelectedProperty().setName((String)newValue);
+            selectionModel.getSelectedProperty().setName(newValue.toString());
         }
         view.refreshObjectEditor();
     }
