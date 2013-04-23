@@ -7,6 +7,8 @@ import org.jbpm.datamodeler.codegen.GenerationListener;
 import org.jbpm.datamodeler.codegen.parser.DataModelParser;
 import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectPropertyToken;
 import org.jbpm.datamodeler.codegen.parser.tokens.DataObjectToken;
+import org.jbpm.datamodeler.commons.file.FileScanner;
+import org.jbpm.datamodeler.commons.file.ScanResult;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.PropertyType;
@@ -22,6 +24,7 @@ import org.jbpm.datamodeler.xml.SerializerException;
 import org.jbpm.datamodeler.xml.XMLSerializer;
 import org.jbpm.datamodeler.xml.impl.XMLSerializerImpl;
 import org.kie.commons.io.IOService;
+import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.datamodel.events.InvalidateDMOProjectCacheEvent;
 import org.kie.guvnor.datamodel.model.ModelField;
@@ -42,10 +45,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 @Service
 @ApplicationScoped
@@ -142,16 +142,20 @@ public class DataModelerServiceImpl implements DataModelerService {
             //updateModel(dataModel, paths.convert(projectPath));
 
             dataModel = new DataModelImpl();
-            String defaultPackageName = calculateDefaultPackageName(path);
-            //TODO improve this
-            DataModelOracle dataModelOracle = dataModelService.getDataModel(path);
+            List<Path> packages = calculateProjectPackages(ioService, projectPath);
+
+            for (Path packageDir : packages) {
+                String defaultPackageName = calculateDefaultPackageName(packageDir);
+                //TODO improve this
+                DataModelOracle dataModelOracle = dataModelService.getDataModel(packageDir);
             
-            DataModelOracleDriver driver = new DataModelOracleDriver();
-            driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
+                DataModelOracleDriver driver = new DataModelOracleDriver();
+                driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
+            }
 
 
             DataModelTO dataModelTO = DataModelHelper.domain2To(dataModel);
-            dataModelTO.setDefaultPackage(defaultPackageName);
+            //dataModelTO.setDefaultPackage(defaultPackageName);
 
             printProjectDataModelOracle(path);
 
@@ -489,5 +493,25 @@ public class DataModelerServiceImpl implements DataModelerService {
         } else {
             return packageName;
         }
+    }
+
+    private List<Path> calculateProjectPackages(IOService ioService, Path path) throws IOException {
+            
+        Collection<ScanResult> scanResults;
+        List<Path> results = new ArrayList<Path>();
+
+        FileScanner fileScanner = new FileScanner();
+
+        Path projectHome = projectService.resolveProject(path);
+        org.kie.commons.java.nio.file.Path javaPath = existsProjectJavaPath(paths.convert(projectHome));
+        if (javaPath != null) {
+            scanResults = fileScanner.scanDirectories(ioService, javaPath, false, true);
+            for (ScanResult scanResult : scanResults) {
+                results.add(paths.convert(scanResult.getFile()));
+            }
+
+        }
+
+        return results;
     }
 }
