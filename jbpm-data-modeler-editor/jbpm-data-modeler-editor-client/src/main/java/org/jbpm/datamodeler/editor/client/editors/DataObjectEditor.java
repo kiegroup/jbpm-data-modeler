@@ -308,7 +308,7 @@ public class DataObjectEditor  extends Composite {
     }
 
     public void notifyDataModelChanged() {
-        populateObjectTypes();
+        if (newPropertyDataObjectType.getValue()) populateObjectTypes();
     }
 
     public void setDataModel(DataModelTO dataModel) {
