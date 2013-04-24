@@ -97,21 +97,12 @@ public class FileScanner {
                 //scannedCache.put(rootPath, rootPath);
                 if (includeRoot) results.add(new ScanResult(rootPath));
 
-                final DirectoryStream<Path> foundChildren = ioService.newDirectoryStream( rootPath ,
-                        new DirectoryStream.Filter<Path>() {
 
-                            @Override
-                            public boolean accept( final Path entry ) throws IOException {
 
-                                boolean include = true;
-                                return include;
-    
-                            }
-                        } );
-
+                final DirectoryStream<Path> children = ioService.newDirectoryStream(rootPath);
                 //finally
                 if (recursiveScan) {
-                    for (Path child : childDirectories) {
+                    for (Path child : children) {
                         results.addAll( scanDirectories(ioService, child, true, recursiveScan/*, scannedCache*/) );
                     }
                 }

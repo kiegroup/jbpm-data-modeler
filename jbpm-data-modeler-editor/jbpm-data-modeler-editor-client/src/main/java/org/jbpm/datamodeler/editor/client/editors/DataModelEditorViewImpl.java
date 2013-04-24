@@ -94,7 +94,7 @@ public class DataModelEditorViewImpl extends Composite
     @Override
     public void modelSelected() {
         //TODO complete this implementation when the properties editor is ready
-        tabbedPropertyEditor.tabPanel.selectTab(0);
+        //tabbedPropertyEditor.tabPanel.selectTab(0);
     }
 
     @Override
@@ -104,14 +104,14 @@ public class DataModelEditorViewImpl extends Composite
         dataObjectEditor.setDataObject(dataObject, clearBreadcrums);
         //TODO complete this implementation when the properties editor is ready
         tabbedPropertyEditor.setDataObject(dataObject);
-        tabbedPropertyEditor.tabPanel.selectTab(1);
+        tabbedPropertyEditor.tabPanel.selectTab(0);
     }
 
     @Override
     public void selectDataObjectProperty(ObjectPropertyTO selectedProperty) {
         //TODO complete this implementation when the properties editor is ready
         tabbedPropertyEditor.setDataObjectProperty(selectedProperty);
-        tabbedPropertyEditor.tabPanel.selectTab(2);
+        tabbedPropertyEditor.tabPanel.selectTab(1);
     }
 
     @Override

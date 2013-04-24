@@ -50,8 +50,8 @@ public class TabbedPropertyEditor extends Composite {
     @PostConstruct
     private void init() {
 
-        modelTab.setHeading("Model");
-        modelTab.add(modelProperties);
+        //modelTab.setHeading("Model");
+        //modelTab.add(modelProperties);
 
         objectTab.setHeading("Entity");
         objectTab.add(objectProperties);
@@ -59,7 +59,7 @@ public class TabbedPropertyEditor extends Composite {
         fieldTab.setHeading("Field");
         fieldTab.add(fieldProperties);
 
-        tabPanel.add(modelTab);
+        //tabPanel.add(modelTab);
         tabPanel.add(objectTab);
         tabPanel.add(fieldTab);
 
@@ -77,7 +77,7 @@ public class TabbedPropertyEditor extends Composite {
     }
 
     public void setDataModel(DataModelTO dataModel) {
-        loadDataModelAttributes(dataModel);
+        //loadDataModelAttributes(dataModel);
     }
 
     private void loadDataObjectAttributes(DataObjectTO dataObject) {

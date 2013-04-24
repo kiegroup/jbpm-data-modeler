@@ -16,7 +16,7 @@ public interface DataModelerService {
     
     void saveModel(DataModelTO dataModel, final Path path);
     
-    void generateModel(DataModelTO dataModel, final Path path);
+    //void generateModel(DataModelTO dataModel, final Path path);
 
     /**
      * Indicates if given path related to a project is inside project resources path. (src/main/resources or src/test/resources)

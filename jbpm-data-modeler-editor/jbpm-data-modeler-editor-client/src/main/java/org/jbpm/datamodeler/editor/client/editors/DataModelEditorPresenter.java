@@ -129,7 +129,7 @@ public class DataModelEditorPresenter {
 
                     @Override
                     public void onSuccess() {
-                        getDataModel().getDataObjects().remove(dataObjectTO);
+                        getDataModel().removeDataObject(dataObjectTO);
                         view.deleteDataObject(dataObjectTO, index);
                         validatorService.notifyDataObjectDeleted(dataObjectTO.getClassName());
                         notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObjectTO.getName())));
@@ -417,8 +417,9 @@ public class DataModelEditorPresenter {
         modelerService.call(new RemoteCallback<Object>() {
                 @Override
                 public void callback(Object response) {
-
-
+                    //when the model is saved without errors
+                    //clean the deleted dataobjects status, mark all dataobjects as persisted, etc.
+                    restoreModelStatus();
                 }
             },
             new DataModelerErrorCallback("An error was produced during data model saving.")
@@ -464,6 +465,7 @@ public class DataModelEditorPresenter {
      */
     void onGenerate() {
 
+        /*
         modelerService.call(new RemoteCallback<Object>() {
             @Override
             public void callback(Object response) {
@@ -473,6 +475,7 @@ public class DataModelEditorPresenter {
             },
             new DataModelerErrorCallback("An error was produced during data model generation.")
         ).generateModel(getDataModel(), path);
+        */
     }
 
     @OnReveal
@@ -507,6 +510,7 @@ public class DataModelEditorPresenter {
             }
         };
 
+        /*
         org.uberfire.client.mvp.Command generateCommand = new org.uberfire.client.mvp.Command() {
             @Override
             public void execute() {
@@ -519,6 +523,7 @@ public class DataModelEditorPresenter {
                     .respondsWith(generateCommand)
                     .endMenu().build().getItems().get(0));
         }
+        */
 
         if ( saveCommand != null ) {
             menuItems.add(newSimpleItem(Constants.INSTANCE.modelEditor_menu_save())
@@ -528,6 +533,10 @@ public class DataModelEditorPresenter {
 
 
         return menuItems;
+    }
+
+    private void restoreModelStatus() {
+        getDataModel().setPersistedStatus();
     }
 }
 

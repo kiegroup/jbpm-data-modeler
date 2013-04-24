@@ -29,6 +29,12 @@ public class DataModelTO implements Serializable {
     private String name;
 
     private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
+
+    /**
+     * A list to remember data objects that was deleted in memory and has to be removed fisically when the model
+     * is saved.
+     */
+    private List<DataObjectTO> deletedDataObjects = new ArrayList<DataObjectTO>();
     
     private String defaultPackage;
 
@@ -68,6 +74,30 @@ public class DataModelTO implements Serializable {
 
     public void setDefaultPackage(String defaultPackage) {
         this.defaultPackage = defaultPackage;
+    }
+
+    public void removeDataObject(DataObjectTO dataObject) {
+        getDataObjects().remove(dataObject);
+        deletedDataObjects.add(dataObject);
+    }
+
+    public List<DataObjectTO> getDeletedDataObjects() {
+        return deletedDataObjects;
+    }
+
+    public void setDeletedDataObjects(List<DataObjectTO> deletedDataObjects) {
+        this.deletedDataObjects = deletedDataObjects;
+    }
+
+    /**
+     * Tag all objects as persisted and clean deleted objects list.
+     */
+    public void setPersistedStatus() {
+        deletedDataObjects.clear();
+        for (DataObjectTO dataObjectTO : dataObjects) {
+            dataObjectTO.setOriginalClassName(dataObjectTO.getClassName());
+            dataObjectTO.setStatus(DataObjectTO.PERSISTENT);
+        }
     }
 }
 

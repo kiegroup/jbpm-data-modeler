@@ -24,12 +24,30 @@ import java.util.List;
 
 @Portable
 public class DataObjectTO implements Serializable {
-    
+
+    /*
+     * Data objects that was read form persistent status, .java files.
+     */
+    public static final Integer PERSISTENT = 0;
+
+
+    /*
+     * Data objects that was created in memory an was not saved to persistent .java file yet.
+     */
+    public static final Integer VOLATILE = 1;
+
     private String name;
     
     private String packageName;
     
-    private String className;
+    private String superClassName;
+    
+    private int status = VOLATILE;
+
+
+    //Remembers the original name for the DataObject.
+    //This value shouldn't be changed.
+    private String originalClassName;
 
     private List<ObjectPropertyTO> properties = new ArrayList<ObjectPropertyTO>();
 
@@ -51,10 +69,6 @@ public class DataObjectTO implements Serializable {
 
     public String getClassName() {
         return ( (packageName != null && !"".equals(packageName)) ? packageName+"." : "") + getName();
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
     }
 
     public String getPackageName() {
@@ -79,6 +93,58 @@ public class DataObjectTO implements Serializable {
     public void setProperties(List<ObjectPropertyTO> properties) {
         this.properties = properties;
     }
+
+    public String getOriginalClassName() {
+        return originalClassName;
+    }
+
+    public void setOriginalClassName(String originalClassName) {
+        this.originalClassName = originalClassName;
+    }
+
+    public String getSuperClassName() {
+        return superClassName;
+    }
+
+    public void setSuperClassName(String superClassName) {
+        this.superClassName = superClassName;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public boolean isVolatile() {
+        return getStatus() == VOLATILE;
+    }
+    
+    public boolean isPersistent() {
+        return getStatus() == PERSISTENT;
+    }
+
+    public boolean classNameChanged() {
+        return isPersistent() && !getClassName().equals(getOriginalClassName());
+    }
+
+    public boolean packageNameChanged() {
+        if (isPersistent()) {
+            //extract package name.
+            int index = getOriginalClassName().lastIndexOf(".");
+            String originalPackageName = "";
+            if (index > 0) {
+                originalPackageName = getOriginalClassName().substring(0, index);
+                return originalPackageName.equals(getPackageName());
+            } else {
+                return getPackageName() != null;
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public boolean equals(Object o) {
