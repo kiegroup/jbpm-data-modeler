@@ -15,13 +15,13 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.jbpm.datamodeler.editor.model.DataObjectTO;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Dependent
 @Templated(value = "PropertyEditor.html")
@@ -42,13 +42,18 @@ public class PropertyEditor extends Composite {
 
     ListDataProvider<PropertyEditorValue> cellTableValues = new ListDataProvider<PropertyEditorValue>();
 
+    private List<PropertyTypeTO> baseTypes;
+    private List<DataObjectTO> entityTypes;
+
     PropertyEditorConfig config = new PropertyEditorConfig();
+    DynamicSelectionCell attributeTypesCombo = new DynamicSelectionCell();
 
     public PropertyEditor() {
     }
 
     @PostConstruct
     public void init() {
+        config.setCell("type", attributeTypesCombo);
 
         nameColumn = new Column<PropertyEditorValue, String>(new TextCell()) {
             @Override
@@ -78,7 +83,7 @@ public class PropertyEditor extends Composite {
                 StringBuffer errorBuffer = new StringBuffer();
                 if (object.isHasError()) {
                     for (PropertyChangeError error : object.getErrors()) {
-                        errorBuffer.append(error.getMsg());
+                        errorBuffer.append(error.getMsg()).append("\n");
                     }
                 }
                 return errorBuffer.toString();
@@ -103,12 +108,44 @@ public class PropertyEditor extends Composite {
         }
     }
 
+    public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
+        this.baseTypes = baseTypes;
+        populateAttributeTypesDynCombo();
+    }
+
+    public void setEntityTypes(List<DataObjectTO> entityTypes) {
+        this.entityTypes = entityTypes;
+        populateAttributeTypesDynCombo();
+    }
+
     public void setProperties(List<PropertyEditorValue> properties) {
         //Init a new property set to edit.
         cellTableValues.getList().clear();
         cellTableValues.getList().addAll(properties);
         cellTableValues.flush();
         cellTableValues.refresh();
+    }
+
+    public void refresh() {
+        populateAttributeTypesDynCombo();
+        cellTable.redraw();
+    }
+
+    private void populateAttributeTypesDynCombo() {
+        List<String> options = new ArrayList<String>(baseTypes.size());
+        if (baseTypes != null && baseTypes.size() > 0) {
+            for (PropertyTypeTO baseType : baseTypes) {
+                options.add(baseType.getName());
+            }
+        }
+        if (entityTypes != null && entityTypes.size() > 0) {
+            for (DataObjectTO entityType : entityTypes) {
+                String className = entityType.getClassName();
+                options.add(className);
+                options.add(className + "[1..N]");
+            }
+        }
+        attributeTypesCombo.setOptions(options);
     }
 
     void initTestStuff() {
