@@ -31,6 +31,11 @@ public class DataModelTO implements Serializable {
     private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
 
     /**
+     * List of class names imported by this module.
+     */
+    private List<String> externalClasses = new ArrayList<String>();
+
+    /**
      * A list to remember data objects that was deleted in memory and has to be removed fisically when the model
      * is saved.
      */
@@ -98,6 +103,14 @@ public class DataModelTO implements Serializable {
             dataObjectTO.setOriginalClassName(dataObjectTO.getClassName());
             dataObjectTO.setStatus(DataObjectTO.PERSISTENT);
         }
+    }
+
+    public List<String> getExternalClasses() {
+        return externalClasses;
+    }
+
+    public void setExternalClasses(List<String> externalClasses) {
+        this.externalClasses = externalClasses;
     }
 }
 
