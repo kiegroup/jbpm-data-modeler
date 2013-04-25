@@ -317,7 +317,7 @@ public class DataObjectEditor  extends Composite {
 
     public void setDataObject(DataObjectTO dataObject, boolean cleanBreadcrumbs) {
         this.dataObject = dataObject;
-        objectName.setText(dataObject.getName());
+        objectName.setText(dataObject.getName() + "::" + dataObject.getPackageName());
 
         //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
         // to one with 3 rows and the table was sorted.

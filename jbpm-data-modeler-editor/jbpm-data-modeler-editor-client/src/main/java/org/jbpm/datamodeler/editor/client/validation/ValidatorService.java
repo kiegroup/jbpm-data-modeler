@@ -1,7 +1,5 @@
 package org.jbpm.datamodeler.editor.client.validation;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
@@ -10,13 +8,13 @@ import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.jbpm.datamodeler.editor.validation.ValidationUtils;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 
 
 
@@ -55,10 +53,27 @@ public class ValidatorService implements DataObjectReferencingListener {
 //        .isValidIdentifier(identifier);
     }
 
+
+    public void isUniqueEntityName(String packageName, String name, DataModelTO model, ValidatorCallback callback) {
+        Boolean b = Boolean.TRUE;
+        String className = packageName+"."+name;
+        for (DataObjectTO d : model.getDataObjects()) {
+            if (d.getClassName().equalsIgnoreCase(className)) {
+                b = Boolean.FALSE;
+                break;
+            }
+        }
+        if (b) callback.onSuccess();
+        else callback.onFailure();
+    }
+
     public void isUniqueEntityName(String name, DataModelTO model, ValidatorCallback callback) {
         Boolean b = Boolean.TRUE;
         for (DataObjectTO d : model.getDataObjects()) {
-            if (d.getName().equalsIgnoreCase(name)) b = Boolean.FALSE;
+            if (d.getName().equalsIgnoreCase(name)) {
+                b = Boolean.FALSE;
+                break;
+            }
         }
         if (b) callback.onSuccess();
         else callback.onFailure();

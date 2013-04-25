@@ -91,6 +91,23 @@ public class TabbedPropertyEditor extends Composite {
         propertyEditorValue = new PropertyEditorValue("name", dataObject.getName() != null ? dataObject.getName() : "");
         properties.add(propertyEditorValue);
 
+        propertyEditorValue = new PropertyEditorValue("shortName", "logical name");
+        properties.add(propertyEditorValue);
+
+        propertyEditorValue = new PropertyEditorValue("description", "data object documentation");
+        properties.add(propertyEditorValue);
+
+        propertyEditorValue = new PropertyEditorValue("packageName", dataObject.getPackageName() != null ? dataObject.getPackageName() : "");
+        properties.add(propertyEditorValue);
+
+        propertyEditorValue = new PropertyEditorValue("superClass", dataObject.getSuperClassName() != null ? dataObject.getSuperClassName() : "");
+        properties.add(propertyEditorValue);
+
+        propertyEditorValue = new PropertyEditorValue("@Role", "event/fact/null?");
+        properties.add(propertyEditorValue);
+
+
+
         /*
         propertyEditorValue = new PropertyEditorValue("documentation", "");
         properties.add(propertyEditorValue);
@@ -110,10 +127,11 @@ public class TabbedPropertyEditor extends Composite {
         propertyEditorValue = new PropertyEditorValue("name", selectedProperty.getName() != null ? selectedProperty.getName() : "");
         properties.add(propertyEditorValue);
 
-        /*
-        propertyEditorValue = new PropertyEditorValue("documentation", "");
+        propertyEditorValue = new PropertyEditorValue("shortName", "logical name");
         properties.add(propertyEditorValue);
-        */
+
+        propertyEditorValue = new PropertyEditorValue("description", "field documentation");
+        properties.add(propertyEditorValue);
 
         propertyEditorValue = new PropertyEditorValue("type", selectedProperty.getClassName());
         properties.add(propertyEditorValue);
@@ -122,6 +140,9 @@ public class TabbedPropertyEditor extends Composite {
         properties.add(propertyEditorValue);
 
         propertyEditorValue = new PropertyEditorValue("required", Boolean.FALSE);
+        properties.add(propertyEditorValue);
+
+        propertyEditorValue = new PropertyEditorValue("@Position", "");
         properties.add(propertyEditorValue);
 
         fieldProperties.setProperties(properties);

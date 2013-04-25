@@ -220,7 +220,8 @@ public class DataModelBrowser extends Composite {
 
     @UiHandler("newEntityButton")
     void newEntityClick( ClickEvent event ) {
-        Command addCommand = modelEditorPresenter.createAddDataObjectCommand(newEntityName.getText());
+        //TODO get the packageName and superClassName from the correct place
+        Command addCommand = modelEditorPresenter.createAddDataObjectCommand(getDataModel().getDefaultPackage(), newEntityName.getText(), null);
         addCommand.execute();
     }
 

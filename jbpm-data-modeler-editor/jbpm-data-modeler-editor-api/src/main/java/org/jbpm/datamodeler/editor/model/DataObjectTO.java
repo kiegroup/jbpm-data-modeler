@@ -145,6 +145,7 @@ public class DataObjectTO implements Serializable {
         return false;
     }
 
+    /*
 
     @Override
     public boolean equals(Object o) {
@@ -157,6 +158,7 @@ public class DataObjectTO implements Serializable {
 
         return true;
     }
+    */
 
     @Override
     public int hashCode() {

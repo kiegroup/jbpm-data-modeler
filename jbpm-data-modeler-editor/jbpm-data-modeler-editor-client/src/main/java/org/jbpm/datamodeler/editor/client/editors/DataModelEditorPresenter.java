@@ -17,6 +17,7 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
@@ -39,6 +40,10 @@ import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 import org.uberfire.client.workbench.widgets.menu.MenuFactory;
 import org.uberfire.client.workbench.widgets.menu.MenuItem;
 import org.uberfire.client.workbench.widgets.menu.Menus;
+import org.uberfire.client.workbench.widgets.toolbar.ToolBar;
+import org.uberfire.client.workbench.widgets.toolbar.ToolBarItem;
+import org.uberfire.client.workbench.widgets.toolbar.impl.DefaultToolBar;
+import org.uberfire.client.workbench.widgets.toolbar.impl.DefaultToolBarItem;
 import org.uberfire.shared.mvp.PlaceRequest;
 
 import javax.enterprise.context.Dependent;
@@ -48,6 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
+import static org.uberfire.client.workbench.widgets.toolbar.IconType.TABLE;
 
 
 @Dependent
@@ -95,6 +101,8 @@ public class DataModelEditorPresenter {
 
     private Menus menus;
 
+    private ToolBar toolBar;
+
     @Inject
     private DataModelEditorSelectionModel selectionModel;
     
@@ -139,32 +147,40 @@ public class DataModelEditorPresenter {
         };
     }
 
-    public Command createAddDataObjectCommand(final String text) {
+    public Command createAddDataObjectCommand(final String packageName, final String name, final String superClassName) {
         return new Command() {
+
+            //TODO validate that the package name is a valid java package name
+
             @Override
             public void execute() {
-                validatorService.isValidIdentifier(text, new ValidatorCallback() {
+                validatorService.isValidIdentifier(name, new ValidatorCallback() {
                     @Override
                     public void onFailure() {
-                        ErrorPopup.showMessage("Invalid data object identifier: " + text + " is not a valid Java identifier");
+                        ErrorPopup.showMessage("Invalid data object identifier: " + name + " is not a valid Java identifier");
                     }
 
                     @Override
                     public void onSuccess() {
-                        validatorService.isUniqueEntityName(text, getDataModel(), new ValidatorCallback() {
+
+                        //TODO if whe have a valid packageName and a valid class name
+                        //we can proceed to uniqueEntiyName validation
+
+                        //TODO dejar esto prolijo
+                        validatorService.isUniqueEntityName(packageName, name, getDataModel(), new ValidatorCallback() {
                             @Override
                             public void onFailure() {
-                                ErrorPopup.showMessage("A data object with identifier: " + text + " already exists in the model.");
+                                ErrorPopup.showMessage("A data object with identifier: " + name + " already exists in the model.");
                             }
 
                             @Override
                             public void onSuccess() {
-                                DataObjectTO dataObject = new DataObjectTO(text);
+                                DataObjectTO dataObject = new DataObjectTO(name);
                                 dataObject.setPackageName(getDataModel().getDefaultPackage());
                                 getDataModel().getDataObjects().add(dataObject);
                                 view.addDataObject(dataObject);
                                 selectionModel.setSelectedObject(dataObject);
-                                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(text)));
+                                notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(name)));
                             }
                         });
                     }
@@ -431,6 +447,7 @@ public class DataModelEditorPresenter {
 
         //The onStart method must read the file and load the DataModel to be edited.
         makeMenuBar();
+        makeToolBar();
 
         this.path = path;
 
@@ -495,7 +512,40 @@ public class DataModelEditorPresenter {
                     .endMenu().build();
     }
 
-    
+    @WorkbenchToolBar
+    public ToolBar getToolBar() {
+        return this.toolBar;
+    }
+
+    private void makeToolBar() {
+        toolBar = new DefaultToolBar( "dataModeler" );
+
+
+        org.uberfire.client.mvp.Command newDataObjectCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                Window.alert("Create new data object from the toolbar?");
+            }
+        };
+
+        org.uberfire.client.mvp.Command newDataObjectPropertyCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                Window.alert("Create new property from the toolbar?");
+            }
+        };
+
+
+        ToolBarItem item = new DefaultToolBarItem( TABLE, "New Data Object", newDataObjectCommand);
+        toolBar.addItem(item);
+
+
+        item = new DefaultToolBarItem( TABLE, "New Data Object Property", newDataObjectPropertyCommand);
+        toolBar.addItem(item);
+
+
+    }
+
     private List<MenuItem> getItems() {
 
         final List<MenuItem> menuItems = new ArrayList<MenuItem>();

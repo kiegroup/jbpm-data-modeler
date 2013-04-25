@@ -21,6 +21,14 @@
     <inherits name="org.kie.guvnor.commons.ui.GuvnorCommonsUI"/>
     <inherits name="org.kie.guvnor.commons.security.GuvnorCommonsSecurity"/>
 
+
+    <inherits name="org.drools.guvnor.models.testscenarios.DroolsGuvnorModelsTestScenarios"/>
+
+    <inherits name='org.kie.guvnor.testscenario.TestScenarioEditorAPI'/>
+
+    <!--inherits name="org.kie.guvnor.testscenario.GuvnorTestScenarioEditorClient"/-->
+
+
     <!-- projects -->
 
     <inherits name="org.kie.guvnor.metadata.GuvnorMetadataWidget"/>
