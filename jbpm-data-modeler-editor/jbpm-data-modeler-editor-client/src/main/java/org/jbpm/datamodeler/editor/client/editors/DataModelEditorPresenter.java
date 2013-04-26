@@ -312,7 +312,7 @@ public class DataModelEditorPresenter {
 
                     @Override
                     public void onSuccess() {
-                        validatorService.isUniqueEntityName(pendingValue.toString(), getDataModel(), new ValidatorCallback() {
+                        validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
                             @Override
                             public void onFailure() {
                                 errors.add(new PropertyChangeError("A data object with identifier: " + pendingValue + " already exists in the model."));
@@ -356,7 +356,7 @@ public class DataModelEditorPresenter {
 
                     @Override
                     public void onSuccess() {
-                        validatorService.isUniqueEntityName(pendingValue.toString(), getDataModel(), new ValidatorCallback() {
+                        validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
                             @Override
                             public void onFailure() {
                                 errors.add(new PropertyChangeError("An attribute with identifier: " + pendingValue + " already exists in the data object."));

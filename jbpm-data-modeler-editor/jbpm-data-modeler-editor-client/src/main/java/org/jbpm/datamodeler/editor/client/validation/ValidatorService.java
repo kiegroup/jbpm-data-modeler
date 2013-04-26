@@ -56,21 +56,9 @@ public class ValidatorService implements DataObjectReferencingListener {
 
     public void isUniqueEntityName(String packageName, String name, DataModelTO model, ValidatorCallback callback) {
         Boolean b = Boolean.TRUE;
-        String className = packageName+"."+name;
+        String className = packageName != null ? packageName + "." + name : name;
         for (DataObjectTO d : model.getDataObjects()) {
             if (d.getClassName().equalsIgnoreCase(className)) {
-                b = Boolean.FALSE;
-                break;
-            }
-        }
-        if (b) callback.onSuccess();
-        else callback.onFailure();
-    }
-
-    public void isUniqueEntityName(String name, DataModelTO model, ValidatorCallback callback) {
-        Boolean b = Boolean.TRUE;
-        for (DataObjectTO d : model.getDataObjects()) {
-            if (d.getName().equalsIgnoreCase(name)) {
                 b = Boolean.FALSE;
                 break;
             }
