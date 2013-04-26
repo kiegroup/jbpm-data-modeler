@@ -13,6 +13,7 @@ import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.Propert
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -43,6 +44,8 @@ public class TabbedPropertyEditor extends Composite {
 
     @Inject
     public PropertyEditor fieldProperties;
+
+    private DataModelTO dataModel;
 
     public TabbedPropertyEditor() {
     }
@@ -78,6 +81,15 @@ public class TabbedPropertyEditor extends Composite {
 
     public void setDataModel(DataModelTO dataModel) {
         //loadDataModelAttributes(dataModel);
+        this.dataModel = dataModel;
+    }
+
+    public void notifyDataModelChanged() {
+        fieldProperties.refresh();
+    }
+
+    public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
+        fieldProperties.setBaseTypes(baseTypes);
     }
 
     private void loadDataObjectAttributes(DataObjectTO dataObject) {
@@ -145,6 +157,7 @@ public class TabbedPropertyEditor extends Composite {
         propertyEditorValue = new PropertyEditorValue("@Position", "");
         properties.add(propertyEditorValue);
 
+        fieldProperties.setEntityTypes(dataModel.getDataObjects());
         fieldProperties.setProperties(properties);
     }
 

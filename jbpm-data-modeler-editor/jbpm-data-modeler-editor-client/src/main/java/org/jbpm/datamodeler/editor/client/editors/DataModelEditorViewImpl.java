@@ -83,12 +83,14 @@ public class DataModelEditorViewImpl extends Composite
     public void deleteDataObject(DataObjectTO dataObject, int index) {
         dataModelBrowser.deleteDataObject(dataObject, index);
         dataObjectEditor.notifyDataModelChanged();
+        tabbedPropertyEditor.notifyDataModelChanged();
     }
 
     @Override
     public void addDataObject(DataObjectTO dataObject) {
         dataModelBrowser.addDataObject(dataObject);
         dataObjectEditor.notifyDataModelChanged();
+        tabbedPropertyEditor.notifyDataModelChanged();
     }
 
     @Override
@@ -139,6 +141,7 @@ public class DataModelEditorViewImpl extends Composite
     @Override
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
         dataObjectEditor.setBaseTypes(baseTypes);
+        tabbedPropertyEditor.setBaseTypes(baseTypes);
     }
 
     @Override
