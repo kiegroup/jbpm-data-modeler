@@ -1,6 +1,7 @@
 package org.jbpm.datamodeler.driver.impl;
 
 
+import org.jbpm.datamodeler.commons.NamingUtils;
 import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
@@ -11,7 +12,7 @@ import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Path;
 import org.kie.guvnor.datamodel.model.ModelField;
-import org.kie.guvnor.datamodel.oracle.DataModelOracle;
+import org.kie.guvnor.datamodel.oracle.ProjectDataModelOracle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,27 +58,29 @@ public class DataModelOracleDriver implements ModelDriver {
         return new DataModelImpl();
     }
 
-    public void addOracleModel(DataModel dataModel, DataModelOracle oracleDataModel, String packageName) {
+    public void addOracleModel(DataModel dataModel, ProjectDataModelOracle oracleDataModel) {
 
-        logger.debug("Adding oracleDataModel: " + oracleDataModel + " to dataModel: " + dataModel + " for packageName: " + packageName);
+        logger.debug("Adding oracleDataModel: " + oracleDataModel + " to dataModel: " + dataModel);
         
         String[] factTypes = oracleDataModel.getFactTypes();
         
         if (factTypes != null && factTypes.length > 0) {
             for (int i = 0; i < factTypes.length; i++) {
-                addFactType(dataModel, oracleDataModel, packageName, factTypes[i]);
+                addFactType(dataModel, oracleDataModel, factTypes[i]);
             }
         } else {
             logger.debug("oracleDataModel hasn't defined fact types");
         }
     }
 
-    private void addFactType(DataModel dataModel, DataModelOracle oracleDataModel, String packageName, String factType) {
+    private void addFactType(DataModel dataModel, ProjectDataModelOracle oracleDataModel, String factType) {
 
-        logger.debug("Adding factTye: " + factType + ", packageName: " + packageName + ", to dataModel: " + dataModel + ", from oracleDataModel: " + oracleDataModel);
-        DataObject dataObject = dataModel.addDataObject(packageName, factType);
+        String packageName = NamingUtils.getInstance().extractPackageName(factType);
+        String className = NamingUtils.getInstance().extractClassName(factType);
 
-        String[] factTypes = oracleDataModel.getFactTypes();
+        logger.debug("Adding factType: " + factType + ", to dataModel: " + dataModel + ", from oracleDataModel: " + oracleDataModel);
+        DataObject dataObject = dataModel.addDataObject(factType);
+
         Map<String, ModelField[]> fields = oracleDataModel.getModelFields();
         ModelField[] factFields = fields.get(factType);
         ModelField field;
@@ -99,14 +102,10 @@ public class DataModelOracleDriver implements ModelDriver {
      * @param fieldType
      * @return
      */
-    private String getFieldType(DataModelOracle oracleDataModel, String packageName, String fieldType) {
+    private String getFieldType(ProjectDataModelOracle oracleDataModel, String packageName, String fieldType) {
         //TODO review what happens if we read things like int, boolean, etc.
 
-        if (isDataObject(oracleDataModel, fieldType)) {
-            return packageName + "." + fieldType;
-        } else {
-            return fieldType;
-        }
+        return fieldType;
     }
 
     /**
@@ -115,7 +114,7 @@ public class DataModelOracleDriver implements ModelDriver {
      * @param fieldType
      * @return
      */
-    private boolean isDataObject(DataModelOracle oracleDataModel, String fieldType) {
+    private boolean isDataObject(ProjectDataModelOracle oracleDataModel, String fieldType) {
         String factTypes[] = oracleDataModel.getFactTypes();
         boolean result = false;
         if (factTypes != null && fieldType != null) {

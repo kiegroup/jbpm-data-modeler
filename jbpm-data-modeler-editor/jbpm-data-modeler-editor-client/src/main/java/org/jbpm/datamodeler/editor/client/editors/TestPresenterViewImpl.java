@@ -23,7 +23,11 @@ public class TestPresenterViewImpl extends Composite
     @DataField
     private SimplePanel propertiesPanel = new SimplePanel();
 
+    /*
+    @DataField
+    private DataObjectDetailEditor detailPanel = new DataObjectDetailEditor();
 
+*/
     @Inject
     private PropertyEditor propertyEditor;
 

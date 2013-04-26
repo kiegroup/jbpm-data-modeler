@@ -19,6 +19,8 @@ package org.jbpm.datamodeler.editor.model;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Portable
 public class ObjectPropertyTO implements Serializable {
@@ -30,6 +32,8 @@ public class ObjectPropertyTO implements Serializable {
     private boolean multiple = false;
 
     private boolean baseType = true;
+
+    private List<AnnotationTO> annotations = new ArrayList<AnnotationTO>();
 
     public ObjectPropertyTO() {
     }
@@ -72,4 +76,15 @@ public class ObjectPropertyTO implements Serializable {
     public void setBaseType(boolean baseType) {
         this.baseType = baseType;
     }
+
+    public List<AnnotationTO> getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(List<AnnotationTO> annotations) {
+        this.annotations = annotations;
+    }
+
+
+
 }

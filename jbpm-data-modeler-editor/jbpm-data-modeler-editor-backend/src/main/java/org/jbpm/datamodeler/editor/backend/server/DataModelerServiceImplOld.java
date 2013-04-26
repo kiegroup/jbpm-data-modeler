@@ -14,7 +14,6 @@ import org.jbpm.datamodeler.core.PropertyType;
 import org.jbpm.datamodeler.core.impl.DataModelImpl;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.core.impl.PropertyTypeFactoryImpl;
-import org.jbpm.datamodeler.driver.impl.DataModelOracleDriver;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
@@ -26,8 +25,6 @@ import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.datamodel.events.InvalidateDMOProjectCacheEvent;
-import org.kie.guvnor.datamodel.model.ModelField;
-import org.kie.guvnor.datamodel.oracle.DataModelOracle;
 import org.kie.guvnor.datamodel.service.DataModelService;
 import org.kie.guvnor.project.service.ProjectService;
 import org.kie.guvnor.services.metadata.MetadataService;
@@ -43,7 +40,12 @@ import org.uberfire.client.workbench.widgets.events.ResourceUpdatedEvent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.StringTokenizer;
+
+//import org.kie.guvnor.datamodel.oracle.DataModelOracle;
 
 public class DataModelerServiceImplOld /*implements DataModelerService*/ {
 
@@ -55,6 +57,8 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
     private static final String TEST_RESOURCES_PATH   = "src/test/resources";
 
     private static final String DEFAULT_GUVNOR_PKG = "defaultpkg";
+
+
 
     @Inject
     @Named("ioStrategy")
@@ -143,10 +147,10 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
             for (Path packageDir : packages) {
                 String defaultPackageName = calculateDefaultPackageName(packageDir);
                 //TODO improve this
-                DataModelOracle dataModelOracle = dataModelService.getDataModel(packageDir);
+            //    DataModelOracle dataModelOracle = dataModelService.getDataModel(packageDir);
 
-                DataModelOracleDriver driver = new DataModelOracleDriver();
-                driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
+            //    DataModelOracleDriver driver = new DataModelOracleDriver();
+            //   driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
             }
 
 
@@ -154,7 +158,7 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
             DataModelTO dataModelTO = DataModelHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
             //dataModelTO.setDefaultPackage(defaultPackageName);
 
-            printProjectDataModelOracle(path);
+            //printProjectDataModelOracle(path);
 
             return dataModelTO;
 
@@ -320,6 +324,8 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
         }
     }
 
+    /*
+
     public void printProjectDataModelOracle(Path projectPath) {
 
 
@@ -363,6 +369,8 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
         }
 
     }
+
+    */
 
     private void updateDataObject(DataObject dataObject, org.kie.commons.java.nio.file.Path javaPath) {
 
@@ -511,4 +519,5 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
         }
         return results;
     }
+
 }

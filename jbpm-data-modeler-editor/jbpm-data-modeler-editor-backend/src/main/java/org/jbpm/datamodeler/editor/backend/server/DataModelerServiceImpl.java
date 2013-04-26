@@ -22,7 +22,7 @@ import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.datamodel.events.InvalidateDMOProjectCacheEvent;
 import org.kie.guvnor.datamodel.model.ModelField;
-import org.kie.guvnor.datamodel.oracle.DataModelOracle;
+import org.kie.guvnor.datamodel.oracle.ProjectDataModelOracle;
 import org.kie.guvnor.datamodel.service.DataModelService;
 import org.kie.guvnor.project.service.ProjectService;
 import org.kie.guvnor.services.metadata.MetadataService;
@@ -105,6 +105,8 @@ public class DataModelerServiceImpl implements DataModelerService {
             dataModel = new DataModelImpl();
             //TODO improve this. With current DataModelOracle implementation
             //we need to read every package individually
+            
+            /*
             List<Path> packages = calculateProjectPackages(ioService, projectPath);
 
             for (Path packageDir : packages) {
@@ -115,6 +117,11 @@ public class DataModelerServiceImpl implements DataModelerService {
                 DataModelOracleDriver driver = new DataModelOracleDriver();
                 driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
             }
+            */
+
+            ProjectDataModelOracle projectDataModelOracle = dataModelService.getProjectDataModel(projectPath);
+            DataModelOracleDriver driver = new DataModelOracleDriver();
+            driver.addOracleModel(dataModel, projectDataModelOracle);
 
             //Objects read from persistent .java format are tagged as PERSISTENT objects
             DataModelTO dataModelTO = DataModelHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
@@ -437,7 +444,7 @@ public class DataModelerServiceImpl implements DataModelerService {
 
         if (dataModelService != null) {
             //DataModelOracle dataModelOracle = dataModelService.getDataModel(projectService.resolveProject(projectPath));
-            DataModelOracle dataModelOracle = dataModelService.getDataModel(projectPath);
+            ProjectDataModelOracle dataModelOracle = dataModelService.getProjectDataModel(projectPath);
 
             if (dataModelOracle != null) {
                 String[] factTypes = dataModelOracle.getFactTypes();
@@ -447,16 +454,16 @@ public class DataModelerServiceImpl implements DataModelerService {
                 }
 
                 logger.debug("*********************** External Fact types");
-                String externalFactTypes[] = dataModelOracle.getExternalFactTypes();
-                for (int i = 0; externalFactTypes != null && i < externalFactTypes.length; i++) {
-                    logger.debug(externalFactTypes[i]);
-                }
-
+                //String externalFactTypes[] = dataModelOracle..getExternalFactTypes();
+                //or (int i = 0; externalFactTypes != null && i < externalFactTypes.length; i++) {
+                    //logger.debug(externalFactTypes[i]);
+                //}
+                /**
                 logger.debug("*********************** All Fact types");
                 String allFactTypes[] = dataModelOracle.getAllFactTypes();
                 for (int i = 0; allFactTypes != null && i < allFactTypes.length; i++) {
                     logger.debug(allFactTypes[i]);
-                }
+                } **/
 
                 logger.debug("*********************** Project Fact types structure");
                 Map<String, ModelField[]> fields = dataModelOracle.getModelFields();

@@ -51,6 +51,8 @@ public class DataObjectTO implements Serializable {
 
     private List<ObjectPropertyTO> properties = new ArrayList<ObjectPropertyTO>();
 
+    private List<AnnotationTO> annotations = new ArrayList<AnnotationTO>();
+
     public DataObjectTO() {
     }
 
@@ -145,23 +147,11 @@ public class DataObjectTO implements Serializable {
         return false;
     }
 
-    /*
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DataObjectTO that = (DataObjectTO) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-
-        return true;
+    public List<AnnotationTO> getAnnotations() {
+        return annotations;
     }
-    */
 
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+    public void setAnnotations(List<AnnotationTO> annotations) {
+        this.annotations = annotations;
     }
 }
