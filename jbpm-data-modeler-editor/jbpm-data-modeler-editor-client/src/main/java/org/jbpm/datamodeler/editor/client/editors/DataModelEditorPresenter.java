@@ -35,6 +35,7 @@ import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.annotations.*;
+import org.uberfire.client.common.BusyPopup;
 import org.uberfire.client.common.ErrorPopup;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
@@ -324,7 +325,7 @@ public class DataModelEditorPresenter {
 
                     @Override
                     public void onSuccess() {
-                        validatorService.isUniqueEntityName(pendingValue.toString(), getDataModel(), new ValidatorCallback() {
+                        validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
                             @Override
                             public void onFailure() {
                                 errors.add(new PropertyChangeError("A data object with identifier: " + pendingValue + " already exists in the model."));
@@ -368,7 +369,7 @@ public class DataModelEditorPresenter {
 
                     @Override
                     public void onSuccess() {
-                        validatorService.isUniqueEntityName(pendingValue.toString(), getDataModel(), new ValidatorCallback() {
+                        validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
                             @Override
                             public void onFailure() {
                                 errors.add(new PropertyChangeError("An attribute with identifier: " + pendingValue + " already exists in the data object."));
@@ -463,6 +464,8 @@ public class DataModelEditorPresenter {
 
         this.path = path;
 
+        BusyPopup.showMessage("Loading datamodel");
+
         modelerService.call(
                 new RemoteCallback<List<PropertyTypeTO>>() {
 
@@ -479,6 +482,7 @@ public class DataModelEditorPresenter {
 
                     @Override
                     public void callback(DataModelTO dataModel) {
+                        BusyPopup.close();
                         setDataModel(dataModel);
                         view.setDataModel(dataModel);
                         notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_loaded(dataModel.getName())));
