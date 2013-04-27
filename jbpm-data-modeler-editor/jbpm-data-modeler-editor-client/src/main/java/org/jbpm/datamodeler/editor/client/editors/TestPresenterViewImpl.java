@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditor;
 
 import javax.enterprise.context.Dependent;
@@ -23,11 +24,15 @@ public class TestPresenterViewImpl extends Composite
     @DataField
     private SimplePanel propertiesPanel = new SimplePanel();
 
-    /*
+    @Inject
     @DataField
-    private DataObjectDetailEditor detailPanel = new DataObjectDetailEditor();
+    private DataObjectDetailEditor detailPanel;
 
-*/
+
+    @DataField
+    private PackageSelector packageSelector = new PackageSelector();
+    
+    
     @Inject
     private PropertyEditor propertyEditor;
 

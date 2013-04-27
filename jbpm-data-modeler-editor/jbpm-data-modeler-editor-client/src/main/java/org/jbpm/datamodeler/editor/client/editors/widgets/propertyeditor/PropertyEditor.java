@@ -15,11 +15,13 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Observes;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -227,4 +229,8 @@ public class PropertyEditor extends Composite {
         propertiesPanel.add(showProperties);
     }
 
+    
+    void meLlegaEvento(@Observes DataModelerEvent e) {
+        propertiesPanel.add(new Label(e.message));
+    }
 }

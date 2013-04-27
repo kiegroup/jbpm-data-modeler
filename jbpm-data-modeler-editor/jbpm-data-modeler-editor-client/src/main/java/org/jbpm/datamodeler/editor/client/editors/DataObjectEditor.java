@@ -43,11 +43,15 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
+import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -108,6 +112,9 @@ public class DataObjectEditor  extends Composite {
     private DataModelEditorPresenter modelEditorPresenter;
 
     private List<PropertyTypeTO> baseTypes;
+
+    @Inject
+    Event<DataModelerEvent> dataModelerEventEvent;
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -251,8 +258,18 @@ public class DataObjectEditor  extends Composite {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 ObjectPropertyTO selectedPropertyTO = ((SingleSelectionModel<ObjectPropertyTO>)dataObjectPropertiesTable.getSelectionModel()).getSelectedObject();
+
+                DataModelerEvent event2 = new DataModelerEvent();
+                event2.action = "propertySelected";
+                event2.propertyTO = selectedPropertyTO;
+
+                dataModelerEventEvent.fire(event2);
+
+                /*
                 Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
                 selectCommand.execute();
+                */
+
             }
         });
 
@@ -315,6 +332,13 @@ public class DataObjectEditor  extends Composite {
         this.dataModel = dataModel;
     }
 
+    void selectedObjectChanges(@Observes DataModelerEvent event) {
+        if (event.action == "select" ) {
+            setDataObject(event.dataObjectTO, true);
+        }
+    }
+    
+    
     public void setDataObject(DataObjectTO dataObject, boolean cleanBreadcrumbs) {
         this.dataObject = dataObject;
         objectName.setText(dataObject.getName() + "::" + dataObject.getPackageName());

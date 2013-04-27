@@ -10,6 +10,7 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditor;
 import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.PropertyEditorValue;
+import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -17,6 +18,8 @@ import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +43,18 @@ public class TabbedPropertyEditor extends Composite {
     public PropertyEditor modelProperties;
 
     @Inject
-    public PropertyEditor objectProperties;
+    public PropertyEditor objectPropertiesOLD;
+
+    @Inject
+    public DataObjectDetailEditor objectProperties;
 
     @Inject
     public PropertyEditor fieldProperties;
 
     private DataModelTO dataModel;
+
+    @Inject
+    Event<DataModelerEvent> dataModelerEventEvent;
 
     public TabbedPropertyEditor() {
     }
@@ -125,7 +134,7 @@ public class TabbedPropertyEditor extends Composite {
         properties.add(propertyEditorValue);
         */
 
-        objectProperties.setProperties(properties);
+        objectPropertiesOLD.setProperties(properties);
     }
 
     private void loadObjectPropertyAttributes(ObjectPropertyTO selectedProperty) {
@@ -174,4 +183,12 @@ public class TabbedPropertyEditor extends Composite {
         */
         modelProperties.setProperties(properties);
     }
+
+    void onPropertySelection(@Observes DataModelerEvent event) {
+        if (event.action == "propertySelected") {
+            loadObjectPropertyAttributes(event.propertyTO);
+        }
+    }
+
+
 }

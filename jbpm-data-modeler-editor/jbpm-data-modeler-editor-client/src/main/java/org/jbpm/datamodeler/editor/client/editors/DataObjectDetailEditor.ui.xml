@@ -1,0 +1,73 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:datamodeler="urn:import:org.jbpm.datamodeler.editor.client.editors.widgets"
+        >
+
+    <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
+
+    <gwt:HTMLPanel styleName="well container span8 row-fluid">
+
+        <table class="row-fluid span12">
+            <tr>
+                <td>
+                    <gwt:Label ui:field="titleLabel" text="Name"  />
+                </td>
+                <td>
+                    <b:TextBox ui:field="name"></b:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="shortNameLabel" text="Short name"  />
+                </td>
+                <td>
+                    <b:TextBox ui:field="shortName"></b:TextBox>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="descriptionLabel" text="Description"  />
+                </td>
+                <td>
+                    <b:TextArea ui:field="description"></b:TextArea>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="packageNameLabel" text="Package"  />
+                </td>
+                <td>
+                    <datamodeler:PackageSelector ui:field="packageSelector"></datamodeler:PackageSelector>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="superclassLabel" text="Superclass"  />
+                </td>
+                <td>
+                    <datamodeler:SuperclassSelector ui:field="superclassSelector"></datamodeler:SuperclassSelector>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="roleLabel" text="Role"  />
+                </td>
+                <td>
+                    <b:ListBox ui:field="roleSelector"></b:ListBox>
+                </td>
+            </tr>
+
+        </table>
+
+        <b:Button ui:field="sendEvent" text="sendEvent"></b:Button>
+
+
+    </gwt:HTMLPanel>
+
+</ui:UiBinder>

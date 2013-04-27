@@ -27,6 +27,7 @@ import org.jbpm.datamodeler.editor.client.editors.widgets.propertyeditor.Propert
 import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
+import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -105,6 +106,9 @@ public class DataModelEditorPresenter {
 
     @Inject
     private DataModelEditorSelectionModel selectionModel;
+
+    @Inject
+    Event<DataModelerEvent> dataModelerEventEvent;
     
     @WorkbenchPartTitle
     public String getTitle() {
@@ -203,8 +207,16 @@ public class DataModelEditorPresenter {
         return new Command() {
             @Override
             public void execute() {
+
+                DataModelerEvent event = new DataModelerEvent();
+                event.action = "select";
+                event.dataObjectTO = selectedObject;
+
+                dataModelerEventEvent.fire(event);
+                /*
                 view.selectDataObject(selectedObject, clearBreadcrums);
                 selectionModel.setSelectedObject(selectedObject);
+                */
             }
         };
     }
