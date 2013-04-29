@@ -1,4 +1,4 @@
-package org.jbpm.datamodeler.editor.validation;
+package org.jbpm.datamodeler.validation;
 
 import java.util.Arrays;
 
@@ -16,10 +16,10 @@ public class ValidationUtils {
 
     public static Boolean isJavaIdentifier(String s) {
         if (s == null || s.isEmpty() || s.trim().isEmpty()) return false;
-//        if (!Character.isJavaIdentifierStart(s.charAt(0))) return false;
-//        for (int i = 1; i < s.length(); i++) {
-//            if (!Character.isJavaIdentifierPart(s.charAt(i))) return false;
-//        }
+        if (!Character.isJavaIdentifierStart(s.charAt(0))) return false;
+        for (int i = 1; i < s.length(); i++) {
+            if (!Character.isJavaIdentifierPart(s.charAt(i))) return false;
+        }
         return !Arrays.asList(JAVA_KEYWORDS).contains(s);
     }
 }

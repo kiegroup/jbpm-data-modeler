@@ -1,11 +1,12 @@
 package org.jbpm.datamodeler.editor.client.validation;
 
+import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
-import org.jbpm.datamodeler.editor.validation.ValidationUtils;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -33,24 +34,22 @@ public class ValidatorService implements DataObjectReferencingListener {
     }
 
     //TODO Generify this!!
-    public void isValidIdentifier(String identifier, ValidatorCallback callback) {
-        if (ValidationUtils.isJavaIdentifier(identifier)) callback.onSuccess();
-        else callback.onFailure();
-//        modelerService.call(
-//            new RemoteCallback<Boolean>() {
-//                @Override
-//                public void callback(Boolean b) {
-//                    if (b) {
-//                        callback.onSuccess();
-//                    }
-//                    else {
-//                        callback.onFailure();
-//                    }
-//                }
-//            },
-//            new DataModelerErrorCallback("An error occurred during the server validation process")
-//        )
-//        .isValidIdentifier(identifier);
+    public void isValidIdentifier(String identifier, final ValidatorCallback callback) {
+        modelerService.call(
+            new RemoteCallback<Boolean>() {
+                @Override
+                public void callback(Boolean b) {
+                    if (b) {
+                        callback.onSuccess();
+                    }
+                    else {
+                        callback.onFailure();
+                    }
+                }
+            },
+            new DataModelerErrorCallback("An error occurred during the server validation process")
+        )
+        .isValidIdentifier(identifier);
     }
 
 

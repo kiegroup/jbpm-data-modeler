@@ -12,12 +12,15 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectDeletedEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
+import org.uberfire.client.common.ErrorPopup;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -52,7 +55,10 @@ public class DataObjectEditor extends Composite {
 
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
-    
+
+    @Inject
+    private ValidatorService validatorService;
+
     DataObjectTO dataObject;
 
     DataModelTO dataModel;
@@ -115,32 +121,33 @@ public class DataObjectEditor extends Composite {
     // event handlers
 
     @UiHandler("name")
-    void nameChanged(ValueChangeEvent<String> event) {
+    void nameChanged(final ValueChangeEvent<String> event) {
 
+        final String oldValue = getDataObject().getName();
+
+        validatorService.isValidIdentifier(name.getValue(), new ValidatorCallback() {
+            @Override
+            public void onFailure() {
+                //1) mensaje popup
+                ErrorPopup.showMessage("Invalid data object identifier: " + name.getValue() + " is not a valid Java identifier");
+                //2) dejar el foco en el campo
+                name.setFocus(true);
+                //3) texto seleccionado
+                name.selectAll();
+            }
+
+            @Override
+            public void onSuccess() {
+                dataObject.setName(event.getValue());
+                notifyObjectChange("name", oldValue, getDataObject().getName());
+            }
+        });
         //TODO add validation.
         //data object name will be changed only if validation is successful
-
-        String oldValue = getDataObject().getName();
-
-        boolean validationOk = true;
-
-        if (validationOk) {
-
-            dataObject.setName(event.getValue());
-            notifyObjectChange("name", oldValue, getDataObject().getName());
-        } else {
-            //1) mensaje popup
-            //2) dejar el foco en el campo
-            //3) texto seleccionado
-            name.setFocus(true);
-            
-        }
-
-
         //como me registro para saber el cambio en la clase:
 
-        //en el lugar que toque.
-        //superclassSelector.getSuperclassList().addChangeHandler(null);
+        //todo en el lugar que toque.
+//        superclassSelector.getSuperclassList().addChangeHandler(null);
 
     }
 
