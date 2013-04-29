@@ -288,7 +288,7 @@ public class DataModelBrowser extends Composite {
 
     private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
         if (event.isFrom(getDataModel())) {
-            if (event.isFrom(DataModelerEvent.DATA_OBJECT_EDITOR) || event.isFrom(DataModelerEvent.DATA_MODEL_BREAD_CRUMB)) {
+            if (event.isFrom(DataModelerEvent.DATA_OBJECT_BROWSER) || event.isFrom(DataModelerEvent.DATA_MODEL_BREAD_CRUMB)) {
                 //It's a data object selection in another related widget, select the object in the browser
                 //but don't fire selection event.
                 selectDataObject(event.getCurrentDataObject());

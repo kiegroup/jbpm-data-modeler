@@ -45,7 +45,7 @@ public class TabbedPropertyEditor extends Composite {
     public PropertyEditor objectPropertiesOLD;
 
     @Inject
-    public DataObjectDetailEditor objectProperties;
+    public DataObjectEditor objectProperties;
 
     @Inject
     public DataObjectFieldEditor fieldProperties;

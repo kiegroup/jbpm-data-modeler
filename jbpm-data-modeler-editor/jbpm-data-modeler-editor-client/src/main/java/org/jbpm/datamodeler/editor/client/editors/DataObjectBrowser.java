@@ -452,15 +452,15 @@ public class DataObjectBrowser extends Composite {
 
     // Event notifications
     private void notifyFieldSelected(ObjectPropertyTO selectedPropertyTO) {
-        dataModelerEvent.fire(new DataObjectFieldSelectedEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), selectedPropertyTO));
+        dataModelerEvent.fire(new DataObjectFieldSelectedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), getDataObject(), selectedPropertyTO));
     }
 
     private void notifyFieldDeleted(ObjectPropertyTO deletedPropertyTO) {
-        dataModelerEvent.fire(new DataObjectFieldDeletedEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), deletedPropertyTO));
+        dataModelerEvent.fire(new DataObjectFieldDeletedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), getDataObject(), deletedPropertyTO));
     }
 
     private void notifyObjectSelected(DataObjectTO dataObject) {
-        dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), dataObject));
+        dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), dataObject));
     }
 
 }

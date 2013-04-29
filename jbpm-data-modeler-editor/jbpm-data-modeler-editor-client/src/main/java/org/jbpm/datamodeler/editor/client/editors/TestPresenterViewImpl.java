@@ -26,7 +26,7 @@ public class TestPresenterViewImpl extends Composite
 
     @Inject
     @DataField
-    private DataObjectDetailEditor detailPanel;
+    private DataObjectEditor detailPanel;
 
 
     @DataField

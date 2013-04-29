@@ -23,10 +23,10 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-public class DataObjectDetailEditor extends Composite {
+public class DataObjectEditor extends Composite {
 
     interface DataObjectDetailEditorUIBinder
-            extends UiBinder<Widget, DataObjectDetailEditor> {
+            extends UiBinder<Widget, DataObjectEditor> {
 
     };
 
@@ -57,7 +57,7 @@ public class DataObjectDetailEditor extends Composite {
 
     DataModelTO dataModel;
 
-    public DataObjectDetailEditor() {
+    public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
     }
 
@@ -109,7 +109,7 @@ public class DataObjectDetailEditor extends Composite {
 
     // event notifications
     private void notifyObjectChange(String memberName, Object oldValue, Object newValue) {
-        dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_DETAIL_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
+        dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
     }
 
     // event handlers
@@ -140,7 +140,7 @@ public class DataObjectDetailEditor extends Composite {
         //como me registro para saber el cambio en la clase:
 
         //en el lugar que toque.
-        superclassSelector.getSuperclassList().addChangeHandler(null);
+        //superclassSelector.getSuperclassList().addChangeHandler(null);
 
     }
 

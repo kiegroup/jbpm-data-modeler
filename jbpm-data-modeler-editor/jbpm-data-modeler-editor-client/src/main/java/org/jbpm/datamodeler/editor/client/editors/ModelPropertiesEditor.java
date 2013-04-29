@@ -31,7 +31,7 @@ public class ModelPropertiesEditor extends Composite {
     private Tab fieldTab = new Tab();
 
     @Inject
-    private DataObjectDetailEditor objectProperties;
+    private DataObjectEditor objectProperties;
 
     @Inject
     private DataObjectFieldEditor fieldProperties;

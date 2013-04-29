@@ -144,7 +144,7 @@ public class DataObjectBreadcrums extends Breadcrumbs {
 
         if (event.isFrom(getDataModel())) {
             if (event.getCurrentDataObject() != null) {
-                if (event.isFrom(DataModelerEvent.DATA_OBJECT_EDITOR)) {
+                if (event.isFrom(DataModelerEvent.DATA_OBJECT_BROWSER)) {
                     //it's a type selection in the editor
                     //locate the object and select my row, but it's not needed to fire selection
                     add(event.getCurrentDataObject());
