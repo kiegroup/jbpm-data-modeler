@@ -20,11 +20,11 @@ public class DataModelerEvent {
 
     public static final String DATA_MODEL_BREAD_CRUMB = "DATA_MODEL_BREAD_CRUMB";
 
-    public static final String DATA_OBJECT_EDITOR = "DATA_OBJECT_EDITOR";
+    public static final String DATA_OBJECT_BROWSER = "DATA_OBJECT_BROWSER";
 
     public static final String DATA_OBJECT_FIELD_EDITOR = "DATA_OBJECT_FIELD_EDITOR";
 
-    public static final String DATA_OBJECT_DETAIL_EDITOR = "DATA_OBJECT_DETAIL_EDITOR";
+    public static final String DATA_OBJECT_EDITOR = "DATA_OBJECT_EDITOR";
 
 
     public DataModelerEvent() {
