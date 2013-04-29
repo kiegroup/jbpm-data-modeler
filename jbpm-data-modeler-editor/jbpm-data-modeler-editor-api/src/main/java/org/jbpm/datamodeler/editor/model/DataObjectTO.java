@@ -154,4 +154,17 @@ public class DataObjectTO implements Serializable {
     public void setAnnotations(List<AnnotationTO> annotations) {
         this.annotations = annotations;
     }
+    
+    public AnnotationTO getAnnotation(String annotationName) {
+        if (annotationName == null) return null;
+
+        for (AnnotationTO annotation : annotations) {
+            if (annotationName.equals(annotation.getName())) return annotation;
+        }
+        return null;
+    }
+    
+    public void addAnnotation(AnnotationTO annotation) {
+        annotations.add(annotation);
+    }
 }
