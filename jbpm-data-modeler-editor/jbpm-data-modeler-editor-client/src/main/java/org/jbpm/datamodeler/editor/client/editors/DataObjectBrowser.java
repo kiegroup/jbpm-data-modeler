@@ -62,10 +62,10 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class DataObjectEditor  extends Composite {
+public class DataObjectBrowser extends Composite {
 
     interface DataObjectEditorUIBinder
-            extends UiBinder<Widget, DataObjectEditor> {
+            extends UiBinder<Widget, DataObjectBrowser> {
 
     };
 
@@ -126,7 +126,7 @@ public class DataObjectEditor  extends Composite {
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
 
-    public DataObjectEditor() {
+    public DataObjectBrowser() {
         initWidget(uiBinder.createAndBindUi(this));
 
         objectName.setText(Constants.INSTANCE.objectEditor_objectUnknown());

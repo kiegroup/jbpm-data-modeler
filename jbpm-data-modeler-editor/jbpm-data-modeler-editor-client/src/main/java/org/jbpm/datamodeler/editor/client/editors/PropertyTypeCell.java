@@ -21,12 +21,12 @@ public class PropertyTypeCell extends TextCell {
 
     private boolean navigable = false;
     
-    DataObjectEditor editor;
+    DataObjectBrowser editor;
 
     @Inject
     private javax.enterprise.event.Event<DataModelerEvent> dataModelerEvent;
 
-    public PropertyTypeCell(boolean navigable, DataObjectEditor editor) {
+    public PropertyTypeCell(boolean navigable, DataObjectBrowser editor) {
         super();        
         this.navigable = navigable;
         this.editor = editor;

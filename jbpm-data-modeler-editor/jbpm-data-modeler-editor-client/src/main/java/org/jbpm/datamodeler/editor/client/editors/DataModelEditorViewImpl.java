@@ -51,7 +51,7 @@ public class DataModelEditorViewImpl extends Composite
     private DataModelBrowser dataModelBrowser;
 
     @Inject
-    private DataObjectEditor dataObjectEditor;
+    private DataObjectBrowser dataObjectBrowser;
 
     public DataModelEditorViewImpl() {
     }
@@ -62,8 +62,8 @@ public class DataModelEditorViewImpl extends Composite
         dataModelBrowser.setDataModel(dataModel);
         dataModelBrowser.setModelEditorPresenter(presenter);
 
-        dataObjectEditor.setDataModel(dataModel);
-        dataObjectEditor.setModelEditorPresenter(presenter);
+        dataObjectBrowser.setDataModel(dataModel);
+        dataObjectBrowser.setModelEditorPresenter(presenter);
 
         modelPropertiesEditor.setDataModel(dataModel);
     }
@@ -73,18 +73,18 @@ public class DataModelEditorViewImpl extends Composite
         this.presenter = presenter;
         
         browserPanel.add(dataModelBrowser);
-        dataObjectPanel.add(dataObjectEditor);
+        dataObjectPanel.add(dataObjectBrowser);
         propertiesPanel.add(modelPropertiesEditor);
     }
 
     @Override
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
-        dataObjectEditor.setBaseTypes(baseTypes);
+        dataObjectBrowser.setBaseTypes(baseTypes);
     }
 
     @Override
     public void refreshObjectEditor() {
-        dataObjectEditor.refresh();
+        dataObjectBrowser.refresh();
     }
 
 }
