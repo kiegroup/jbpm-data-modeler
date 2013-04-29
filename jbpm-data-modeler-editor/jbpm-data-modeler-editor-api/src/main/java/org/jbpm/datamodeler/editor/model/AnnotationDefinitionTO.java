@@ -24,11 +24,13 @@ public class AnnotationDefinitionTO {
     
     public static final String POSITION_ANNOTATON = "@Position";
 
-    public static final String SHORT_DESCRIPTION_ANNOTATION = "@ShortDescription";
+    public static final String LABEL_ANNOTATION = "@Label";
 
-    public static final String DESCRIPTION_ANNOTATION = "@ShortDescription";
+    public static final String DESCRIPTION_ANNOTATION = "@Description";
 
     public static final String EQUALS_ANNOTATION = "@Equals";
+    
+    public static final String VALUE_PARAM = "value";
 
     private List<AnnotationMemberDefinitionTO> annotationMembers;
 
