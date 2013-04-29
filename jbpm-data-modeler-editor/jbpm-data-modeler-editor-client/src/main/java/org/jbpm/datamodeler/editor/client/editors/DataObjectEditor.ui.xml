@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:datamodeler="urn:import:org.jbpm.datamodeler.editor.client.editors"
         >
 
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
@@ -9,7 +10,8 @@
 
             <b:Column size="12">
                 <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
-                    <b:Breadcrumbs divider=">" ui:field="dataObjectNavigation"/>
+                    <gwt:SimplePanel ui:field="breadCrumbsPanel"></gwt:SimplePanel>
+                    <!--datamodeler:DataObjectBreadcrums  divider=">" ui:field="dataObjectNavigation"/-->
 
                     <gwt:HTMLPanel>
                         <div class="well" style="margin-top:20px;">

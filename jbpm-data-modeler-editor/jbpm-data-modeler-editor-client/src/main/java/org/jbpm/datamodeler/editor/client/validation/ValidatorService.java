@@ -154,11 +154,13 @@ public class ValidatorService implements DataObjectReferencingListener {
 
         private void objectDeleted(String subjectClassName) {
             List<String> refs = references.get(subjectClassName);
-            for (String objectClassName : refs) {
-                List objRefs = referencedBy.get(objectClassName);
-                if (!objRefs.remove(subjectClassName)) notification.fire(new NotificationEvent("Reference-error when deleting data object (referring object)."));
+            if (refs != null) {
+                for (String objectClassName : refs) {
+                    List objRefs = referencedBy.get(objectClassName);
+                    if (!objRefs.remove(subjectClassName)) notification.fire(new NotificationEvent("Reference-error when deleting data object (referring object)."));
+                }
+                refs.remove(subjectClassName);
             }
-            refs.remove(subjectClassName);
         }
     }
 }

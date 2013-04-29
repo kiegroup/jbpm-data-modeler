@@ -1,0 +1,14 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:gwt="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+        >
+
+    <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
+
+    <gwt:HTMLPanel>
+        <gwt:HorizontalPanel>
+            <b:ListBox ui:field="packageList"></b:ListBox>
+            <b:Button ui:field="newPackage" styleName="btn btn-primary" text="{i18n.objectEditor_create}"/>
+        </gwt:HorizontalPanel>
+    </gwt:HTMLPanel>
+</ui:UiBinder>

@@ -21,8 +21,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
-import org.jbpm.datamodeler.editor.model.DataObjectTO;
-import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.enterprise.context.Dependent;
@@ -47,7 +45,7 @@ public class DataModelEditorViewImpl extends Composite
     private SimplePanel propertiesPanel = new SimplePanel();
 
     @Inject
-    private TabbedPropertyEditor tabbedPropertyEditor;
+    private ModelPropertiesEditor modelPropertiesEditor;
 
     @Inject
     private DataModelBrowser dataModelBrowser;
@@ -55,16 +53,11 @@ public class DataModelEditorViewImpl extends Composite
     @Inject
     private DataObjectEditor dataObjectEditor;
 
-    private DataModelTO dataModel;
-
-    private DataObjectTO selectedDataObject;
-
     public DataModelEditorViewImpl() {
     }
 
     @Override
     public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
 
         dataModelBrowser.setDataModel(dataModel);
         dataModelBrowser.setModelEditorPresenter(presenter);
@@ -72,58 +65,7 @@ public class DataModelEditorViewImpl extends Composite
         dataObjectEditor.setDataModel(dataModel);
         dataObjectEditor.setModelEditorPresenter(presenter);
 
-        tabbedPropertyEditor.setDataModel(dataModel);
-
-        if (dataModel != null && dataModel.getDataObjects().size() > 0) {
-            presenter.createSelectCommand(dataModel.getDataObjects().get(0), true).execute();
-        }
-    }
-
-    @Override
-    public void deleteDataObject(DataObjectTO dataObject, int index) {
-        dataModelBrowser.deleteDataObject(dataObject, index);
-        dataObjectEditor.notifyDataModelChanged();
-        tabbedPropertyEditor.notifyDataModelChanged();
-    }
-
-    @Override
-    public void addDataObject(DataObjectTO dataObject) {
-        dataModelBrowser.addDataObject(dataObject);
-        dataObjectEditor.notifyDataModelChanged();
-        tabbedPropertyEditor.notifyDataModelChanged();
-    }
-
-    @Override
-    public void modelSelected() {
-        //TODO complete this implementation when the properties editor is ready
-        //tabbedPropertyEditor.tabPanel.selectTab(0);
-    }
-
-    @Override
-    public void selectDataObject(DataObjectTO dataObject, boolean clearBreadcrums) {
-        this.selectedDataObject = dataObject;
-        dataModelBrowser.selectDataObject(dataObject);
-        dataObjectEditor.setDataObject(dataObject, clearBreadcrums);
-        //TODO complete this implementation when the properties editor is ready
-        tabbedPropertyEditor.setDataObject(dataObject);
-        tabbedPropertyEditor.tabPanel.selectTab(0);
-    }
-
-    @Override
-    public void selectDataObjectProperty(ObjectPropertyTO selectedProperty) {
-        //TODO complete this implementation when the properties editor is ready
-        tabbedPropertyEditor.setDataObjectProperty(selectedProperty);
-        tabbedPropertyEditor.tabPanel.selectTab(1);
-    }
-
-    @Override
-    public void addDataObjectProperty(ObjectPropertyTO objectProperty) {
-        dataObjectEditor.addDataObjectProperty(objectProperty);
-    }
-
-    @Override
-    public void deleteDataObjectProperty(ObjectPropertyTO property, int index) {
-        dataObjectEditor.deleteDataObjectProperty(property, index);
+        modelPropertiesEditor.setDataModel(dataModel);
     }
 
     @Override
@@ -132,16 +74,12 @@ public class DataModelEditorViewImpl extends Composite
         
         browserPanel.add(dataModelBrowser);
         dataObjectPanel.add(dataObjectEditor);
-        propertiesPanel.add(tabbedPropertyEditor);
-        tabbedPropertyEditor.modelProperties.addPropertyEditorListener(presenter.getDataModelEditorListener());
-        tabbedPropertyEditor.objectProperties.addPropertyEditorListener(presenter.getDataObjectEditorListener());
-        tabbedPropertyEditor.fieldProperties.addPropertyEditorListener(presenter.getDataObjectFieldEditorListener());
+        propertiesPanel.add(modelPropertiesEditor);
     }
 
     @Override
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
         dataObjectEditor.setBaseTypes(baseTypes);
-        tabbedPropertyEditor.setBaseTypes(baseTypes);
     }
 
     @Override

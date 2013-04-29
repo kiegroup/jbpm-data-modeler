@@ -6,11 +6,12 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 
+import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,9 @@ public class PropertyTypeCell extends TextCell {
     private boolean navigable = false;
     
     DataObjectEditor editor;
+
+    @Inject
+    private javax.enterprise.event.Event<DataModelerEvent> dataModelerEvent;
 
     public PropertyTypeCell(boolean navigable, DataObjectEditor editor) {
         super();        
@@ -40,8 +44,7 @@ public class PropertyTypeCell extends TextCell {
 
         ObjectPropertyTO property = (ObjectPropertyTO)context.getKey();
         if (DOM.eventGetType((Event) event) == Event.ONCLICK && !property.isBaseType()) {
-            Command command = editor.getModelEditorPresenter().createSelectTypeCommand(property.getClassName());
-            command.execute();
+            editor.onTypeCellSelection(property);
         } else {
            super.onBrowserEvent(context, parent, value, event, stringValueUpdater);
         }
@@ -76,4 +79,5 @@ public class PropertyTypeCell extends TextCell {
             super.render(context, value, sb);
         }
     }
+
 }

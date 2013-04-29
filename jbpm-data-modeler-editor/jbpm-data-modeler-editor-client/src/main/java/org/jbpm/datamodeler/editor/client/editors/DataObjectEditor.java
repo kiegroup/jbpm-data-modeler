@@ -16,7 +16,6 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.TooltipCellDecorator;
@@ -36,19 +35,25 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
+import org.jbpm.datamodeler.editor.events.DataObjectFieldDeletedEvent;
+import org.jbpm.datamodeler.editor.events.DataObjectFieldSelectedEvent;
+import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
+import org.uberfire.client.common.ErrorPopup;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -69,8 +74,11 @@ public class DataObjectEditor  extends Composite {
     @UiField
     VerticalPanel mainPanel;
 
-    @UiField (provided = true)
-    Breadcrumbs dataObjectNavigation = new DataObjectBreadcrums(5);
+    @UiField
+    SimplePanel breadCrumbsPanel;
+
+    @Inject
+    DataObjectBreadcrums dataObjectNavigation;
 
     @UiField
     Label objectName;
@@ -96,8 +104,7 @@ public class DataObjectEditor  extends Composite {
     @UiField
     com.github.gwtbootstrap.client.ui.CheckBox newPropertyIsMultiple;
 
-    //@UiField(provided = true)
-    //SimplePager pager = new SimplePager(SimplePager.TextLocation.RIGHT, false, true);
+    final PropertyTypeCell typeCell = new PropertyTypeCell(true, this);
 
     final SingleSelectionModel<ObjectPropertyTO> selectionModel = new SingleSelectionModel<ObjectPropertyTO>();
 
@@ -114,7 +121,10 @@ public class DataObjectEditor  extends Composite {
     private List<PropertyTypeTO> baseTypes;
 
     @Inject
-    Event<DataModelerEvent> dataModelerEventEvent;
+    private ValidatorService validatorService;
+
+    @Inject
+    Event<DataModelerEvent> dataModelerEvent;
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -143,38 +153,11 @@ public class DataObjectEditor  extends Composite {
                                 final ObjectPropertyTO property,
                                 final ImageResource value ) {
 
-                Command deleteCommand = modelEditorPresenter.createDeleteCommand(dataObject, property, index);
-                deleteCommand.execute();
+                deleteDataObjectProperty(property, index);
             }
         } );
 
-        /// bbb
-        /*
-        final com.github.gwtbootstrap.client.ui.ButtonCell deletePropertyButton = new com.github.gwtbootstrap.client.ui.ButtonCell();
-        deletePropertyButton.setType( ButtonType.DEFAULT );
-        deletePropertyButton.setIcon( IconType.REMOVE );
 
-        final TooltipCellDecorator<String> decorator = new TooltipCellDecorator<String>(deletePropertyButton);
-        decorator.setText("click to delete this property");
-
-        final Column<ObjectPropertyTO, String> deletePropertyColumn = new Column<ObjectPropertyTO, String>(decorator) {
-            @Override
-            public String getValue( final ObjectPropertyTO global ) {
-                return "";
-            }
-        };
-        deletePropertyColumn.setFieldUpdater( new FieldUpdater<ObjectPropertyTO, String>() {
-            public void update( final int index,
-                                final ObjectPropertyTO property,
-                                final String value ) {
-
-                Command deleteCommand = modelEditorPresenter.createDeleteCommand(dataObject, property, index);
-                deleteCommand.execute();
-            }
-        } );
-        */
-
-        //dataObjectPropertiesTable.addColumn(deletePropertyColumn);
         dataObjectPropertiesTable.addColumn(deletePropertyColumnImg);
         dataObjectPropertiesTable.setColumnWidth(deletePropertyColumnImg, 20, Style.Unit.PX);
 
@@ -219,18 +202,7 @@ public class DataObjectEditor  extends Composite {
         propertyNameColHandler.setComparator(propertyNameColumn, new ObjectPropertyComparator("name"));
         dataObjectPropertiesTable.addColumnSortHandler(propertyNameColHandler);
 
-        //Init property type column
-        /*
-        final TextColumn<ObjectPropertyTO> propertyTypeColumn = new TextColumn<ObjectPropertyTO>() {
-
-            @Override
-            public String getValue(final ObjectPropertyTO objectProperty) {
-                return propertyTypeDisplay(objectProperty);
-            }
-
-        };
-        */
-        final Column<ObjectPropertyTO, String> propertyTypeColumn = new Column<ObjectPropertyTO, String>(new PropertyTypeCell(true, this))  {
+        final Column<ObjectPropertyTO, String> propertyTypeColumn = new Column<ObjectPropertyTO, String>(typeCell)  {
 
             @Override
             public String getValue(final ObjectPropertyTO objectProperty) {
@@ -258,26 +230,11 @@ public class DataObjectEditor  extends Composite {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 ObjectPropertyTO selectedPropertyTO = ((SingleSelectionModel<ObjectPropertyTO>)dataObjectPropertiesTable.getSelectionModel()).getSelectedObject();
-
-                DataModelerEvent event2 = new DataModelerEvent();
-                event2.action = "propertySelected";
-                event2.propertyTO = selectedPropertyTO;
-
-                dataModelerEventEvent.fire(event2);
-
-                /*
-                Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
-                selectCommand.execute();
-                */
-
+                notifyFieldSelected(selectedPropertyTO);
             }
         });
 
         dataObjectPropertiesTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
-
-
-        //pager.setDisplay(dataObjectPropertiesTable);
-        //pager.setPageSize(10);
 
         dataObjectPropertiesProvider.addDataDisplay(dataObjectPropertiesTable);
         dataObjectPropertiesProvider.refresh();
@@ -286,7 +243,17 @@ public class DataObjectEditor  extends Composite {
         newPropertyIsMultiple.setValue(false);
         newPropertyBasicType.setValue(true);
         newPropertyButton.setIcon(IconType.PLUS_SIGN);
+    }
+    
+    @PostConstruct
+    void completeUI() {
+        dataObjectNavigation.setDivider(">");
+        breadCrumbsPanel.add(dataObjectNavigation);
+    }
 
+    public void setDataModel(DataModelTO dataModel) {
+        this.dataModel = dataModel;
+        dataObjectNavigation.setDataModel(dataModel);
     }
 
     private void populateBaseTypes() {
@@ -304,42 +271,35 @@ public class DataObjectEditor  extends Composite {
         }        
     }
 
-    @UiHandler("newPropertyButton")
-    void newPropertyClick(ClickEvent event) {
+    private void createNewProperty(final DataObjectTO dataObject, final String propertyName, final String propertyType, final boolean multiple, final boolean baseType) {
 
-        Command createPropertyCommand = modelEditorPresenter.createAddDataObjectPropertyCommand(dataObject, newPropertyName.getText(), newPropertyType.getValue(), newPropertyIsMultiple.getValue(), newPropertyBasicType.getValue());
-        createPropertyCommand.execute();
-    }
+        validatorService.isValidIdentifier(propertyName, new ValidatorCallback() {
+            @Override
+            public void onFailure() {
+                ErrorPopup.showMessage("Invalid data object attribute identifier: " + propertyName + " is not a valid Java identifier");
+            }
 
-    @UiHandler("newPropertyDataObjectType")
-    void dataObjectTypeSelected(ClickEvent event) {
-        newPropertyIsMultiple.setVisible(true);
-        populateObjectTypes();
-    }
+            @Override
+            public void onSuccess() {
+                validatorService.isUniqueAttributeName(propertyName, dataObject, new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ErrorPopup.showMessage("An attribute with identifier: " + propertyName + " already exists in the data object.");
+                    }
 
-    @UiHandler("newPropertyBasicType")
-    void basicTypeSelected(ClickEvent event) {
-        newPropertyIsMultiple.setVisible(false);
-        newPropertyIsMultiple.setValue(false);
-        populateBaseTypes();
-    }
-
-    public void notifyDataModelChanged() {
-        if (newPropertyDataObjectType.getValue()) populateObjectTypes();
-    }
-
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
-    }
-
-    void selectedObjectChanges(@Observes DataModelerEvent event) {
-        if (event.action == "select" ) {
-            setDataObject(event.dataObjectTO, true);
-        }
+                    @Override
+                    public void onSuccess() {
+                        ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple, baseType);
+                        addDataObjectProperty(property);
+                        if (!baseType)
+                            validatorService.notifyDataObjectReferenced(property.getClassName(), dataObject.getClassName());
+                    }
+                });
+            }
+        });
     }
     
-    
-    public void setDataObject(DataObjectTO dataObject, boolean cleanBreadcrumbs) {
+    private void setDataObject(DataObjectTO dataObject) {
         this.dataObject = dataObject;
         objectName.setText(dataObject.getName() + "::" + dataObject.getPackageName());
 
@@ -359,8 +319,9 @@ public class DataObjectEditor  extends Composite {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 ObjectPropertyTO selectedPropertyTO = ((SingleSelectionModel<ObjectPropertyTO>)dataObjectPropertiesTable.getSelectionModel()).getSelectedObject();
-                Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
-                selectCommand.execute();
+                notifyFieldSelected(selectedPropertyTO);
+                //Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
+                //selectCommand.execute();
             }
         });
 
@@ -387,21 +348,30 @@ public class DataObjectEditor  extends Composite {
         }
 
         ColumnSortEvent.fire(dataObjectPropertiesTable, dataObjectPropertiesTable.getColumnSortList());
-
-        addBreadcrumb(dataObject, cleanBreadcrumbs);
+        if (dataObjectProperties.size() == 0) {
+            //there are no properties.
+            //fire an empty property seleccion event in order to notify the
+            notifyFieldSelected(null);
+        }
     }
 
-    public void addDataObjectProperty(ObjectPropertyTO objectProperty) {
+    private void addDataObjectProperty(ObjectPropertyTO objectProperty) {
+        dataObject.getProperties().add(objectProperty);
         dataObjectPropertiesProvider.getList().add(objectProperty);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
         dataObjectPropertiesTable.setKeyboardSelectedRow(dataObjectPropertiesProvider.getList().size() - 1);
     }
 
-    public void deleteDataObjectProperty(ObjectPropertyTO objectProperty, int index) {
+    private void deleteDataObjectProperty(ObjectPropertyTO objectProperty, int index) {
+        
+        dataObject.getProperties().remove(objectProperty);
         dataObjectPropertiesProvider.getList().remove(index);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
+        validatorService.notifyDataObjectUnReferenced(objectProperty.getClassName(), dataObject.getClassName());
+        notifyFieldDeleted(objectProperty);
+
     }
 
     public void setModelEditorPresenter(DataModelEditorPresenter modelEditorPresenter) {
@@ -417,11 +387,6 @@ public class DataObjectEditor  extends Composite {
         populateBaseTypes();
     }
 
-    public void addBreadcrumb(DataObjectTO dataObject, boolean clear) {
-        if (clear) dataObjectNavigation.clear();
-        ((DataObjectBreadcrums)dataObjectNavigation).add(dataObject, modelEditorPresenter.createSelectCommand(dataObject, false));
-    }
-
     public void refresh() {
         dataObjectPropertiesProvider.refresh();
     }
@@ -433,4 +398,69 @@ public class DataObjectEditor  extends Composite {
         }
         return className;
     }
+
+    public DataModelTO getDataModel() {
+        return dataModel;
+    }
+
+    public DataObjectTO getDataObject() {
+        return dataObject;
+    }
+
+    public void onTypeCellSelection(ObjectPropertyTO property) {
+
+        DataObjectTO dataObject = dataModel.getDataObjectByClassName(property.getClassName());
+        if (dataObject != null) {
+            notifyObjectSelected(dataObject);
+        }
+    }
+
+    //Event handlers
+
+    @UiHandler("newPropertyButton")
+    void newPropertyClick(ClickEvent event) {
+        createNewProperty(dataObject, newPropertyName.getText(), newPropertyType.getValue(), newPropertyIsMultiple.getValue(), newPropertyBasicType.getValue());
+    }
+
+    @UiHandler("newPropertyDataObjectType")
+    void dataObjectTypeSelected(ClickEvent event) {
+        newPropertyIsMultiple.setVisible(true);
+        populateObjectTypes();
+    }
+
+    @UiHandler("newPropertyBasicType")
+    void basicTypeSelected(ClickEvent event) {
+        newPropertyIsMultiple.setVisible(false);
+        newPropertyIsMultiple.setValue(false);
+        populateBaseTypes();
+    }
+
+    //Event Observers
+
+    private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
+        if (event.isFrom(getDataModel())) {
+            if (event.getCurrentDataObject() != null) {
+                setDataObject(event.getCurrentDataObject());
+            } else {
+                //TODO clear the editor because any object is selected
+                //this is the case when we are deleting the objects
+                //and the las object is deleted
+            }
+        }
+    }
+
+
+    // Event notifications
+    private void notifyFieldSelected(ObjectPropertyTO selectedPropertyTO) {
+        dataModelerEvent.fire(new DataObjectFieldSelectedEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), selectedPropertyTO));
+    }
+
+    private void notifyFieldDeleted(ObjectPropertyTO deletedPropertyTO) {
+        dataModelerEvent.fire(new DataObjectFieldDeletedEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), deletedPropertyTO));
+    }
+
+    private void notifyObjectSelected(DataObjectTO dataObject) {
+        dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), dataObject));
+    }
+
 }

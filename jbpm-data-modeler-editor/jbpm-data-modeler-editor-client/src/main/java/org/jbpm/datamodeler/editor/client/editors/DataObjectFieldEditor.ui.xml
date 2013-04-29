@@ -48,28 +48,37 @@
 
             <tr>
                 <td>
-                    <gwt:Label ui:field="packageNameLabel" text="Package"  />
+                    <gwt:Label ui:field="typeLabel" text="Type"  />
                 </td>
                 <td>
-                    <datamodeler:PackageSelector ui:field="packageSelector"></datamodeler:PackageSelector>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <gwt:Label ui:field="superclassLabel" text="Superclass"  />
-                </td>
-                <td>
-                    <datamodeler:SuperclassSelector ui:field="superclassSelector"></datamodeler:SuperclassSelector>
+                    <b:ListBox ui:field="typeSelector"></b:ListBox>
                 </td>
             </tr>
 
             <tr>
                 <td>
-                    <gwt:Label ui:field="roleLabel" text="Role"  />
+                    <gwt:Label ui:field="equalsLabel" text="Equals"  />
                 </td>
                 <td>
-                    <b:ListBox ui:field="roleSelector"></b:ListBox>
+                    <b:CheckBox ui:field="equalsSelector"></b:CheckBox>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="requiredLabel" text="Required"  />
+                </td>
+                <td>
+                    <b:CheckBox ui:field="requiredSelector"></b:CheckBox>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <gwt:Label ui:field="positionLabel" text="@Position"  />
+                </td>
+                <td>
+                    <b:TextBox ui:field="positionText"></b:TextBox>
                 </td>
             </tr>
 

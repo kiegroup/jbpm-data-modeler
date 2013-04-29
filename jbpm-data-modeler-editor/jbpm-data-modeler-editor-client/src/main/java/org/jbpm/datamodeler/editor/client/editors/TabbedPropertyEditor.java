@@ -19,7 +19,6 @@ import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,10 @@ public class TabbedPropertyEditor extends Composite {
     public DataObjectDetailEditor objectProperties;
 
     @Inject
-    public PropertyEditor fieldProperties;
+    public DataObjectFieldEditor fieldProperties;
+
+    @Inject
+    public PropertyEditor fieldPropertiesOLD;
 
     private DataModelTO dataModel;
 
@@ -94,11 +96,11 @@ public class TabbedPropertyEditor extends Composite {
     }
 
     public void notifyDataModelChanged() {
-        fieldProperties.refresh();
+        fieldPropertiesOLD.refresh();
     }
 
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
-        fieldProperties.setBaseTypes(baseTypes);
+        fieldPropertiesOLD.setBaseTypes(baseTypes);
     }
 
     private void loadDataObjectAttributes(DataObjectTO dataObject) {
@@ -135,6 +137,9 @@ public class TabbedPropertyEditor extends Composite {
         */
 
         objectPropertiesOLD.setProperties(properties);
+        
+        objectProperties.name.setText(dataObject.getName());
+
     }
 
     private void loadObjectPropertyAttributes(ObjectPropertyTO selectedProperty) {
@@ -145,29 +150,32 @@ public class TabbedPropertyEditor extends Composite {
         List<PropertyEditorValue> properties = new ArrayList<PropertyEditorValue>();
 
         //Init the standard set of data object property manipulable attributes.
-        propertyEditorValue = new PropertyEditorValue("name", selectedProperty.getName() != null ? selectedProperty.getName() : "");
-        properties.add(propertyEditorValue);
 
-        propertyEditorValue = new PropertyEditorValue("shortName", "logical name");
-        properties.add(propertyEditorValue);
+        if (selectedProperty != null) {
+            propertyEditorValue = new PropertyEditorValue("name", selectedProperty.getName() != null ? selectedProperty.getName() : "");
+            properties.add(propertyEditorValue);
 
-        propertyEditorValue = new PropertyEditorValue("description", "field documentation");
-        properties.add(propertyEditorValue);
+            propertyEditorValue = new PropertyEditorValue("shortName", "logical name");
+            properties.add(propertyEditorValue);
 
-        propertyEditorValue = new PropertyEditorValue("type", selectedProperty.getClassName());
-        properties.add(propertyEditorValue);
+            propertyEditorValue = new PropertyEditorValue("description", "field documentation");
+            properties.add(propertyEditorValue);
 
-        propertyEditorValue = new PropertyEditorValue("equals", Boolean.FALSE);
-        properties.add(propertyEditorValue);
+            propertyEditorValue = new PropertyEditorValue("type", selectedProperty.getClassName());
+            properties.add(propertyEditorValue);
 
-        propertyEditorValue = new PropertyEditorValue("required", Boolean.FALSE);
-        properties.add(propertyEditorValue);
+            propertyEditorValue = new PropertyEditorValue("equals", Boolean.FALSE);
+            properties.add(propertyEditorValue);
 
-        propertyEditorValue = new PropertyEditorValue("@Position", "");
-        properties.add(propertyEditorValue);
+            propertyEditorValue = new PropertyEditorValue("required", Boolean.FALSE);
+            properties.add(propertyEditorValue);
 
-        fieldProperties.setEntityTypes(dataModel.getDataObjects());
-        fieldProperties.setProperties(properties);
+            propertyEditorValue = new PropertyEditorValue("@Position", "");
+            properties.add(propertyEditorValue);
+        }
+
+        fieldPropertiesOLD.setEntityTypes(dataModel.getDataObjects());
+        fieldPropertiesOLD.setProperties(properties);
     }
 
     private void loadDataModelAttributes(DataModelTO dataModel) {
@@ -183,12 +191,5 @@ public class TabbedPropertyEditor extends Composite {
         */
         modelProperties.setProperties(properties);
     }
-
-    void onPropertySelection(@Observes DataModelerEvent event) {
-        if (event.action == "propertySelected") {
-            loadObjectPropertyAttributes(event.propertyTO);
-        }
-    }
-
 
 }
