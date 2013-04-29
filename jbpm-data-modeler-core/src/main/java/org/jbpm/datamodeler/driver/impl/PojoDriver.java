@@ -36,10 +36,6 @@ public class PojoDriver implements ModelDriver {
         configuredAnnotations.put(annotationDefinition.getName(), annotationDefinition);
         configuredAnnotationsDriver.put(annotationDefinition.getName(), new DefaultAnnotationDriver());
 
-        annotationDefinition = new RequiredAnnotationDefinition();
-        configuredAnnotations.put(annotationDefinition.getName(), annotationDefinition);
-        configuredAnnotationsDriver.put(annotationDefinition.getName(), new DefaultAnnotationDriver());
-
     }
 
     @Override

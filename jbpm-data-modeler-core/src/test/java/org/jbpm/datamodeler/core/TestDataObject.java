@@ -1,6 +1,5 @@
 package org.jbpm.datamodeler.core;
 
-import org.jbpm.datamodeler.annotations.DataObject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +9,7 @@ import org.jbpm.datamodeler.annotations.DataObject;
  * To change this template use File | Settings | File Templates.
  */
 
-@DataObject
+
 public class TestDataObject {
 
 }
