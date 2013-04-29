@@ -17,6 +17,8 @@ public interface Constants extends Messages {
 
     public String modelEditor_menu_generate();
 
+    public String modelEditor_loading();
+
     public String modelEditor_notification_dataObject_created(String name);
 
     public String modelEditor_notification_dataObject_deleted(String name);
