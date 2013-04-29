@@ -216,7 +216,7 @@ public class DataModelEditorPresenter {
 
     private void loadContent(Path path) {
 
-        BusyPopup.showMessage("Loading datamodel");
+        BusyPopup.showMessage(Constants.INSTANCE.modelEditor_loading());
 
         modelerService.call(
                 new RemoteCallback<List<PropertyTypeTO>>() {
