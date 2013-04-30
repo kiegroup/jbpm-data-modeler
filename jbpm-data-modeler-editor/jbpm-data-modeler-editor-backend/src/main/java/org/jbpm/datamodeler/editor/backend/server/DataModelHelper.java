@@ -72,7 +72,7 @@ public class DataModelHelper {
         dataObjectTO.setProperties(propertiesTO);
     }
 
-    public static void to2Domain(DataObjectTO dataObjectTO, DataObject dataObject) {
+    public void to2Domain(DataObjectTO dataObjectTO, DataObject dataObject) {
         dataObject.setName(dataObjectTO.getName());
         List<ObjectPropertyTO> properties = dataObjectTO.getProperties();
 
