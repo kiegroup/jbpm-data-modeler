@@ -56,9 +56,10 @@ public class DataObjectTO implements Serializable {
     public DataObjectTO() {
     }
 
-    public DataObjectTO(String name) {
-        this();
+    public DataObjectTO(String name, String packageName, String superClassName) {
         this.name = name;
+        this.packageName = packageName;
+        this.superClassName = superClassName;
     }
 
     public String getName() {

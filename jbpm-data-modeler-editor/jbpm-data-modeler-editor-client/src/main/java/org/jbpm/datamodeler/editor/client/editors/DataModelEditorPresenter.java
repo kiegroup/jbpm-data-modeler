@@ -16,29 +16,25 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.type.DataModelResourceType;
-import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectCreatedEvent;
+import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
-import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.annotations.*;
 import org.uberfire.client.common.BusyPopup;
-import org.uberfire.client.common.ErrorPopup;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 import org.uberfire.client.workbench.widgets.menu.MenuFactory;
 import org.uberfire.client.workbench.widgets.menu.MenuItem;
 import org.uberfire.client.workbench.widgets.menu.Menus;
+import org.uberfire.client.workbench.widgets.toolbar.IconType;
 import org.uberfire.client.workbench.widgets.toolbar.ToolBar;
 import org.uberfire.client.workbench.widgets.toolbar.ToolBarItem;
 import org.uberfire.client.workbench.widgets.toolbar.impl.DefaultToolBar;
@@ -52,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
-import static org.uberfire.client.workbench.widgets.toolbar.IconType.TABLE;
 
 
 @Dependent
@@ -84,16 +79,19 @@ public class DataModelEditorPresenter {
     private ToolBar toolBar;
 
     @Inject
+    private NewDataObjectPopup newDataObjectPopup;
+
+    @Inject
     private DataModelEditorSelectionModel selectionModel;
 
     @Inject
-    Event<DataModelerEvent> dataModelerEventEvent;
+    Event<DataModelerEvent> dataModelerEvent;
 
     @Inject
     private Event<NotificationEvent> notification;
 
     private Path path;
-    
+
     @WorkbenchPartTitle
     public String getTitle() {
         return Constants.INSTANCE.modelEditor_screen_name() + " [" + (path != null ? path.getFileName() : "") + "]";
@@ -108,15 +106,9 @@ public class DataModelEditorPresenter {
         return selectionModel.getSelectedModel();
     }
 
-    private void setDataModel(DataModelTO dataModel) {
-        selectionModel.setSelectedModel(dataModel);
-        validatorService.notifyDataModelSelected(dataModel);
-        view.setDataModel(dataModel);
-
-        if (dataModel != null && dataModel.getDataObjects().size() > 0) {
-            //TODO notificar para que se seleccione el primero objeto de la lista?
-        }
-    }
+    /*
+    TODO remover este metodo cuando ya no lo necesitemos
+    lo dejo por si necesitamos hacer copy paste de la parte de las valiaciones.
 
     public Command createAddDataObjectCommand(final String packageName, final String name, final String superClassName) {
         return new Command() {
@@ -166,6 +158,7 @@ public class DataModelEditorPresenter {
             }
         };
     }
+    */
 
     @IsDirty
     public boolean isDirty() {
@@ -197,6 +190,7 @@ public class DataModelEditorPresenter {
                     //when the model is saved without errors
                     //clean the deleted dataobjects status, mark all dataobjects as persisted, etc.
                     restoreModelStatus();
+                    notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_saved()));
                 }
             },
             new DataModelerErrorCallback("An error was produced during data model saving.")
@@ -214,7 +208,7 @@ public class DataModelEditorPresenter {
         loadContent(path);
     }
 
-    private void loadContent(Path path) {
+    private void loadContent(final Path path) {
 
         BusyPopup.showMessage(Constants.INSTANCE.modelEditor_loading());
 
@@ -236,7 +230,7 @@ public class DataModelEditorPresenter {
                     public void callback(DataModelTO dataModel) {
                         BusyPopup.close();
                         setDataModel(dataModel);
-                        notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_loaded(dataModel.getName())));
+                        notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_loaded(path.toString())));
                     }
 
                 },
@@ -244,10 +238,24 @@ public class DataModelEditorPresenter {
         ).loadModel(path);
     }
 
+    private void setDataModel(DataModelTO dataModel) {
+        selectionModel.setSelectedModel(dataModel);
+        validatorService.notifyDataModelSelected(dataModel);
+        view.setDataModel(dataModel);
+
+        if (dataModel != null && dataModel.getDataObjects().size() > 0) {            
+            dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataModel.getDataObjects().get(0)));
+        }
+    }
 
     @OnReveal
     public void onReveal() {
         //Window.alert("onReveal");
+    }
+
+    private void onNewDataObject() {
+        newDataObjectPopup.setDataModel(getDataModel());
+        newDataObjectPopup.show();
     }
 
     @WorkbenchMenu
@@ -271,28 +279,25 @@ public class DataModelEditorPresenter {
         toolBar = new DefaultToolBar( "dataModeler" );
 
 
+        org.uberfire.client.mvp.Command saveCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                onSave();
+            }
+        };
+
         org.uberfire.client.mvp.Command newDataObjectCommand = new org.uberfire.client.mvp.Command() {
             @Override
             public void execute() {
-                Window.alert("Create new data object from the toolbar?");
+                onNewDataObject();
             }
         };
 
-        org.uberfire.client.mvp.Command newDataObjectPropertyCommand = new org.uberfire.client.mvp.Command() {
-            @Override
-            public void execute() {
-                Window.alert("Create new property from the toolbar?");
-            }
-        };
-
-
-        ToolBarItem item = new DefaultToolBarItem( TABLE, "New Data Object", newDataObjectCommand);
+        ToolBarItem item = new DefaultToolBarItem( IconType.SAVE, Constants.INSTANCE.modelEditor_menu_save(), saveCommand);
         toolBar.addItem(item);
 
-
-        item = new DefaultToolBarItem( TABLE, "New Data Object Property", newDataObjectPropertyCommand);
+        item = new DefaultToolBarItem( IconType.FILE, Constants.INSTANCE.modelEditor_menu_new_dataObject(), newDataObjectCommand);
         toolBar.addItem(item);
-
 
     }
 
@@ -300,8 +305,12 @@ public class DataModelEditorPresenter {
 
         final List<MenuItem> menuItems = new ArrayList<MenuItem>();
 
-        //TODO take a look at guvnor editors to see if class org.kie.guvnor.commons.ui.client.menu.FileMenuBuilder
-        //can be used
+        org.uberfire.client.mvp.Command newDataObjectCommand = new org.uberfire.client.mvp.Command() {
+            @Override
+            public void execute() {
+                onNewDataObject();
+            }
+        };
 
         org.uberfire.client.mvp.Command saveCommand = new org.uberfire.client.mvp.Command() {
             @Override
@@ -309,6 +318,12 @@ public class DataModelEditorPresenter {
                 onSave();
             }
         };
+
+        if ( newDataObjectCommand != null ) {
+            menuItems.add(newSimpleItem(Constants.INSTANCE.modelEditor_menu_new_dataObject())
+                    .respondsWith(newDataObjectCommand)
+                    .endMenu().build().getItems().get(0));
+        }
 
         if ( saveCommand != null ) {
             menuItems.add(newSimpleItem(Constants.INSTANCE.modelEditor_menu_save())
@@ -323,4 +338,3 @@ public class DataModelEditorPresenter {
         getDataModel().setPersistedStatus();
     }
 }
-

@@ -33,7 +33,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -73,9 +72,6 @@ public class DataModelBrowser extends Composite {
     CellTable<DataObjectTO> dataObjectsTable = new CellTable<DataObjectTO>(1000, GWT.<CellTable.SelectableResources>create(CellTable.SelectableResources.class));
 
     @UiField
-    TextBox newEntityName;
-
-    @UiField
     com.github.gwtbootstrap.client.ui.Button newEntityButton;
 
     @Inject
@@ -98,6 +94,9 @@ public class DataModelBrowser extends Composite {
 
     @Inject
     private Event<DataModelerEvent> dataModelerEvent;
+
+    @Inject
+    private NewDataObjectPopup newDataObjectPopup;
 
     public DataModelBrowser() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -209,10 +208,8 @@ public class DataModelBrowser extends Composite {
 
     @UiHandler("newEntityButton")
     void newEntityClick( ClickEvent event ) {
-        //TODO get the packageName and superClassName from the correct place.
-        //Pending to decide if we are going to use a popup for object creation.
-        Command addCommand = modelEditorPresenter.createAddDataObjectCommand(getDataModel().getDefaultPackage(), newEntityName.getText(), null);
-        addCommand.execute();
+        newDataObjectPopup.setDataModel(getDataModel());
+        newDataObjectPopup.show();
     }
 
     public void selectDataObject(DataObjectTO dataObject) {

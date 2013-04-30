@@ -43,8 +43,7 @@ public class DataModelHelper {
 
         if (dataObjects != null) {
             for (DataObject dataObject  : dataObjects) {
-                dataObjectTO = new DataObjectTO(dataObject.getName());
-                dataObjectTO.setPackageName(dataObject.getPackageName());
+                dataObjectTO = new DataObjectTO(dataObject.getName(), dataObject.getPackageName(), dataObject.getSuperClassName());
                 if (status != null) {
                     dataObjectTO.setStatus(status);
                 }

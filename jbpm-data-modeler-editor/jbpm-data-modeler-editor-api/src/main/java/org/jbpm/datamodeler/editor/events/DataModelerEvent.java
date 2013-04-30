@@ -26,6 +26,8 @@ public class DataModelerEvent {
 
     public static final String DATA_OBJECT_EDITOR = "DATA_OBJECT_EDITOR";
 
+    public static final String NEW_DATA_OBJECT_POPUP = "NEW_DATA_OBJECT_POPUP";
+
 
     public DataModelerEvent() {
     }

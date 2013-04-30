@@ -111,6 +111,10 @@ public class PackageSelector extends Composite {
         }
     }
 
+    public ListBox getPackageList() {
+        return packageList;
+    }
+
     public DataModelTO getDataModel() {
         return dataModel;
     }

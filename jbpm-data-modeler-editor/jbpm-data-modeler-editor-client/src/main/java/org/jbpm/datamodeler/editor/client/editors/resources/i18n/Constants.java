@@ -15,6 +15,8 @@ public interface Constants extends Messages {
     
     public String modelEditor_menu_save();
 
+    public String modelEditor_menu_new_dataObject();
+
     public String modelEditor_menu_generate();
 
     public String modelEditor_loading();
@@ -26,6 +28,8 @@ public interface Constants extends Messages {
     public String modelEditor_notification_dataModel_generated();
 
     public String modelEditor_notification_dataModel_loaded(String name);
+
+    public String modelEditor_notification_dataModel_saved();
 
     public String modelBrowser_modelUnknown();
 
