@@ -8,10 +8,11 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.*;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
+import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
@@ -20,7 +21,6 @@ import org.jbpm.datamodeler.editor.events.DataObjectDeletedEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
-import org.uberfire.client.common.ErrorPopup;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -37,6 +37,9 @@ public class DataObjectEditor extends Composite {
 
     @UiField
     TextBox name;
+
+    @UiField
+    Label titleLabel;
 
     @UiField
     TextBox shortName;
@@ -56,12 +59,14 @@ public class DataObjectEditor extends Composite {
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
 
-    @Inject
-    private ValidatorService validatorService;
-
     DataObjectTO dataObject;
 
     DataModelTO dataModel;
+
+    @Inject
+    private ValidatorService validatorService;
+
+    private DataObjectEditorErrorPopup ep = new DataObjectEditorErrorPopup();
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -88,7 +93,6 @@ public class DataObjectEditor extends Composite {
 
         if (event.isFrom(getDataModel())) {
             //TODO populate all the fields, etc.
-
             setDataObject(event.getCurrentDataObject());
             name.setText(getDataObject().getName());
             description.setText(getDataObject().getClassName());
@@ -122,28 +126,43 @@ public class DataObjectEditor extends Composite {
 
     @UiHandler("name")
     void nameChanged(final ValueChangeEvent<String> event) {
+        // Set widgets to errorpopup for styling purposes etc.
+        ep.setTitleWidget(titleLabel);
+        ep.setValueWidget(name);
 
+        final String packageName = getDataObject().getPackageName();
         final String oldValue = getDataObject().getName();
+        final String newValue = name.getValue();
 
-        validatorService.isValidIdentifier(name.getValue(), new ValidatorCallback() {
+        // In case an invalid name (entered before), was corrected to the original value, don't do anything but reset the label style
+        if (oldValue.equalsIgnoreCase(newValue)) {
+            titleLabel.setStyleName(null);
+            return;
+        }
+        // Otherwise validate
+        validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
             @Override
             public void onFailure() {
-                //1) mensaje popup
-                ErrorPopup.showMessage("Invalid data object identifier: " + name.getValue() + " is not a valid Java identifier");
-                //2) dejar el foco en el campo
-                name.setFocus(true);
-                //3) texto seleccionado
-                name.selectAll();
+                ep.showMessage("Invalid data object identifier: " + newValue + " is not a valid Java identifier");
             }
 
             @Override
             public void onSuccess() {
-                dataObject.setName(event.getValue());
-                notifyObjectChange("name", oldValue, getDataObject().getName());
+                validatorService.isUniqueEntityName(packageName, newValue, getDataModel(), new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ep.showMessage("A data object with identifier: " + newValue + " already exists in the model.");
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        titleLabel.setStyleName(null);
+                        dataObject.setName(newValue);
+                        notifyObjectChange("name", oldValue, getDataObject().getName());
+                    }
+                });
             }
         });
-        //TODO add validation.
-        //data object name will be changed only if validation is successful
         //como me registro para saber el cambio en la clase:
 
         //todo en el lugar que toque.
@@ -151,54 +170,25 @@ public class DataObjectEditor extends Composite {
 
     }
 
-
-    /*
-       Valicaciones que estan en el presenter.
-
-       public PropertyEditorListener getDataObjectEditorListener() {
-       return new PropertyEditorListener() {
-           @Override
-           public boolean doBeforePropertyChange(final PropertyEditor source, final String propertyName, final Object pendingValue, final Object currentValue, final List<PropertyChangeError> errors) {
-               validatorService.isValidIdentifier(pendingValue.toString(), new ValidatorCallback() {
-                   public boolean returnValue(boolean b) {
-                       return b;
-                   }
-
-                   @Override
-                   public void onFailure() {
-                       errors.add(new PropertyChangeError("Invalid data object identifier: " + pendingValue + " is not a valid Java identifier"));
-                       returnValue(false);
-                   }
-
-                   @Override
-                   public void onSuccess() {
-                       validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
-                           @Override
-                           public void onFailure() {
-                               errors.add(new PropertyChangeError("A data object with identifier: " + pendingValue + " already exists in the model."));
-                               returnValue(false);
-                           }
-
-                           @Override
-                           public void onSuccess() {
-                               returnValue(true);
-                           }
-                       });
-                   }
-               });
-               return false;
-           }
-
-           @Override
-           public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
-               //TODO Implement model property change
-               //Window.alert("data object property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
-               changeSelectedDataObjectProperty(propertyName, newValue, currentValue);
-           }
-       };
-   }
-
-
-    */
-
+    private class DataObjectEditorErrorPopup extends ErrorPopup {
+        private Widget titleWidget;
+        private Widget valueWidget;
+        private DataObjectEditorErrorPopup() {
+            setAfterCloseEvent(new Command() {
+                @Override
+                public void execute() {
+                    titleWidget.setStyleName("text-error");
+                    if (valueWidget instanceof Focusable) ((FocusWidget)valueWidget).setFocus(true);
+                    if (valueWidget instanceof ValueBoxBase) ((ValueBoxBase)valueWidget).selectAll();
+                    clearWidgets();
+                }
+            });
+        }
+        private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;}
+        private void setValueWidget(Widget valueWidget){this.valueWidget = valueWidget;}
+        private void clearWidgets() {
+            titleWidget = null;
+            valueWidget = null;
+        }
+    }
 }
