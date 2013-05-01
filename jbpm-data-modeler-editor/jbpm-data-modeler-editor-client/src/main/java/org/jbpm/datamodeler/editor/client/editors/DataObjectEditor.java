@@ -99,6 +99,11 @@ public class DataObjectEditor extends Composite {
         }
     }
 
+    //como me registro para saber el cambio en la clase:
+
+    //todo en el lugar que toque.
+//        superclassSelector.getSuperclassList().addChangeHandler(null);
+
     private void loadDataObject(DataObjectTO dataObject) {
         //TODO
         //Cargar el objeto correctamente.
@@ -122,7 +127,7 @@ public class DataObjectEditor extends Composite {
         dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
     }
 
-    // event handlers
+    // Event handlers
 
     @UiHandler("name")
     void nameChanged(final ValueChangeEvent<String> event) {
@@ -163,11 +168,6 @@ public class DataObjectEditor extends Composite {
                 });
             }
         });
-        //como me registro para saber el cambio en la clase:
-
-        //todo en el lugar que toque.
-//        superclassSelector.getSuperclassList().addChangeHandler(null);
-
     }
 
     private class DataObjectEditorErrorPopup extends ErrorPopup {
