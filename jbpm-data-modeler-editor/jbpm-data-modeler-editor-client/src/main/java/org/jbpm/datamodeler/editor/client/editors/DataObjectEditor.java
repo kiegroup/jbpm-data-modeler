@@ -8,10 +8,13 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.*;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
+import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectDeletedEvent;
@@ -36,6 +39,9 @@ public class DataObjectEditor extends Composite {
     TextBox name;
 
     @UiField
+    Label titleLabel;
+
+    @UiField
     TextBox shortName;
 
     @UiField
@@ -52,10 +58,15 @@ public class DataObjectEditor extends Composite {
 
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
-    
+
     DataObjectTO dataObject;
 
     DataModelTO dataModel;
+
+    @Inject
+    private ValidatorService validatorService;
+
+    private DataObjectEditorErrorPopup ep = new DataObjectEditorErrorPopup();
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -82,12 +93,16 @@ public class DataObjectEditor extends Composite {
 
         if (event.isFrom(getDataModel())) {
             //TODO populate all the fields, etc.
-
             setDataObject(event.getCurrentDataObject());
             name.setText(getDataObject().getName());
             description.setText(getDataObject().getClassName());
         }
     }
+
+    //como me registro para saber el cambio en la clase:
+
+    //todo en el lugar que toque.
+//        superclassSelector.getSuperclassList().addChangeHandler(null);
 
     private void loadDataObject(DataObjectTO dataObject) {
         //TODO
@@ -112,86 +127,68 @@ public class DataObjectEditor extends Composite {
         dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
     }
 
-    // event handlers
+    // Event handlers
 
     @UiHandler("name")
-    void nameChanged(ValueChangeEvent<String> event) {
+    void nameChanged(final ValueChangeEvent<String> event) {
+        // Set widgets to errorpopup for styling purposes etc.
+        ep.setTitleWidget(titleLabel);
+        ep.setValueWidget(name);
 
-        //TODO add validation.
-        //data object name will be changed only if validation is successful
+        final String packageName = getDataObject().getPackageName();
+        final String oldValue = getDataObject().getName();
+        final String newValue = name.getValue();
 
-        String oldValue = getDataObject().getName();
-
-        boolean validationOk = true;
-
-        if (validationOk) {
-
-            dataObject.setName(event.getValue());
-            notifyObjectChange("name", oldValue, getDataObject().getName());
-        } else {
-            //1) mensaje popup
-            //2) dejar el foco en el campo
-            //3) texto seleccionado
-            name.setFocus(true);
-            
+        // In case an invalid name (entered before), was corrected to the original value, don't do anything but reset the label style
+        if (oldValue.equalsIgnoreCase(newValue)) {
+            titleLabel.setStyleName(null);
+            return;
         }
+        // Otherwise validate
+        validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
+            @Override
+            public void onFailure() {
+                ep.showMessage("Invalid data object identifier: " + newValue + " is not a valid Java identifier");
+            }
 
+            @Override
+            public void onSuccess() {
+                validatorService.isUniqueEntityName(packageName, newValue, getDataModel(), new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ep.showMessage("A data object with identifier: " + newValue + " already exists in the model.");
+                    }
 
-        //como me registro para saber el cambio en la clase:
-
-        //en el lugar que toque.
-        //superclassSelector.getSuperclassList().addChangeHandler(null);
-
+                    @Override
+                    public void onSuccess() {
+                        titleLabel.setStyleName(null);
+                        dataObject.setName(newValue);
+                        notifyObjectChange("name", oldValue, getDataObject().getName());
+                    }
+                });
+            }
+        });
     }
 
-
-    /*
-       Valicaciones que estan en el presenter.
-
-       public PropertyEditorListener getDataObjectEditorListener() {
-       return new PropertyEditorListener() {
-           @Override
-           public boolean doBeforePropertyChange(final PropertyEditor source, final String propertyName, final Object pendingValue, final Object currentValue, final List<PropertyChangeError> errors) {
-               validatorService.isValidIdentifier(pendingValue.toString(), new ValidatorCallback() {
-                   public boolean returnValue(boolean b) {
-                       return b;
-                   }
-
-                   @Override
-                   public void onFailure() {
-                       errors.add(new PropertyChangeError("Invalid data object identifier: " + pendingValue + " is not a valid Java identifier"));
-                       returnValue(false);
-                   }
-
-                   @Override
-                   public void onSuccess() {
-                       validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
-                           @Override
-                           public void onFailure() {
-                               errors.add(new PropertyChangeError("A data object with identifier: " + pendingValue + " already exists in the model."));
-                               returnValue(false);
-                           }
-
-                           @Override
-                           public void onSuccess() {
-                               returnValue(true);
-                           }
-                       });
-                   }
-               });
-               return false;
-           }
-
-           @Override
-           public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
-               //TODO Implement model property change
-               //Window.alert("data object property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
-               changeSelectedDataObjectProperty(propertyName, newValue, currentValue);
-           }
-       };
-   }
-
-
-    */
-
+    private class DataObjectEditorErrorPopup extends ErrorPopup {
+        private Widget titleWidget;
+        private Widget valueWidget;
+        private DataObjectEditorErrorPopup() {
+            setAfterCloseEvent(new Command() {
+                @Override
+                public void execute() {
+                    titleWidget.setStyleName("text-error");
+                    if (valueWidget instanceof Focusable) ((FocusWidget)valueWidget).setFocus(true);
+                    if (valueWidget instanceof ValueBoxBase) ((ValueBoxBase)valueWidget).selectAll();
+                    clearWidgets();
+                }
+            });
+        }
+        private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;}
+        private void setValueWidget(Widget valueWidget){this.valueWidget = valueWidget;}
+        private void clearWidgets() {
+            titleWidget = null;
+            valueWidget = null;
+        }
+    }
 }

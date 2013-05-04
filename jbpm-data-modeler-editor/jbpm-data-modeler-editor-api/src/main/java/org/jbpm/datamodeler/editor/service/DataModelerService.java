@@ -35,4 +35,5 @@ public interface DataModelerService {
 
     List<PropertyTypeTO> getBasePropertyTypes();
 
+    Boolean isValidIdentifier(String identifier);
 }

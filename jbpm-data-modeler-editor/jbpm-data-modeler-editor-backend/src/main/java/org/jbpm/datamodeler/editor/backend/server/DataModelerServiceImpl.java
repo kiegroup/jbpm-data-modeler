@@ -17,6 +17,7 @@ import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 import org.jbpm.datamodeler.editor.service.ServiceException;
+import org.jbpm.datamodeler.validation.ValidationUtils;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Files;
@@ -344,6 +345,11 @@ public class DataModelerServiceImpl implements DataModelerService {
         path = path.getParent();
 
         return paths.convert( path );
+    }
+
+    @Override
+    public Boolean isValidIdentifier(String identifier) {
+        return ValidationUtils.isJavaIdentifier(identifier);
     }
 
     private org.kie.commons.java.nio.file.Path existsProjectJavaPath(org.kie.commons.java.nio.file.Path projectPath) {
