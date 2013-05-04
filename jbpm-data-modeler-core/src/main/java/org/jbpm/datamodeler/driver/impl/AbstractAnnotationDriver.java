@@ -16,8 +16,9 @@ public abstract class AbstractAnnotationDriver implements AnnotationDriver {
     private static final Logger logger = LoggerFactory.getLogger(AbstractAnnotationDriver.class);
 
     @Override
-    public Annotation buildAnnotation(AnnotationDefinition annotationDefinition, AnnotationToken annotationToken) throws ModelDriverException {
+    public Annotation buildAnnotation(AnnotationDefinition annotationDefinition, Object externalAnnotationToken) throws ModelDriverException {
 
+        AnnotationToken annotationToken = (AnnotationToken)externalAnnotationToken;
         if (!annotationDefinition.getName().equals(normalizeAnnotationName(annotationToken.getName()))) {
             //TODO review this policy, maybe in the future we use a less restrictive system. E.g. if a token cant be
             //recognized by the driver we can create a generic annotation.

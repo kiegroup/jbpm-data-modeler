@@ -2,20 +2,25 @@ package org.jbpm.datamodeler.editor.model;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Portable
-public class AnnotationTO implements Serializable {
+public class AnnotationTO {
 
     private String className;
 
     private String name;
 
+    private AnnotationDefinitionTO annotationDefinition;
+
     private Map<String, Object> values = new HashMap<String, Object>();
 
     public AnnotationTO() {
+    }
+
+    public AnnotationTO(AnnotationDefinitionTO annotationDefinition) {
+        this.annotationDefinition = annotationDefinition;
     }
 
     public Object getValue(String annotationMemberName) {
@@ -23,7 +28,7 @@ public class AnnotationTO implements Serializable {
     }
 
     public Map<String, Object> getValues() {
-        return null;
+        return values;
     }
 
     public void setValue(String annotationMemberName, Object value) {
@@ -44,5 +49,13 @@ public class AnnotationTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public AnnotationDefinitionTO getAnnotationDefinition() {
+        return annotationDefinition;
+    }
+
+    public void setAnnotationDefinition(AnnotationDefinitionTO annotationDefinition) {
+        this.annotationDefinition = annotationDefinition;
     }
 }

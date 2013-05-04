@@ -21,11 +21,15 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.jbpm.datamodeler.core.Annotation;
 import org.jbpm.datamodeler.core.ObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -63,8 +67,6 @@ public class GenerationEngine {
 
             //TODO REVIEW THIS
             properties.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, "org.apache.velocity.runtime.log.JdkLogChute");
-
-
 
             // init velocity engine
             velocityEngine.init(properties);
@@ -168,6 +170,14 @@ public class GenerationEngine {
     }
 
     public void generateHashCode(GenerationContext generationContext, String template) throws IOException {
+        generateSubTemplate(generationContext, template);
+    }
+    
+    public void generateTypeAnnotation(GenerationContext generationContext, Annotation annotation, String template) throws IOException {
+        generateSubTemplate(generationContext, template);
+    }
+
+    public void generateFieldAnnotation(GenerationContext generationContext, Annotation annotation, String template) throws IOException {
         generateSubTemplate(generationContext, template);
     }
 

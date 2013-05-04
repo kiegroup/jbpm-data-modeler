@@ -35,6 +35,8 @@ public interface DataObject extends HasName, HasPackageName, HasClassName, HasAn
 
     ObjectProperty addProperty(String name, String className, boolean multiple);
 
+    ObjectProperty addProperty(String name, String className, boolean multiple, String bag);
+
     ObjectProperty removeProperty(String name);
 
 }

@@ -29,8 +29,9 @@ public class SuperclassSelector extends Composite {
     public SuperclassSelector() {
         initWidget(uiBinder.createAndBindUi(this));
 
-        superclassList.addItem("com.redhat.datamodeler.Class1", "com.redhat.datamodeler.Class1");
-        superclassList.addItem("com.redhat.datamodeler.Class2", "com.redhat.datamodeler.Class2");
+        superclassList.addItem("org.pack1.TypeTestParent", "org.pack1.TypeTestParent");
+        //superclassList.addItem("com.redhat.datamodeler.Class1", "com.redhat.datamodeler.Class1");
+        //superclassList.addItem("com.redhat.datamodeler.Class2", "com.redhat.datamodeler.Class2");
     }
 
     public ListBox getSuperclassList() {

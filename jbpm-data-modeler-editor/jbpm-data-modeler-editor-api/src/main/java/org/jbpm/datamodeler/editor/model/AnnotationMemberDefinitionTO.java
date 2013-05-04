@@ -1,5 +1,8 @@
 package org.jbpm.datamodeler.editor.model;
 
+import org.jboss.errai.common.client.api.annotations.Portable;
+
+@Portable
 public class AnnotationMemberDefinitionTO {
 
     private String name;
@@ -10,9 +13,26 @@ public class AnnotationMemberDefinitionTO {
 
     private Object defaultValue;
 
-    private boolean array;
+    private boolean array = false;
 
-    private boolean className;
+    private String className;
+
+    private boolean enumMember = false;
+
+    private boolean primitiveType = false;
+
+    public AnnotationMemberDefinitionTO() {
+    }
+
+    public AnnotationMemberDefinitionTO(String name, String className, boolean primitiveType, boolean enumMember, Object defaultValue, String shortDescription, String description) {
+        this.name = name;
+        this.className = className;
+        this.primitiveType = primitiveType;
+        this.enumMember = enumMember;
+        this.defaultValue = defaultValue;
+        this.shortDescription = shortDescription;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -42,23 +62,25 @@ public class AnnotationMemberDefinitionTO {
         return defaultValue;
     }
 
-    public void setDefaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
+
+    public String getClassName() {
+        return className;
+    }
+    
+    public boolean isEnum() {
+        return enumMember;
+    }
+
+    public boolean isPrimitiveType() {
+        return primitiveType;
     }
 
     public boolean isArray() {
         return array;
     }
 
-    public void setArray(boolean array) {
-        this.array = array;
+    public boolean isString() {
+        return "java.lang.String".equals(className);
     }
 
-    public boolean isClassName() {
-        return className;
-    }
-
-    public void setClassName(boolean className) {
-        this.className = className;
-    }
 }

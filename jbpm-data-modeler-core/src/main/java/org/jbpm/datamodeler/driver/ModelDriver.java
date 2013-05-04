@@ -14,9 +14,9 @@ public interface ModelDriver {
 
     List<AnnotationDefinition> getConfiguredAnnotations();
 
-    AnnotationDefinition getConfiguredAnnotation(String annotationName);
+    AnnotationDefinition getConfiguredAnnotation(String annotationClass);
 
-    AnnotationDriver getAnnotationDriver(String annotationName);
+    AnnotationDriver getAnnotationDriver(String annotationClass);
 
     DataModel loadModel(IOService ioService, Collection<Path> rootPaths, boolean recursiveScan) throws IOException;
 

@@ -27,13 +27,6 @@ public class AbstractAnnotationDefinition implements AnnotationDefinition {
 
     protected boolean propertyAnnotation = false;
 
-    protected AbstractAnnotationDefinition(String name, String className, String shortDescription, String description) {
-        this.name = name;
-        this.className = className;
-        this.shortDescription = shortDescription;
-        this.description = description;
-    }
-
     protected AbstractAnnotationDefinition(String name, String className, String shortDescription, String description, boolean objectAnnotation, boolean propertyAnnotation) {
         this.name = name;
         this.className = className;
@@ -63,14 +56,14 @@ public class AbstractAnnotationDefinition implements AnnotationDefinition {
         return annotationMembers;
     }
 
-    protected void addMember(AnnotationMemberDefinition annotationMember) {
+    public void addMember(AnnotationMemberDefinition annotationMember) {
         annotationMembers.add(annotationMember);
         annotationMemberMap.put(annotationMember.getName(), annotationMember);
     }
 
     @Override
     public boolean isMarker() {
-        return annotationMembers != null && annotationMembers.size() > 0;
+        return annotationMembers == null || annotationMembers.size() == 0;
     }
 
     @Override

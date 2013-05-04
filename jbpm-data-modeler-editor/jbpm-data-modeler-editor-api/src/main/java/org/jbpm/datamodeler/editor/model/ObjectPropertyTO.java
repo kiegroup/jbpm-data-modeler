@@ -18,12 +18,11 @@ package org.jbpm.datamodeler.editor.model;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Portable
-public class ObjectPropertyTO implements Serializable {
+public class ObjectPropertyTO {
 
     private String className;
 
@@ -32,8 +31,12 @@ public class ObjectPropertyTO implements Serializable {
     private boolean multiple = false;
 
     private boolean baseType = true;
+    
+    private String bag;
 
     private List<AnnotationTO> annotations = new ArrayList<AnnotationTO>();
+    
+    private static final String DEFAULT_PROPERTY_BAG = "java.util.List";
 
     public ObjectPropertyTO() {
     }
@@ -43,8 +46,19 @@ public class ObjectPropertyTO implements Serializable {
         this.className = className;
         this.multiple = multiple;
         this.baseType = baseType;
+        if (multiple) {
+            this.bag = DEFAULT_PROPERTY_BAG;
+        }
     }
-    
+
+    public ObjectPropertyTO(String name, String className, boolean multiple, boolean baseType, String bag) {
+        this.name = name;
+        this.className = className;
+        this.multiple = multiple;
+        this.baseType = baseType;
+        this.bag = bag;
+    }
+
     public String getClassName() {
         return className;
     }
@@ -75,6 +89,14 @@ public class ObjectPropertyTO implements Serializable {
 
     public void setBaseType(boolean baseType) {
         this.baseType = baseType;
+    }
+
+    public String getBag() {
+        return bag;
+    }
+
+    public void setBag(String bag) {
+        this.bag = bag;
     }
 
     public List<AnnotationTO> getAnnotations() {

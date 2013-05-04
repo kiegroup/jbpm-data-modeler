@@ -12,6 +12,8 @@ public interface DataModelerService {
 
     Path createModel(Path context, String fileName);
 
+    Path resolveProject(Path path);
+
     DataModelTO loadModel(final Path path);
     
     void saveModel(DataModelTO dataModel, final Path path);

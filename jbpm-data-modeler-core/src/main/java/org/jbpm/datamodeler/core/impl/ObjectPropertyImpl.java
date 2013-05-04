@@ -27,11 +27,21 @@ public class ObjectPropertyImpl extends AbstractHasAnnotations implements Object
     private String bag;
     
     private boolean multiple;
+    
+    private static final String DEFAULT_PROPERTY_BAG = "java.util.List";
 
     public ObjectPropertyImpl(String name, String className, boolean multiple) {
         this.name = name;
         this.className = className;
-        setMultiple(multiple);
+        this.bag = DEFAULT_PROPERTY_BAG;
+        this.multiple = multiple;
+    }
+
+    public ObjectPropertyImpl(String name, String className, boolean multiple, String bag) {
+        this.name = name;
+        this.className = className;
+        this.multiple = multiple;
+        this.bag = bag;
     }
 
     @Override
@@ -60,16 +70,14 @@ public class ObjectPropertyImpl extends AbstractHasAnnotations implements Object
     @Override
     public void setMultiple(boolean multiple) {
         this.multiple = multiple;
-        if (multiple) {
-            setBag("java.util.List");
-        } else {
+        if (!multiple) {
             setBag(null);
         }
     }
 
     @Override
     public boolean isArray() {
-        //TODO check this
+        //TODO check this when array support will be added
         return getClassName() != null && className.endsWith("[]");
     }
 

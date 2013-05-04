@@ -3,6 +3,7 @@ package org.jbpm.datamodeler.editor.model;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Portable
@@ -15,6 +16,8 @@ public class AnnotationDefinitionTO {
     private boolean marker;
 
     private String shortDescription;
+    
+    private String description;
 
     private boolean objectAnnotation;
 
@@ -32,7 +35,19 @@ public class AnnotationDefinitionTO {
     
     public static final String VALUE_PARAM = "value";
 
-    private List<AnnotationMemberDefinitionTO> annotationMembers;
+    private List<AnnotationMemberDefinitionTO> annotationMembers = new ArrayList<AnnotationMemberDefinitionTO>();
+
+    public AnnotationDefinitionTO() {
+    }
+
+    public AnnotationDefinitionTO(String name, String className, String shortDescription, String description, boolean objectAnnotation, boolean propertyAnnotation) {
+        this.name = name;
+        this.className = className;
+        this.shortDescription = shortDescription;
+        this.description = description;
+        this.objectAnnotation = objectAnnotation;
+        this.propertyAnnotation = propertyAnnotation;
+    }
 
     public String getName() {
         return name;
@@ -51,7 +66,7 @@ public class AnnotationDefinitionTO {
     }
 
     public boolean isMarker() {
-        return marker;
+        return annotationMembers == null || annotationMembers.size() == 0;
     }
 
     public void setMarker(boolean marker) {
@@ -59,7 +74,7 @@ public class AnnotationDefinitionTO {
     }
 
     public boolean getMarker() {
-        return marker;
+        return isMarker();
     }
 
     public List<AnnotationMemberDefinitionTO> getAnnotationMembers() {
@@ -88,5 +103,17 @@ public class AnnotationDefinitionTO {
 
     public void setPropertyAnnotation(boolean propertyAnnotation) {
         this.propertyAnnotation = propertyAnnotation;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void addMember(AnnotationMemberDefinitionTO memberDefinitionTO) {
+        annotationMembers.add(memberDefinitionTO);
     }
 }

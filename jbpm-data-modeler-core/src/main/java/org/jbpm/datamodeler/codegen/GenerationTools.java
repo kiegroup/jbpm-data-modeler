@@ -16,14 +16,17 @@
 
 package org.jbpm.datamodeler.codegen;
 
-import org.jbpm.datamodeler.core.ObjectProperty;
+import org.jbpm.datamodeler.core.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Helper tools to generate names easily from code generation engine.
+ * Helper tools to generate names and other stuff easily from code generation engine.
  */
 public class GenerationTools {
 
-
+    private static final Logger logger = LoggerFactory.getLogger(GenerationTools.class);
+    
     public String fitToSize(int size, String name, char padChar) {
         int n = size - name.length();
 
@@ -115,6 +118,83 @@ public class GenerationTools {
         type.append(attribute.getClassName());
         if (attribute.isMultiple()) {
             type.append(">");
+        }
+        return type.toString();
+    }
+
+    public String resolveAnnotationType (Annotation annotation) {
+        StringBuffer type = new StringBuffer();
+        AnnotationDefinition annotationDefinition = annotation.getAnnotationDefinition();
+
+        if (annotationDefinition == null) {
+            logger.warn("Annotation definition for annotation: " + annotation + " is not defined.");
+            return type.toString();
+        }
+        
+        if (annotationDefinition.isMarker()) {
+            return type.toString();
+        }
+
+        //finally we can process annotation members.
+        Object memberValue;
+        int memberCount = 0;
+        for (AnnotationMemberDefinition memberDefinition : annotationDefinition.getAnnotationMembers()) {
+            if ( (memberValue = annotation.getValue(memberDefinition.getName())) != null) {
+                //a value has been set for this member.
+                if (memberCount == 0) type.append("(");
+                if (memberCount > 0) type.append(", ");
+                type.append(resolveMemberType(memberDefinition, memberValue));
+                memberCount++;
+            }
+        }
+        if (memberCount > 0) type.append(")");
+
+        return type.toString();
+    }
+    
+    public String resolveMemberType(AnnotationMemberDefinition memberDefinition, Object value) {
+        StringBuffer type = new StringBuffer();
+
+        type.append(memberDefinition.getName());
+        type.append(" = ");
+
+        if (memberDefinition.isEnum()) {
+            type.append(memberDefinition.getClassName());
+            type.append(".");
+            type.append(value);
+        } else if (memberDefinition.isString()) {
+            type.append("\"");
+            type.append(value);
+            type.append("\"");
+        } else if (memberDefinition.isPrimitiveType()) {
+            //primitive types are wrapped by the java.lang.type.
+
+            if (Character.class.getName().equals(memberDefinition.getClassName())) {
+                type.append("'");
+                type.append(value.toString());
+                type.append("'");
+            } else if (Long.class.getName().equals(memberDefinition.getClassName())) {
+                type.append(value.toString());
+                type.append("L");
+            } else if (Float.class.getName().equals(memberDefinition.getClassName())) {
+                type.append(value.toString());
+                type.append("f");
+            } else if (Double.class.getName().equals(memberDefinition.getClassName())) {
+                type.append(value.toString());
+                type.append("d");
+            } else {
+                type.append(value.toString());
+            }
+
+        }
+        return type.toString();
+    }
+    
+    public String resolveSuperClassType(DataObject dataObject) {
+        StringBuffer type = new StringBuffer("");
+        if (dataObject.getSuperClassName() != null && !"".equals(dataObject.getSuperClassName())) {
+            type.append("extends ");
+            type.append(dataObject.getSuperClassName());
         }
         return type.toString();
     }

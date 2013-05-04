@@ -18,12 +18,11 @@ package org.jbpm.datamodeler.editor.model;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Portable
-public class DataObjectTO implements Serializable {
+public class DataObjectTO {
 
     /*
      * Data objects that was read form persistent status, .java files.

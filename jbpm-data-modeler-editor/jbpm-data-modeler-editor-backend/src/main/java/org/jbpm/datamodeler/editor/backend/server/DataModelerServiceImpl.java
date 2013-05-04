@@ -30,10 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.client.workbench.widgets.events.ResourceAddedEvent;
-import org.uberfire.client.workbench.widgets.events.ResourceDeletedEvent;
-import org.uberfire.client.workbench.widgets.events.ResourceOpenedEvent;
-import org.uberfire.client.workbench.widgets.events.ResourceUpdatedEvent;
+import org.uberfire.client.workbench.widgets.events.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -75,16 +72,7 @@ public class DataModelerServiceImpl implements DataModelerService {
     private Event<InvalidateDMOProjectCacheEvent> invalidateDMOProjectCache;
 
     @Inject
-    private Event<ResourceOpenedEvent> resourceOpenedEvent;
-
-    @Inject
-    private Event<ResourceAddedEvent> resourceAddedEvent;
-
-    @Inject
-    private Event<ResourceUpdatedEvent> resourceUpdatedEvent;
-
-    @Inject
-    private Event<ResourceDeletedEvent> resourceDeletedEventEvent;
+    private Event<ResourceBatchChangesEvent> resourceBatchChangesEvent;
 
 
     public DataModelerServiceImpl() {
@@ -103,21 +91,6 @@ public class DataModelerServiceImpl implements DataModelerService {
             if (logger.isDebugEnabled()) logger.debug("Current project path is: " + projectPath);
 
             dataModel = new DataModelImpl();
-            //TODO improve this. With current DataModelOracle implementation
-            //we need to read every package individually
-            
-            /*
-            List<Path> packages = calculateProjectPackages(ioService, projectPath);
-
-            for (Path packageDir : packages) {
-                String defaultPackageName = calculateDefaultPackageName(packageDir);
-                //consume the DataModelOracle for each existing project package
-                DataModelOracle dataModelOracle = dataModelService.getDataModel(packageDir);
-            
-                DataModelOracleDriver driver = new DataModelOracleDriver();
-                driver.addOracleModel(dataModel, dataModelOracle, defaultPackageName);
-            }
-            */
 
             ProjectDataModelOracle projectDataModelOracle = dataModelService.getProjectDataModel(projectPath);
             DataModelOracleDriver driver = new DataModelOracleDriver();
@@ -178,21 +151,27 @@ public class DataModelerServiceImpl implements DataModelerService {
 
     private void notifyFileChanges(List<FileChangeDescriptor> fileChanges) {
 
+        //keep this class FileChangeDescriptor and this iteration until we are sure we don't need to manage
+        //any other information that can't be stored in the ResourceChange definition.
+        Set<ResourceChange> batchChanges = new HashSet<ResourceChange>();
         for (FileChangeDescriptor fileChange : fileChanges) {
             switch (fileChange.action) {
                 case FileChangeDescriptor.ADD:
                     logger.debug("Notifying file created: " + fileChange.getPath());
-                    resourceAddedEvent.fire(new ResourceAddedEvent(fileChange.getPath()));
+                    batchChanges.add(new ResourceChange(ChangeType.ADD, fileChange.getPath()));
                     break;
                 case FileChangeDescriptor.DELETE:
                     logger.debug("Notifying file deleted: " + fileChange.getPath());
-                    resourceDeletedEventEvent.fire(new ResourceDeletedEvent(fileChange.getPath()));
+                    batchChanges.add(new ResourceChange(ChangeType.DELETE, fileChange.getPath()));
                     break;
                 case FileChangeDescriptor.UPDATE:
                     logger.debug("Notifying file updated: " + fileChange.getPath());
-                    resourceUpdatedEvent.fire(new ResourceUpdatedEvent(fileChange.getPath()));
+                    batchChanges.add(new ResourceChange(ChangeType.UPDATE, fileChange.getPath()));
                     break;
             }
+        }
+        if (batchChanges.size() > 0) {
+            resourceBatchChangesEvent.fire(new ResourceBatchChangesEvent(batchChanges));
         }
     }
 
@@ -256,6 +235,11 @@ public class DataModelerServiceImpl implements DataModelerService {
         //with the last definition we never create a model file.
 
         return null;
+    }
+
+    @Override
+    public Path resolveProject(Path path) {
+        return projectService.resolveProject(path);
     }
 
     public List<PropertyTypeTO> getBasePropertyTypes() {

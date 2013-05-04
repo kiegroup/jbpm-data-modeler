@@ -30,14 +30,26 @@ import java.lang.annotation.Target;
     ElementType.PACKAGE})
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TestAnnotation {
+public @interface TestTypesAnnotation {
 
-    String name() default "";
+    String stringValue() default "";
     
-    String[] children() default {"child1, child2, child3"};
-    
-    int size() default 0;
+    byte byteValue() default 0;
 
-    boolean enabled() default false;
+    short shortValue() default 0;
+
+    int intValue() default 0;
+
+    long longValue() default 0;
+
+    float floatValue() default 0;
+
+    double doubleValue() default 0;
+
+    char charValue() default '\u0000';
+
+    boolean booleanValue() default false;
+
+    ElementType enumValue() default ElementType.TYPE;
 
 }

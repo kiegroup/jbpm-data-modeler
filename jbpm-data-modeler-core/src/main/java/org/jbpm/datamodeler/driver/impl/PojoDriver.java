@@ -8,6 +8,7 @@ import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.impl.DataModelImpl;
 import org.jbpm.datamodeler.driver.AnnotationDriver;
 import org.jbpm.datamodeler.driver.ModelDriver;
+import org.jbpm.datamodeler.driver.impl.annotations.EqualsAnnotationDefinition;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Path;
@@ -27,10 +28,6 @@ public class PojoDriver implements ModelDriver {
 
     public PojoDriver() {
         AnnotationDefinition annotationDefinition;
-
-        annotationDefinition = new DataObjectAnnotationDefinition();
-        configuredAnnotations.put(annotationDefinition.getName(), annotationDefinition);
-        configuredAnnotationsDriver.put(annotationDefinition.getName(), new DefaultAnnotationDriver());
 
         annotationDefinition = new EqualsAnnotationDefinition();
         configuredAnnotations.put(annotationDefinition.getName(), annotationDefinition);
@@ -64,9 +61,6 @@ public class PojoDriver implements ModelDriver {
 
             }
         }
-
-
-                
 
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }

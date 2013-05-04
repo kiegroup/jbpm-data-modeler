@@ -2,10 +2,8 @@ package org.jbpm.datamodeler.editor.model;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
-import java.io.Serializable;
-
 @Portable
-public class PropertyTypeTO implements Serializable {
+public class PropertyTypeTO {
 
     private String name;
 

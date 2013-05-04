@@ -45,10 +45,14 @@ public class HomePerspective {
 
     @Inject
     private NewResourcesMenu newResourcesMenu;
+
     @Inject
     private PlaceManager placeManager;
 
     private Menus menus;
+
+    @Inject
+    private ToolsMenu toolsMenu;
 
     @PostConstruct
     public void init() {
@@ -77,8 +81,15 @@ public class HomePerspective {
     }
 
     private void buildMenuBar() {
+        /*
         this.menus = MenuFactory.newTopLevelMenu("New")
                 .withItems(newResourcesMenu.getMenuItems())
                 .endMenu().build();
+        */
+
+        this.menus = MenuFactory.newTopLevelMenu("Tools")
+                .withItems(toolsMenu.getMenuItems())
+                .endMenu().build();
+
     }
 }

@@ -14,13 +14,16 @@ public class AnnotationMemberDefinitionImpl implements AnnotationMemberDefinitio
     
     private Object defaultValue;
 
-    public AnnotationMemberDefinitionImpl(String name, String className, String shortDescription, String description) {
-        this(name, className, null, shortDescription, description);
+    private boolean enumMember = false;
+
+    public AnnotationMemberDefinitionImpl(String name, String className, boolean enumMember, String shortDescription, String description) {
+        this(name, className, enumMember, null, shortDescription, description);
     }
 
-    public AnnotationMemberDefinitionImpl(String name, String className, Object defaultValue, String shortDescription, String description) {
+    public AnnotationMemberDefinitionImpl(String name, String className, boolean enumMember, Object defaultValue, String shortDescription, String description) {
         this.name = name;
         this.className = className;
+        this.enumMember = enumMember;
         this.defaultValue = defaultValue;
         this.shortDescription = shortDescription;
         this.description = description;
@@ -67,9 +70,35 @@ public class AnnotationMemberDefinitionImpl implements AnnotationMemberDefinitio
     }
 
     @Override
-    public boolean isArray() {
+    public boolean isPrimitiveType() {
 
-        //TODO check this
-        return getClassName() != null && className.endsWith("[]");
+        //returns true for: byte, short, int, long, float, double, char, boolean
+
+        return
+                Byte.class.getName().equals(className) ||
+                Short.class.getName().equals(className) ||
+                Integer.class.getName().equals(className) ||
+                Long.class.getName().equals(className) ||
+                Float.class.getName().equals(className) ||
+                Double.class.getName().equals(className) ||
+                Character.class.getName().equals(className) ||
+                Boolean.class.getName().equals(className);
+    }
+
+    @Override
+    public boolean isString() {
+        return String.class.getName().equals(className);
+    }
+
+    @Override
+    public boolean isEnum() {
+        return enumMember;
+    }
+
+    @Override
+    public boolean isArray() {
+        //return getClassName() != null && className.endsWith("[]");
+        //not supported yet.
+        return false;
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 public interface AnnotationDefinition extends HasClassName {
 
     /**
-     * Annotation unique identifier e.g. @DataObject, @Equals, @Entity, @Column
+     * Annotation name e.g. @DataObject, @Equals, @Entity, @Column
      *
      * @return
      */
