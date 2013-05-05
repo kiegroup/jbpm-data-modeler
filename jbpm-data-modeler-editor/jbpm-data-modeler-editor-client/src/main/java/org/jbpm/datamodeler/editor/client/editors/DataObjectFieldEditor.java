@@ -92,6 +92,7 @@ public class DataObjectFieldEditor extends Composite {
     // event notifications
 
     private void notifyFieldChange(String memberName, Object oldValue, Object newValue) {
+        // TODO getDataModel().getHelper().dataModelChanged();
         dataModelerEventEvent.fire(new DataObjectFieldChangeEvent(DataModelerEvent.DATA_OBJECT_FIELD_EDITOR, getDataModel(), getDataObject(), getObjectField(), memberName, oldValue, newValue));
     }
 

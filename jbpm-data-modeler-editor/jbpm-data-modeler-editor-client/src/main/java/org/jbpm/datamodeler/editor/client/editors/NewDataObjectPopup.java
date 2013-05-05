@@ -194,6 +194,7 @@ public class NewDataObjectPopup extends Modal {
     }
 
     private void notifyObjectCreated(DataObjectTO createdObjectTO) {
+        getDataModel().getHelper().dataObjectCreated(createdObjectTO.getClassName());
         dataModelerEvent.fire(new DataObjectCreatedEvent(DataModelerEvent.NEW_DATA_OBJECT_POPUP, getDataModel(), createdObjectTO));
         notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(createdObjectTO.getName())));
     }

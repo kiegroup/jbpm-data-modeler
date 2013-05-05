@@ -102,7 +102,7 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
             if (logger.isDebugEnabled()) logger.debug("Saving data model: " + dataModel.getName() + " into path: " + path);
 
             //convert to the domain model
-            DataModel dataModelDomain = DataModelHelper.getInstance().to2Domain(dataModel);
+            DataModel dataModelDomain = DataModelerServiceHelper.getInstance().to2Domain(dataModel);
 
             XMLSerializer serializer = new XMLSerializerImpl();
             String content = serializer.serialize(dataModelDomain);
@@ -155,7 +155,7 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
 
 
             //Objects readed from persistent .java format are tagged as PERSISTENT objects
-            DataModelTO dataModelTO = DataModelHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
+            DataModelTO dataModelTO = DataModelerServiceHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
             //dataModelTO.setDefaultPackage(defaultPackageName);
 
             //printProjectDataModelOracle(path);
@@ -174,7 +174,7 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
 
         try {
             //convert to domain model
-            DataModel dataModelDomain = DataModelHelper.getInstance().to2Domain(dataModel);
+            DataModel dataModelDomain = DataModelerServiceHelper.getInstance().to2Domain(dataModel);
 
             //get the path to project root directory (the main pom.xml directory) and calculate
             //the java sources path

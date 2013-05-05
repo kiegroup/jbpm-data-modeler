@@ -40,14 +40,8 @@ import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
-import org.jbpm.datamodeler.editor.events.DataModelerEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectFieldDeletedEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectFieldSelectedEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
-import org.jbpm.datamodeler.editor.model.DataModelTO;
-import org.jbpm.datamodeler.editor.model.DataObjectTO;
-import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
-import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
+import org.jbpm.datamodeler.editor.events.*;
+import org.jbpm.datamodeler.editor.model.*;
 import org.uberfire.client.common.ErrorPopup;
 
 import javax.annotation.PostConstruct;
@@ -290,8 +284,6 @@ public class DataObjectBrowser extends Composite {
                     public void onSuccess() {
                         ObjectPropertyTO property = new ObjectPropertyTO(propertyName, propertyType, multiple, baseType);
                         addDataObjectProperty(property);
-                        if (!baseType)
-                            validatorService.notifyDataObjectReferenced(property.getClassName(), dataObject.getClassName());
                     }
                 });
             }
@@ -353,6 +345,9 @@ public class DataObjectBrowser extends Composite {
 
     private void addDataObjectProperty(ObjectPropertyTO objectProperty) {
         dataObject.getProperties().add(objectProperty);
+
+        if (!objectProperty.isBaseType()) getDataModel().getHelper().dataObjectReferenced(objectProperty.getClassName(), dataObject.getClassName());
+
         dataObjectPropertiesProvider.getList().add(objectProperty);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
@@ -362,10 +357,12 @@ public class DataObjectBrowser extends Composite {
     private void deleteDataObjectProperty(ObjectPropertyTO objectProperty, int index) {
         
         dataObject.getProperties().remove(objectProperty);
+
+        getDataModel().getHelper().dataObjectUnReferenced(objectProperty.getClassName(), dataObject.getClassName());
+
         dataObjectPropertiesProvider.getList().remove(index);
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
-        validatorService.notifyDataObjectUnReferenced(objectProperty.getClassName(), dataObject.getClassName());
         notifyFieldDeleted(objectProperty);
 
     }
@@ -445,6 +442,13 @@ public class DataObjectBrowser extends Composite {
         }
     }
 
+    private void onDataObjectCreated(@Observes DataObjectCreatedEvent event) {
+        if (newPropertyDataObjectType.getValue()) populateObjectTypes();
+    }
+
+    private void onDataObjectDeleted(@Observes DataObjectDeletedEvent event) {
+        if (newPropertyDataObjectType.getValue()) populateObjectTypes();
+    }
 
     // Event notifications
     private void notifyFieldSelected(ObjectPropertyTO selectedPropertyTO) {

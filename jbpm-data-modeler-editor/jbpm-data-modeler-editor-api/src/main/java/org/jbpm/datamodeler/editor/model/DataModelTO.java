@@ -42,6 +42,8 @@ public class DataModelTO {
     
     private String defaultPackage;
 
+    private DataModelHelper helper;
+
     public DataModelTO() {
     }
 
@@ -110,6 +112,14 @@ public class DataModelTO {
 
     public void setExternalClasses(List<String> externalClasses) {
         this.externalClasses = externalClasses;
+    }
+
+    public DataModelHelper getHelper() {
+        return helper;
+    }
+
+    public void setHelper(DataModelHelper helper) {
+        this.helper = helper;
     }
 }
 

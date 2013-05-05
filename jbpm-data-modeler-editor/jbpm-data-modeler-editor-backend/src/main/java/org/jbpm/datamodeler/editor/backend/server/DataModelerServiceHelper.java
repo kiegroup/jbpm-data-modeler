@@ -6,12 +6,13 @@ import org.jbpm.datamodeler.core.impl.*;
 import org.jbpm.datamodeler.editor.model.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class DataModelHelper {
+public class DataModelerServiceHelper {
 
-    public static DataModelHelper getInstance() {
-        return new DataModelHelper();
+    public static DataModelerServiceHelper getInstance() {
+        return new DataModelerServiceHelper();
     }
 
     public DataModel to2Domain(DataModelTO dataModelTO) {
@@ -45,6 +46,8 @@ public class DataModelHelper {
                 dataModelTO.getDataObjects().add(dataObjectTO);
             }
         }
+
+        dataModelTO.setExternalClasses(Arrays.asList("external.Class1", "external.Class2"));
         return dataModelTO;
     }
 

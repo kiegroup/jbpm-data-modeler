@@ -98,7 +98,7 @@ public class DataModelerServiceImpl implements DataModelerService {
             driver.addOracleModel(dataModel, projectDataModelOracle);
 
             //Objects read from persistent .java format are tagged as PERSISTENT objects
-            DataModelTO dataModelTO = DataModelHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
+            DataModelTO dataModelTO = DataModelerServiceHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
             dataModelTO.setDefaultPackage(DEFAULT_GUVNOR_PKG);
 
             printProjectDataModelOracle(path);
@@ -127,7 +127,7 @@ public class DataModelerServiceImpl implements DataModelerService {
             List<FileChangeDescriptor> fileChanges = cleanupFiles(dataModel, javaPath);
 
             //convert to domain model
-            DataModel dataModelDomain = DataModelHelper.getInstance().to2Domain(dataModel);
+            DataModel dataModelDomain = DataModelerServiceHelper.getInstance().to2Domain(dataModel);
 
             GenerationContext generationContext = new GenerationContext(dataModelDomain);
             ServiceGenerationListener generationListener = new ServiceGenerationListener(javaPath);

@@ -94,6 +94,7 @@ public class DataObjectEditor extends Composite {
         if (event.isFrom(getDataModel())) {
             //TODO populate all the fields, etc.
             setDataObject(event.getCurrentDataObject());
+            superclassSelector.setDataObject(event.getCurrentDataObject());
             name.setText(getDataObject().getName());
             description.setText(getDataObject().getClassName());
         }
@@ -124,6 +125,7 @@ public class DataObjectEditor extends Composite {
 
     // event notifications
     private void notifyObjectChange(String memberName, Object oldValue, Object newValue) {
+        getDataModel().getHelper().dataModelChanged();
         dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
     }
 
@@ -145,29 +147,40 @@ public class DataObjectEditor extends Composite {
             return;
         }
         // Otherwise validate
-        validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
+        validatorService.canChangeObjectName(getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
-                ep.showMessage("Invalid data object identifier: " + newValue + " is not a valid Java identifier");
+                ep.showMessage("Cannot change this object's name because it is being referenced from other DataObjects");
             }
 
             @Override
             public void onSuccess() {
-                validatorService.isUniqueEntityName(packageName, newValue, getDataModel(), new ValidatorCallback() {
+                validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
                     @Override
                     public void onFailure() {
-                        ep.showMessage("A data object with identifier: " + newValue + " already exists in the model.");
+                        ep.showMessage("Invalid data object identifier: " + newValue + " is not a valid Java identifier");
                     }
 
                     @Override
                     public void onSuccess() {
-                        titleLabel.setStyleName(null);
-                        dataObject.setName(newValue);
-                        notifyObjectChange("name", oldValue, getDataObject().getName());
+                        validatorService.isUniqueEntityName(packageName, newValue, getDataModel(), new ValidatorCallback() {
+                            @Override
+                            public void onFailure() {
+                                ep.showMessage("A data object with identifier: " + newValue + " already exists in the model.");
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                titleLabel.setStyleName(null);
+                                dataObject.setName(newValue);
+                                notifyObjectChange("name", oldValue, getDataObject().getName());
+                            }
+                        });
                     }
                 });
             }
         });
+
     }
 
     private class DataObjectEditorErrorPopup extends ErrorPopup {

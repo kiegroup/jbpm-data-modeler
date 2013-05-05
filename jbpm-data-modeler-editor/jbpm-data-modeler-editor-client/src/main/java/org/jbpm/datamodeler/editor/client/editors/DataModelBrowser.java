@@ -292,7 +292,7 @@ public class DataModelBrowser extends Composite {
 
     private void deleteDataObject(final DataObjectTO dataObjectTO, final int index) {
 
-        validatorService.isDataObjectDeletable(dataObjectTO, new ValidatorCallback() {
+        validatorService.canDeleteDataObject(dataObjectTO, getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
                 ErrorPopup.showMessage("The data object with identifier: " + dataObjectTO.getName() + " cannot be deleted because it is still referenced within the model.");
@@ -301,14 +301,12 @@ public class DataModelBrowser extends Composite {
             @Override
             public void onSuccess() {
                 getDataModel().removeDataObject(dataObjectTO);
-                validatorService.notifyDataObjectDeleted(dataObjectTO.getClassName());
 
                 dataObjectsProvider.getList().remove(index);
                 dataObjectsProvider.flush();
                 dataObjectsProvider.refresh();
 
                 notifyObjectDeleted(dataObjectTO);
-                
             }
         });
     }
@@ -356,6 +354,7 @@ public class DataModelBrowser extends Composite {
     }
 
     private void notifyObjectDeleted(DataObjectTO dataObject) {
+        getDataModel().getHelper().dataObjectDeleted(dataObject.getClassName());
         dataModelerEvent.fire(new DataObjectDeletedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataObject));
         notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObject.getName())));
     }
