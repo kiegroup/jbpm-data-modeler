@@ -6,21 +6,21 @@
 
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
 
-    <gwt:HTMLPanel styleName="well container span8 row-fluid">
+    <gwt:HTMLPanel styleName="well container row-fluid">
 
         <table class="row-fluid span12">
             <thead>
                 <tr>
-                    <td>
+                    <td style="white-space: nowrap; font-weight: bold;">
                         <gwt:Label ui:field="nameColumnHeader" text="Name"></gwt:Label>
                     </td>
-                    <td>
+                    <td style="white-space: nowrap; font-weight: bold;">
                         <gwt:Label ui:field="valueColumnHeader" text="Value"></gwt:Label>
                     </td>
                 </tr>
             </thead>
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <gwt:Label ui:field="titleLabel" text="Name"  />
                 </td>
                 <td>
@@ -29,7 +29,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <gwt:Label ui:field="shortNameLabel" text="Short name"  />
                 </td>
                 <td>
@@ -38,7 +38,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <gwt:Label ui:field="descriptionLabel" text="Description"  />
                 </td>
                 <td>
@@ -47,7 +47,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <gwt:Label ui:field="packageNameLabel" text="Package"  />
                 </td>
                 <td>
@@ -58,7 +58,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <gwt:Label ui:field="superclassLabel" text="Superclass"  />
                 </td>
                 <td>
@@ -67,7 +67,7 @@
             </tr>
 
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <gwt:Label ui:field="roleLabel" text="Role"  />
                 </td>
                 <td>
