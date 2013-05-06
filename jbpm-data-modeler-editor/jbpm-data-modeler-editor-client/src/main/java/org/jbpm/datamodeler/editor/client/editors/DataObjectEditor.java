@@ -86,6 +86,7 @@ public class DataObjectEditor extends Composite {
 
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+        superclassSelector.setDataModel(dataModel);
     }
 
     // event Observers

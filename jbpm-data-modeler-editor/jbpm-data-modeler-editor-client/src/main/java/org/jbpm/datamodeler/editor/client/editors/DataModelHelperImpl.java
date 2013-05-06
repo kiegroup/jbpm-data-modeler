@@ -1,17 +1,12 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
-import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectCreatedEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelHelper;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 
-import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.*;
 
@@ -43,11 +38,8 @@ public class DataModelHelperImpl extends DataModelHelper {
         return true;
     }
 
-    public List<String> getExclusiveClassList() {
-        List<String> classNames = new ArrayList<String>(this.classNames.size());
-        classNames.addAll(this.classNames);
-        if (currentDataObject != null) classNames.remove(currentDataObject.getClassName());
-        return classNames;
+    public List<String> getClassList() {
+        return Collections.unmodifiableList(classNames);
     }
 
     // TODO change from listener methods to event observers

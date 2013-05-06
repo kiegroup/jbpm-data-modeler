@@ -115,6 +115,7 @@ public class NewDataObjectPopup extends Modal {
 
     public void setDataObject(DataObjectTO dataObject) {
         this.dataObject = dataObject;
+        superclassSelector.setDataObject(dataObject);
     }
 
     public DataModelTO getDataModel() {
@@ -123,6 +124,7 @@ public class NewDataObjectPopup extends Modal {
 
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+        superclassSelector.setDataModel(dataModel);
     }
 
     private void onOk() {

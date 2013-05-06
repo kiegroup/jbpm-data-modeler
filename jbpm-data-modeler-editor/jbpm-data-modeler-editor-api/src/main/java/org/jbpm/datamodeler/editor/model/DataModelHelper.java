@@ -24,5 +24,5 @@ public class DataModelHelper {
 
     public Boolean objectCanBeDeleted(String className) {return Boolean.FALSE;}
 
-    public List<String> getExclusiveClassList() {return null;}
+    public List<String> getClassList() {return null;}
 }
