@@ -204,6 +204,7 @@ public class DataModelBrowser extends Composite {
         this.dataModel = dataModel;
         this.dataObjects = dataModel.getDataObjects();
         modelName.setText(dataModel.getName());
+//        newDataObjectPopup.setDataModel(getDataModel());
 
 
         //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows

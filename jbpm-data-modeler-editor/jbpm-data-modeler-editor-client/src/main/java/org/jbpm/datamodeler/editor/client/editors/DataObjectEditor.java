@@ -10,6 +10,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
+import org.jboss.errai.bus.client.api.RemoteCallback;
+import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
+import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
@@ -19,13 +22,14 @@ import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectDeletedEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
-import org.jbpm.datamodeler.editor.model.DataModelTO;
-import org.jbpm.datamodeler.editor.model.DataObjectTO;
+import org.jbpm.datamodeler.editor.model.*;
+import org.jbpm.datamodeler.editor.service.DataModelerService;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import java.util.Map;
 
 public class DataObjectEditor extends Composite {
 
@@ -43,7 +47,7 @@ public class DataObjectEditor extends Composite {
     Label titleLabel;
 
     @UiField
-    TextBox shortName;
+    TextBox label;
 
     @UiField
     TextArea description;
@@ -62,6 +66,9 @@ public class DataObjectEditor extends Composite {
 
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
+
+    @Inject
+    private Caller<DataModelerService> modelerService;
 
     DataObjectTO dataObject;
 
@@ -96,44 +103,42 @@ public class DataObjectEditor extends Composite {
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
         superclassSelector.setDataModel(dataModel);
+
+        //como me registro para saber el cambio en la clase:
+        //todo en el lugar que toque.
+//        superclassSelector.getSuperclassList().addChangeHandler(null);
     }
 
     // event Observers
     private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
-
         if (event.isFrom(getDataModel())) {
-            //TODO populate all the fields, etc.
-            setDataObject(event.getCurrentDataObject());
-            superclassSelector.setDataObject(event.getCurrentDataObject());
-            name.setText(getDataObject().getName());
-            description.setText(getDataObject().getClassName());
+            loadDataObject(event.getCurrentDataObject());
         }
     }
 
-    //como me registro para saber el cambio en la clase:
-
-    //todo en el lugar que toque.
-//        superclassSelector.getSuperclassList().addChangeHandler(null);
-
     private void loadDataObject(DataObjectTO dataObject) {
-        //TODO
-        //Cargar el objeto correctamente.
-
-    }
-
-
-    private void onDataObjectDeleted(@Observes DataObjectDeletedEvent event) {
-        //when all objects from current model was deleted clean
-        if (event.isFrom(getDataModel())) {
-            if (getDataModel().getDataObjects().size() == 0) {
-                //TODO, when we clean this editor dataObject must be set to null
-                name.setText(null);
-                description.setText(null);
+        clean();
+        if (dataObject != null) {
+            setDataObject(dataObject);
+            superclassSelector.setDataObject(dataObject);
+            name.setText(dataObject.getName());
+            AnnotationTO labelAnnotation = dataObject.getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
+            if (labelAnnotation != null) {
+                label.setText(labelAnnotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
             }
         }
     }
 
-    // event notifications
+    private void onDataObjectDeleted(@Observes DataObjectDeletedEvent event) {
+        // When all objects from current model have been deleted clean
+        if (event.isFrom(getDataModel())) {
+            if (getDataModel().getDataObjects().size() == 0) {
+                clean();
+            }
+        }
+    }
+
+    // Event notifications
     private void notifyObjectChange(String memberName, Object oldValue, Object newValue) {
         getDataModel().getHelper().dataModelChanged();
         dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
@@ -190,7 +195,40 @@ public class DataObjectEditor extends Composite {
                 });
             }
         });
+    }
 
+
+    @UiHandler("label")
+    void labelChanged(final ValueChangeEvent<String> event) {
+        final String _label = label.getValue();
+        AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
+
+        if (annotation != null) {
+            if ( _label != null && !"".equals(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM)) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _label);
+            else getDataObject().removeAnnotation(annotation);
+        } else {
+            if ( _label != null && !"".equals(_label) ) {
+                modelerService.call(
+                    new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
+                        @Override
+                        public void callback(Map<String, AnnotationDefinitionTO> defs) {
+                            AnnotationDefinitionTO def = defs.get(AnnotationDefinitionTO.LABEL_ANNOTATION);
+                            AnnotationTO annotation = new AnnotationTO(def);
+                            annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _label);
+                            getDataObject().addAnnotation(annotation);
+                        }
+                    },
+                    new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
+                ).getAnnotationDefinitions();
+            }
+        }
+    }
+
+    private void clean() {
+        name.setText(null);
+        label.setText(null);
+        description.setText(null);
+        // TODO selectors
     }
 
     private class DataObjectEditorErrorPopup extends ErrorPopup {

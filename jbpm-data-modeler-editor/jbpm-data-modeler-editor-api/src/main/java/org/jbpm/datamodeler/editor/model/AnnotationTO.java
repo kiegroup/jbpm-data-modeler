@@ -21,6 +21,8 @@ public class AnnotationTO {
 
     public AnnotationTO(AnnotationDefinitionTO annotationDefinition) {
         this.annotationDefinition = annotationDefinition;
+        this.className = annotationDefinition.getClassName();
+        this.name = annotationDefinition.getName();
     }
 
     public Object getValue(String annotationMemberName) {
