@@ -31,10 +31,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
-import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.*;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -202,6 +199,8 @@ public class DataObjectBrowser extends Composite {
         propertyNameColHandler.setComparator(propertyNameColumn, new ObjectPropertyComparator("name"));
         dataObjectPropertiesTable.addColumnSortHandler(propertyNameColHandler);
 
+
+        //Init property type column
         final Column<ObjectPropertyTO, String> propertyTypeColumn = new Column<ObjectPropertyTO, String>(typeCell)  {
 
             @Override
@@ -320,8 +319,6 @@ public class DataObjectBrowser extends Composite {
             public void onSelectionChange(SelectionChangeEvent event) {
                 ObjectPropertyTO selectedPropertyTO = ((SingleSelectionModel<ObjectPropertyTO>)dataObjectPropertiesTable.getSelectionModel()).getSelectedObject();
                 notifyFieldSelected(selectedPropertyTO);
-                //Command selectCommand = modelEditorPresenter.createSelectCommand(selectedPropertyTO);
-                //selectCommand.execute();
             }
         });
 
@@ -335,7 +332,7 @@ public class DataObjectBrowser extends Composite {
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
 
-        dataObjectPropertiesTable.getColumnSortList().push(dataObjectPropertiesTable.getColumn(0));
+        dataObjectPropertiesTable.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(dataObjectPropertiesTable.getColumn(1), true));
 
         if (dataObjectProperties.size() > 0) {
             dataObjectPropertiesTable.setKeyboardSelectedRow(0);
@@ -347,7 +344,6 @@ public class DataObjectBrowser extends Composite {
             dataObjectPropertiesTable.setKeyboardSelectedRow(0);
         }
 
-        ColumnSortEvent.fire(dataObjectPropertiesTable, dataObjectPropertiesTable.getColumnSortList());
         if (dataObjectProperties.size() == 0) {
             //there are no properties.
             //fire an empty property seleccion event in order to notify the

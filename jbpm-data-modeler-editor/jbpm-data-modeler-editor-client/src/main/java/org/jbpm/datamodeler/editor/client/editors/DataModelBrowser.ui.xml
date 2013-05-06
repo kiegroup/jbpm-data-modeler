@@ -7,12 +7,18 @@
     <gwt:HTMLPanel>
         <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
             <gwt:HTMLPanel>
+                <div class="well">
                 <h4>
                     <gwt:Label ui:field="modelName"></gwt:Label>
                 </h4>
                 <gwt:ScrollPanel width="100%" height="340px">
-                    <b:CellTable ui:field="dataObjectsTable" styleName="table table-condensed table-hover row-fluid"/>
+
+                    <!--table table-bordered table-striped table-hover-->
+                    <!--b:CellTable ui:field="dataObjectsTable" styleName="table table-condensed table-hover row-fluid"/-->
+                    <b:CellTable ui:field="dataObjectsTable" styleName="table table-bordered table-striped table-hover"/>
+
                 </gwt:ScrollPanel>
+                </div>
 
                 <b:Button ui:field="newEntityButton" styleName="btn btn-primary" text="{i18n.modelBrowser_create}"/>
 

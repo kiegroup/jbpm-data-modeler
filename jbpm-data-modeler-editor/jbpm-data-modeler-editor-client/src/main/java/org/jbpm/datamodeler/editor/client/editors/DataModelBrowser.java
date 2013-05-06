@@ -30,10 +30,11 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.cellview.client.*;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -51,6 +52,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -102,7 +104,9 @@ public class DataModelBrowser extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
 
         modelName.setText(Constants.INSTANCE.modelBrowser_modelUnknown());
-        dataObjectsProvider.addDataDisplay(dataObjectsTable);
+
+        dataObjectsProvider.setList(dataObjects);
+        dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.modelBrowser_emptyTable()));
 
         //Init delete column
         ClickableImageResourceCell clickableImageResourceCell = new ClickableImageResourceCell(true);
@@ -123,6 +127,9 @@ public class DataModelBrowser extends Composite {
                 deleteDataObject(object, index);
             }
         } );
+
+        dataObjectsTable.addColumn(deleteDataObjectColumnImg);
+        dataObjectsTable.setColumnWidth(deleteDataObjectColumnImg, 20, Style.Unit.PX);
 
         //Init data object column
         final TextColumn<DataObjectTO> dataObjectColumn = new TextColumn<DataObjectTO>() {
@@ -152,13 +159,20 @@ public class DataModelBrowser extends Composite {
                 return dataObject.getName();
             }
         };
+        dataObjectColumn.setSortable(true);
+        dataObjectsTable.addColumn(dataObjectColumn, Constants.INSTANCE.modelBrowser_columnName());
 
-        //add columns
-        dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.modelBrowser_emptyTable()));
 
-        dataObjectsTable.addColumn(deleteDataObjectColumnImg);
-        dataObjectsTable.setColumnWidth(deleteDataObjectColumnImg, 20, Style.Unit.PX);
-        dataObjectsTable.addColumn(dataObjectColumn);
+        /*
+
+        ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyNameColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
+        propertyNameColHandler.setComparator(propertyNameColumn, new ObjectPropertyComparator("name"));
+        dataObjectPropertiesTable.addColumnSortHandler(propertyNameColHandler);
+         */
+        ColumnSortEvent.ListHandler<DataObjectTO> dataObjectNameColHandler = new ColumnSortEvent.ListHandler<DataObjectTO>(dataObjectsProvider.getList());
+        dataObjectNameColHandler.setComparator(dataObjectColumn, new DataObjectComparator());
+        dataObjectsTable.addColumnSortHandler(dataObjectNameColHandler);
+        dataObjectsTable.getColumnSortList().push(dataObjectColumn);
 
         //Init the selection model
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -166,18 +180,17 @@ public class DataModelBrowser extends Composite {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 if (!skipNextOnChange) {
-                    DataObjectTO selectedObjectTO = selectionModel.getSelectedObject();
+                    DataObjectTO selectedObjectTO = ((SingleSelectionModel<DataObjectTO>)dataObjectsTable.getSelectionModel()).getSelectedObject();
                     notifyObjectSelected(selectedObjectTO);
                 }
                 skipNextOnChange = false;
             }
         });
 
-
         dataObjectsTable.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.BOUND_TO_SELECTION);
         dataObjectsTable.setSelectionModel(selectionModel);
 
-        dataObjectsProvider.setList(dataObjects);
+        dataObjectsProvider.addDataDisplay(dataObjectsTable);
         dataObjectsProvider.refresh();
 
         newEntityButton.setIcon(IconType.PLUS_SIGN);
@@ -190,12 +203,55 @@ public class DataModelBrowser extends Composite {
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
         this.dataObjects = dataModel.getDataObjects();
-
         modelName.setText(dataModel.getName());
+
+
+        //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
+        // to one with 3 rows and the table was sorted.
+        //Several tests has been done and the final workaround (not too bad) we found is to
+        // 1) sort the table again
+        // 2) create a new selection model
+        // 3) populate the table with new items
+        // 3) select the first row
+        //dataObjectPropertiesTable.getColumnSortList().push(dataObjectPropertiesTable.getColumn(0));
+
+
+        SingleSelectionModel selectionModel2 = new SingleSelectionModel<DataObjectTO>();
+        dataObjectsTable.setSelectionModel(selectionModel2);
+
+        selectionModel2.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                if (!skipNextOnChange) {
+                    DataObjectTO selectedObjectTO = ((SingleSelectionModel<DataObjectTO>)dataObjectsTable.getSelectionModel()).getSelectedObject();
+                    notifyObjectSelected(selectedObjectTO);
+                }
+                skipNextOnChange = false;
+            }
+        });
+
+        ArrayList<DataObjectTO> sortBuffer = new ArrayList<DataObjectTO>();
+        sortBuffer.addAll(dataObjects);
+        Collections.sort(sortBuffer, new DataObjectComparator());
+
         dataObjectsProvider.getList().clear();
-        dataObjectsProvider.getList().addAll(dataObjects);
+        dataObjectsProvider.getList().addAll(sortBuffer);
         dataObjectsProvider.flush();
         dataObjectsProvider.refresh();
+
+        dataObjectsTable.getColumnSortList().push(new ColumnSortList.ColumnSortInfo(dataObjectsTable.getColumn(1), true));
+
+        if (dataObjects.size() > 0) {
+            dataObjectsTable.setKeyboardSelectedRow(0);
+            selectionModel2.setSelected(sortBuffer.get(0), true);
+        }
+
+        //set the first row selected again. Sounds crazy, but's part of the workaround, don't remove this line.
+        if (dataObjects.size() > 0) {
+            dataObjectsTable.setKeyboardSelectedRow(0);
+        }
+
     }
 
     public DataModelEditorPresenter getModelEditorPresenter() {

@@ -116,9 +116,9 @@ public class TestSimplePOJOGeneration {
     @org.junit.Test
     public void testName() throws Exception {
         GenerationContext generationContext = new GenerationContext(getInvoiceModel());
-        //generationContext.setOutputPath("/tmp");
+        generationContext.setOutputPath("/tmp");
 
-        generationContext.setOutputPath("/home/wmedvede/development/projects/jbpm-data-modeler/jbpm-data-modeler-core/src/test/java");
+        //generationContext.setOutputPath("/home/wmedvede/development/projects/jbpm-data-modeler/jbpm-data-modeler-core/src/test/java");
 
         GenerationEngine.getInstance().generate(generationContext);
     }
