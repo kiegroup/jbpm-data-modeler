@@ -88,6 +88,7 @@ public class DataObjectBreadcrums extends Breadcrumbs {
             navLink.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
+                    adjustNavigation(dataObject);
                     notifyObjectSelected(dataObject);
                 }
             });
@@ -95,6 +96,22 @@ public class DataObjectBreadcrums extends Breadcrumbs {
 
             rebuild();
         }
+    }
+
+    private void adjustNavigation(DataObjectTO dataObjectTO) {
+        //we are selecting an already existing object.
+        //if we have A -> B -> C -> D, and we select B
+        //the breadcrumb should show A->B
+
+        List<BufferElement> remainingItems = new ArrayList<BufferElement>();
+
+        for (BufferElement bufferElement : buffer) {
+            remainingItems.add(bufferElement);
+            if (dataObjectTO.getClassName().equals(bufferElement.getDataObject().getClassName())) break;            
+        }
+        buffer.clear();
+        buffer.addAll(remainingItems);
+        rebuild();
     }
 
     private void rebuild() {
