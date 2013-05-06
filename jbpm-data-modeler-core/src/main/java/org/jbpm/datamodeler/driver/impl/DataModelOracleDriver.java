@@ -13,6 +13,7 @@ import org.jbpm.datamodeler.driver.ModelDriverException;
 import org.jbpm.datamodeler.driver.impl.annotations.DescriptionAnnotationDefinition;
 import org.jbpm.datamodeler.driver.impl.annotations.EqualsAnnotationDefinition;
 import org.jbpm.datamodeler.driver.impl.annotations.LabelAnnotationDefinition;
+import org.jbpm.datamodeler.driver.impl.annotations.RoleAnnotationDefinition;
 import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Path;
@@ -44,6 +45,11 @@ public class DataModelOracleDriver implements ModelDriver {
         annotationDefinition = LabelAnnotationDefinition.getInstance();
         configuredAnnotations.add(annotationDefinition);
         annotationDrivers.put(annotationDefinition.getClassName(), new DefaultOracleAnnotationDriver());
+
+        annotationDefinition = RoleAnnotationDefinition.getInstance();
+        configuredAnnotations.add(annotationDefinition);
+        annotationDrivers.put(annotationDefinition.getClassName(), new DefaultOracleAnnotationDriver());
+        
     }
 
     @Override

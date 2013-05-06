@@ -23,15 +23,15 @@ public class AnnotationDefinitionTO {
 
     private boolean propertyAnnotation;
     
-    public static final String ROLE_ANNOTATION = "@Role";
+    public static final String ROLE_ANNOTATION = "org.jbpm.datamodeler.annotations.Role";
     
-    public static final String POSITION_ANNOTATON = "@Position";
+    public static final String POSITION_ANNOTATON = "org.jbpm.datamodeler.annotations.Position";
 
-    public static final String LABEL_ANNOTATION = "@Label";
+    public static final String LABEL_ANNOTATION = "org.jbpm.datamodeler.annotations.Label";
 
-    public static final String DESCRIPTION_ANNOTATION = "@Description";
+    public static final String DESCRIPTION_ANNOTATION = "org.jbpm.datamodeler.annotations.Description";
 
-    public static final String EQUALS_ANNOTATION = "@Equals";
+    public static final String EQUALS_ANNOTATION = "org.jbpm.datamodeler.annotations.Equals";
     
     public static final String VALUE_PARAM = "value";
 
