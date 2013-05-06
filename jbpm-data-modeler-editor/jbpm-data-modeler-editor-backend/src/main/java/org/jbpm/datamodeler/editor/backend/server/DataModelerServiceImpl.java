@@ -7,11 +7,13 @@ import org.jbpm.datamodeler.codegen.GenerationListener;
 import org.jbpm.datamodeler.commons.NamingUtils;
 import org.jbpm.datamodeler.commons.file.FileScanner;
 import org.jbpm.datamodeler.commons.file.ScanResult;
+import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.PropertyType;
 import org.jbpm.datamodeler.core.impl.DataModelImpl;
 import org.jbpm.datamodeler.core.impl.PropertyTypeFactoryImpl;
 import org.jbpm.datamodeler.driver.impl.DataModelOracleDriver;
+import org.jbpm.datamodeler.editor.model.AnnotationDefinitionTO;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
@@ -31,7 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.client.workbench.widgets.events.*;
+import org.uberfire.client.workbench.widgets.events.ChangeType;
+import org.uberfire.client.workbench.widgets.events.ResourceBatchChangesEvent;
+import org.uberfire.client.workbench.widgets.events.ResourceChange;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -350,6 +354,21 @@ public class DataModelerServiceImpl implements DataModelerService {
     @Override
     public Boolean isValidIdentifier(String identifier) {
         return ValidationUtils.isJavaIdentifier(identifier);
+    }
+
+    @Override
+    public Map<String, AnnotationDefinitionTO> getAnnotationDefinitions() {
+        Map<String, AnnotationDefinitionTO> annotations = new HashMap<String, AnnotationDefinitionTO>();
+        DataModelOracleDriver oracleDriver = new DataModelOracleDriver();
+        List<AnnotationDefinition> annotationDefinitions = oracleDriver.getConfiguredAnnotations();
+        AnnotationDefinitionTO annotationDefinitionTO;
+        DataModelerServiceHelper serviceHelper = DataModelerServiceHelper.getInstance();
+
+        for (AnnotationDefinition annotationDefinition : annotationDefinitions) {
+            annotationDefinitionTO = serviceHelper.domain2To(annotationDefinition);
+            annotations.put(annotationDefinitionTO.getClassName(), annotationDefinitionTO);
+        }
+        return annotations;
     }
 
     private org.kie.commons.java.nio.file.Path existsProjectJavaPath(org.kie.commons.java.nio.file.Path projectPath) {

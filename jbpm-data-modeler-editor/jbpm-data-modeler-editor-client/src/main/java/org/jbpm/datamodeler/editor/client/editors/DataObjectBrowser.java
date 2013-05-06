@@ -117,6 +117,8 @@ public class DataObjectBrowser extends Composite {
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
 
+    private boolean skipNextOnChange = false;
+
     public DataObjectBrowser() {
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -431,8 +433,9 @@ public class DataObjectBrowser extends Composite {
     //Event Observers
 
     private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
-        if (event.isFrom(getDataModel())) {
+        if (event.isFrom(getDataModel())) {            
             if (event.getCurrentDataObject() != null) {
+                boolean isFromMe = event.isFrom(DataModelerEvent.DATA_OBJECT_BROWSER);
                 setDataObject(event.getCurrentDataObject());
             } else {
                 //TODO clear the editor because any object is selected

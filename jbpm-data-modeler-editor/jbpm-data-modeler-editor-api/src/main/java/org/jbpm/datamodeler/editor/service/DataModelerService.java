@@ -1,11 +1,13 @@
 package org.jbpm.datamodeler.editor.service;
 
 import org.jboss.errai.bus.server.annotations.Remote;
+import org.jbpm.datamodeler.editor.model.AnnotationDefinitionTO;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.uberfire.backend.vfs.Path;
 
 import java.util.List;
+import java.util.Map;
 
 @Remote
 public interface DataModelerService {
@@ -36,4 +38,7 @@ public interface DataModelerService {
     List<PropertyTypeTO> getBasePropertyTypes();
 
     Boolean isValidIdentifier(String identifier);
+
+    Map<String, AnnotationDefinitionTO> getAnnotationDefinitions();
+
 }

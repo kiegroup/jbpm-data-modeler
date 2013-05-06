@@ -28,6 +28,9 @@ public class DataModelerEvent {
 
     public static final String NEW_DATA_OBJECT_POPUP = "NEW_DATA_OBJECT_POPUP";
 
+    private static int eventIds = 0;
+    
+    private int id = eventIds++;
 
     public DataModelerEvent() {
     }
@@ -78,7 +81,7 @@ public class DataModelerEvent {
     }
 
     public boolean isFrom(DataModelTO dataModel) {
-        return dataModel != null && dataModel == getCurrentModel();
+        return dataModel != null && dataModel.getId() == getCurrentModel().getId();
     }
 
     public boolean isFrom(String source) {
@@ -86,5 +89,9 @@ public class DataModelerEvent {
             return source.equals(this.source);
         }
         return source == this.source;
+    }
+
+    public int getId() {
+        return id;
     }
 }

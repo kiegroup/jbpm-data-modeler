@@ -43,6 +43,11 @@ public class DataModelTO {
     private String defaultPackage;
 
     private DataModelHelper helper;
+    
+    private static int modelIds = 0;
+
+    //only to distinguish models
+    private int id = modelIds++;
 
     public DataModelTO() {
     }
@@ -120,6 +125,10 @@ public class DataModelTO {
 
     public void setHelper(DataModelHelper helper) {
         this.helper = helper;
+    }
+
+    public int getId() {
+        return id;
     }
 }
 
