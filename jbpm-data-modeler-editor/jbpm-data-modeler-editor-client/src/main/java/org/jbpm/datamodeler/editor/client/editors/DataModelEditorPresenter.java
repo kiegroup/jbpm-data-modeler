@@ -186,12 +186,14 @@ public class DataModelEditorPresenter {
     }
 
     private void setDataModel(DataModelTO dataModel) {
-        if (dataModel != null && dataModel.getDataObjects().size() > 0) {
-            // Set data model helper before anything else
+        // Set data model helper before anything else
+        if (dataModel != null) {
             dataModel.setHelper(new DataModelHelperImpl(dataModel));
             selectionModel.setSelectedModel(dataModel);
             view.setDataModel(dataModel);
-            dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataModel.getDataObjects().get(0)));
+            if (dataModel.getDataObjects().size() > 0) {
+                dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataModel.getDataObjects().get(0)));
+            }
         }
     }
 
