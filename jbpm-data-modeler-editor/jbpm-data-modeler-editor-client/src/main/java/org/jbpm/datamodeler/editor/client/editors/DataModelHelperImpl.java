@@ -67,14 +67,24 @@ public class DataModelHelperImpl extends DataModelHelper {
 
     @Override
     public void dataObjectCreated(String objectClassName) {
+        //TODO Review if this invocation is correct.
+        reset();
     }
 
     @Override
     public void dataObjectSelected(String objectClassName) {
+        //TODO  Review if this invocation is correct.
+        //JAN, cuando puse este codigo, este metodo no se invoca en ningun lugar del proyecto.
+        //he puesto la invocacion por las dudas.
+        reset();
     }
 
     @Override
     public void dataObjectUnSelected(String objectClassName) {
+        //TODO Review if this invocation is correct.
+        //JAN, cuando puse este codigo, este metodo tampoco se invoca en ningun lugar del proyecto.
+        //he puesto la invocacion por las dudas.
+        reset();
     }
 
     @Override

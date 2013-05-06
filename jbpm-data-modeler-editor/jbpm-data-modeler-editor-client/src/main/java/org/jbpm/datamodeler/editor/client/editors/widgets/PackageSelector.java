@@ -12,8 +12,11 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.uberfire.client.common.Popup;
+
+import javax.enterprise.event.Observes;
 
 public class PackageSelector extends Composite {
 
@@ -121,5 +124,11 @@ public class PackageSelector extends Composite {
 
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+    }
+
+    //even observers
+
+    private void onModelEven(@Observes DataModelerEvent event) {
+        int i = 0;
     }
 }

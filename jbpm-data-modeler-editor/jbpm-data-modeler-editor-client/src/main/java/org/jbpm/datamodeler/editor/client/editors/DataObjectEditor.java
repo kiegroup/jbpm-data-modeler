@@ -22,6 +22,7 @@ import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -48,6 +49,9 @@ public class DataObjectEditor extends Composite {
     TextArea description;
 
     @UiField
+    SimplePanel packageSelectorPanel;
+
+    @Inject
     PackageSelector packageSelector;
 
     @UiField
@@ -72,6 +76,11 @@ public class DataObjectEditor extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
     }
 
+    @PostConstruct
+    void init() {
+        packageSelectorPanel.add(packageSelector);
+    }
+       
     public DataObjectTO getDataObject() {
         return dataObject;
     }

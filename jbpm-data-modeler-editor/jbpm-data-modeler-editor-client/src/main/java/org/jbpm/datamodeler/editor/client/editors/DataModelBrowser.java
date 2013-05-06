@@ -274,7 +274,8 @@ public class DataModelBrowser extends Composite {
             //when the selected object is set programatically an onSelectionChange event is produced
             //but we want to avoid this redundant (in this case) event because the object has already been selected.
             skipNextOnChange = true;
-            selectionModel.setSelected(dataObject, true);
+            ((SingleSelectionModel<DataObjectTO>)dataObjectsTable.getSelectionModel()).setSelected(dataObject, true);
+            //selectionModel.setSelected(dataObject, true);
             dataObjectsTable.setKeyboardSelectedRow(index);
         }
     }

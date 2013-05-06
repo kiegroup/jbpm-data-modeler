@@ -51,7 +51,9 @@
                     <gwt:Label ui:field="packageNameLabel" text="Package"  />
                 </td>
                 <td>
-                    <datamodeler:PackageSelector ui:field="packageSelector"></datamodeler:PackageSelector>
+                    <gwt:SimplePanel ui:field="packageSelectorPanel" >
+
+                    </gwt:SimplePanel>
                 </td>
             </tr>
 
