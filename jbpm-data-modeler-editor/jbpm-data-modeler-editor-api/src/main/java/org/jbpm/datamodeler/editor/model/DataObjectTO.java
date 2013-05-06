@@ -155,11 +155,11 @@ public class DataObjectTO {
         this.annotations = annotations;
     }
     
-    public AnnotationTO getAnnotation(String annotationName) {
-        if (annotationName == null) return null;
+    public AnnotationTO getAnnotation(String annotationClassName) {
+        if (annotationClassName == null) return null;
 
         for (AnnotationTO annotation : annotations) {
-            if (annotationName.equals(annotation.getName())) return annotation;
+            if (annotationClassName.equals(annotation.getClassName())) return annotation;
         }
         return null;
     }
