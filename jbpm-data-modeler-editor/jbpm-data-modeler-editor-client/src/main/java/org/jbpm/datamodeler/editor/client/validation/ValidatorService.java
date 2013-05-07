@@ -39,6 +39,15 @@ public class ValidatorService {
         )
         .isValidIdentifier(identifier);
     }
+    
+    public void isValidPackageIdentifier(String identifier, final ValidatorCallback callback) {
+        //complete implementation.
+        if ("error".equals(identifier)) {
+            callback.onFailure();
+        } else {
+            callback.onSuccess();
+        }
+    }
 
 
     // Todo drop dependency on datamodel, all components (should) know which model is being treated

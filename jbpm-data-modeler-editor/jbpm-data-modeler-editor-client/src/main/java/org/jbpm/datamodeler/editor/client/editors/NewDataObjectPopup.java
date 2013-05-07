@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
+import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectCreatedEvent;
@@ -99,23 +100,23 @@ public class NewDataObjectPopup extends Modal {
                 })
         ));
 
-        final ListBox packages = packageSelector.getPackageList();
-        packages.addChangeHandler(new ChangeHandler() {
+        packageSelector.enableCreatePackage(false);
+        final ListBox packageList = packageSelector.getPackageList();
+        packageList.addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
-                newPackage.setText(packages.getValue());
+                String selectedValue = packageList.getValue();
+                if (!PackageSelector.NOT_SELECTED.equals(selectedValue)) {
+                    newPackage.setText(selectedValue);
+                } else {
+                    newPackage.setText("");
+                }
             }
         });
-
     }
 
     public DataObjectTO getDataObject() {
         return dataObject;
-    }
-
-    public void setDataObject(DataObjectTO dataObject) {
-        this.dataObject = dataObject;
-        superclassSelector.setDataObject(dataObject);
     }
 
     public DataModelTO getDataModel() {
@@ -125,69 +126,98 @@ public class NewDataObjectPopup extends Modal {
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
         superclassSelector.setDataModel(dataModel);
+        packageSelector.setDataModel(dataModel);
     }
 
     private void onOk() {
 
-        //TODO poner las validaciones en forma correcta.
-        //Hay que validar
-        //1) que nombre de clase se a valido
-        //2) en caso que haya algo en el nombre del paquete que sea valido
-        //3) Finalmente que no exista en el modelo un objeto con ese nombre de clase y paquete.
+        final String newName[] = new String[1];
+        final String newPackageName[] = new String[1];
+        final String superClass[] = new String[1];
 
-        //4) OTRO comentario, el popup cuando se cierra debe limpiarse a si mismo para que la proxima vez que sea abierto
-        //not tenga cosas de la ultima entidad creada.
-        //para eso tenemos el metodo clean.
+        newName[0] = name.getText() != null ? name.getText().trim() : "";
+        newPackageName[0] = newPackage.getText() != null && !"".equals(newPackage.getText().trim()) ?  newPackage.getText().trim() : null;
 
-
-        String newName = name.getText();
-        String newPackage = this.newPackage.getText();        
-
-        //TODO el selector de superclase tiene que tener una opcion al principio
-        //que sea (not selected) o bien un primer campo que blanco
-        //pero tenemos que dejar la posibilidad de NO poner super clase.
-
-        String superClass = superclassSelector.getSuperclassList().getValue();
-        //TODO aqui hay que chequear que si la opcion es not selected entonces el objeto
-        //debe crease sin superclase
-
-        boolean validationOk = true;
+        superClass[0] = superclassSelector.getSuperclassList().getValue();
+        if (SuperclassSelector.NOT_SELECTED.equals(superClass[0])) superClass[0] = null;
 
 
-        //TODO poner las validaciones correctas.
-        //Pongo aqui debajo como seria mas o menos los casos de exito o error.
+        //1) validate className
+        validatorService.isValidIdentifier(newName[0], new ValidatorCallback() {
+            @Override
+            public void onFailure() {
+                setErrorMessage(nameGroup, "Invalid data object identifier: " + newName[0] + " is not a valid Java identifier");
+            }
 
-        validationOk = !"".equals(newName) && !"Test".equals(newName);
+            @Override
+            public void onSuccess() {
 
+                //2) if classname is ok, validate the package name.
+                if (newPackageName[0] != null) {
+                    validatorService.isValidPackageIdentifier(newPackageName[0], new ValidatorCallback() {
+                        @Override
+                        public void onFailure() {
+                            setErrorMessage(newPackageGroup, "Invalid package identifier: " + newPackageName[0] + " is not a valid Java identifier");
+                        }
 
-        if (!validationOk) {
-            //si la validacion NO es correcta hay que hacer esto.
+                        @Override
+                        public void onSuccess() {
+                            validatorService.isUniqueEntityName(newPackageName[0], newName[0], getDataModel(), new ValidatorCallback() {
+                                @Override
+                                public void onFailure() {
+                                    setErrorMessage(nameGroup, "A data object with identifier: " + newName[0] + " already exists in package: " + newPackageName[0]);
+                                }
 
-            //OBS! tenemos que discriminar qué campo es que el no es valido!! si el nombre de clase o el nombre de paquete.
-            //en funcion de esto vamos a encender un control group u otro.
+                                @Override
+                                public void onSuccess() {
+                                    createDataObject(newPackageName[0], newName[0], superClass[0]);
+                                    clean();
+                                    hide();
+                                }
+                            });
 
-            //En cada ronda de validacion solo tengo que poner en error el grupo que NO esta correcto
-            //y si un grupo esta correcto lo tengo que poner con ControlGroupType.NONE
+                        }
+                    });
+                } else {
+                    validatorService.isUniqueEntityName(newPackageName[0], newName[0], getDataModel(), new ValidatorCallback() {
+                        @Override
+                        public void onFailure() {
+                            setErrorMessage(nameGroup, "A data object with identifier: " + newName[0] + " already exists in package.");
+                        }
 
-            nameGroup.setType(ControlGroupType.ERROR);
-            errorMessages.setText("El nombre de clase no es valido: " + newName);
-            errorMessagesGroup.setType(ControlGroupType.ERROR);
+                        @Override
+                        public void onSuccess() {
+                            createDataObject(newPackageName[0], newName[0], superClass[0]);
+                            clean();
+                            hide();
+                        }
+                    });
+                }
+            }
+        });
 
-        } else {
-            DataObjectTO dataObject = new DataObjectTO(newName, newPackage, superClass);
-            getDataModel().getDataObjects().add(dataObject);
-            setDataObject(dataObject);
-            notifyObjectCreated(dataObject);
-            clean();
-            hide();
-        }
+    }
+
+    private void createDataObject(String packageName, String name, String superClass) {
+        DataObjectTO dataObject = new DataObjectTO(name, packageName, superClass);
+        getDataModel().getDataObjects().add(dataObject);
+        notifyObjectCreated(dataObject);
     }
 
     private void clean() {
-        //TODO programar aqui la limpieza del popup.
-        //Este metodo debe dejar todos los campos en blanco y los comboboxes con nada seleccionado
-        //o en su defecto con la opcion (not selected) si es que optampos por tener ese tipo de opcion.
-        //programar aqui la
+        name.setText("");
+        newPackage.setText("");
+        errorMessages.setText("");
+
+        nameGroup.setType(ControlGroupType.NONE);
+        newPackageGroup.setType(ControlGroupType.NONE);
+        errorMessagesGroup.setType(ControlGroupType.NONE);
+    }
+
+    private void setErrorMessage(ControlGroup controlGroup, String errorMessage) {
+        controlGroup.setType(ControlGroupType.ERROR);
+        errorMessages.setText(errorMessage);
+        errorMessagesGroup.setType(ControlGroupType.ERROR);
     }
 
     private void onCancel() {

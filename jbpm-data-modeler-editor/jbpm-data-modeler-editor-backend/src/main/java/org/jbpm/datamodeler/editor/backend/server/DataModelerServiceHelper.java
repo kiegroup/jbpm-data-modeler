@@ -46,8 +46,8 @@ public class DataModelerServiceHelper {
                 dataModelTO.getDataObjects().add(dataObjectTO);
             }
         }
-
-        dataModelTO.setExternalClasses(Arrays.asList("external.Class1", "external.Class2"));
+        //TODO remove this guarrada
+        dataModelTO.setExternalClasses(Arrays.asList("java.lang.Object", "java.util.Date"));
         return dataModelTO;
     }
 

@@ -12,11 +12,15 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.uberfire.client.common.Popup;
 
 import javax.enterprise.event.Observes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PackageSelector extends Composite {
 
@@ -32,21 +36,27 @@ public class PackageSelector extends Composite {
     Button newPackage;
 
     private static PackageSelectorUIBinder uiBinder = GWT.create(PackageSelectorUIBinder.class);
+
+    public static final String NOT_SELECTED = "NOT_SELECTED";
+    public static final String DEFAULT_PACKAGE = "defaultpkg";
     
     private DataModelTO dataModel;
 
     public PackageSelector() {
         initWidget(uiBinder.createAndBindUi(this));
         
-        packageList.addItem("com.redhat.datamodeler", "com.redhat.datamodeler");
-        packageList.addItem("com.microsoft.business", "com.microsoft.business");
+        packageList.addItem("", NOT_SELECTED);
+        packageList.addItem(DEFAULT_PACKAGE, DEFAULT_PACKAGE);
     }
-
 
     @UiHandler("newPackage")
     void createNewPackage(ClickEvent event) {
         final Popup pop = new AddPopup();
         pop.show();
+    }
+
+    public void enableCreatePackage(boolean enable) {
+        newPackage.setVisible(enable);
     }
 
     public class AddPopup extends Popup {
@@ -124,6 +134,27 @@ public class PackageSelector extends Composite {
 
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+        initList();
+    }
+
+    private void initList() {
+        packageList.clear();
+        List<String> packageNames = new ArrayList<String>();
+        if (dataModel != null) {
+            String packageName;
+            for (String className : dataModel.getHelper().getClassList()) {
+                packageName = DataModelerUtils.getInstance().extractPackageName(className);
+                if (packageName != null && !DEFAULT_PACKAGE.equals(packageName) && !packageNames.contains(packageName)) {
+                    packageNames.add(packageName);
+                }
+            }
+        }
+        Collections.sort(packageNames);
+        packageList.addItem("", NOT_SELECTED);
+        packageList.addItem(DEFAULT_PACKAGE, DEFAULT_PACKAGE);
+        for (String packageName : packageNames) {
+            packageList.addItem(packageName, packageName);
+        }
     }
 
     //even observers

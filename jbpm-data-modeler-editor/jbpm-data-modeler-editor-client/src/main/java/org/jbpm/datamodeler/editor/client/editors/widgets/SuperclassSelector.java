@@ -13,6 +13,9 @@ import org.jbpm.datamodeler.editor.model.DataObjectTO;
 
 import javax.enterprise.event.Observes;
 import javax.xml.crypto.Data;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class SuperclassSelector extends Composite {
@@ -30,6 +33,8 @@ public class SuperclassSelector extends Composite {
 
     private static SuperclassSelectorUIBinder uiBinder = GWT.create(SuperclassSelectorUIBinder.class);
 
+    public static final String NOT_SELECTED = "NOT_SELECTED";
+
     public SuperclassSelector() {
         initWidget(uiBinder.createAndBindUi(this));
         initList();
@@ -39,36 +44,40 @@ public class SuperclassSelector extends Composite {
         return superclassList;
     }
 
-    public void setSuperclassList(ListBox superclassList) {
-        this.superclassList = superclassList;
-    }
-
     public DataModelTO getDataModel() {
         return dataModel;
     }
 
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+        initList();
     }
 
     public void setDataObject(DataObjectTO dataObject) {
         this.dataObject = dataObject;
         initList();
-    }
-
-    private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
-        if (event.isFrom(getDataModel())) {
-            System.out.println("YUJUUUUUUUUUUUUUUUUUUU!!!!!!!");
+        if (dataObject != null && dataObject.getSuperClassName() != null) {
+            superclassList.setSelectedValue(dataObject.getSuperClassName());
+        } else {
+            superclassList.setSelectedValue(NOT_SELECTED);
         }
     }
 
     private void initList() {
         superclassList.clear();
+
+        List<String> classNames = new ArrayList<String>();
         if (dataModel != null) {
             for (String className : dataModel.getHelper().getClassList()) {
                 if (dataObject != null && className.equalsIgnoreCase(dataObject.getClassName())) continue;
-                superclassList.addItem(className, className);
+                classNames.add(className);
             }
+        }
+
+        Collections.sort(classNames);
+        superclassList.addItem("", NOT_SELECTED);
+        for (String className : classNames) {
+            superclassList.addItem(className, className);
         }
     }
 }
