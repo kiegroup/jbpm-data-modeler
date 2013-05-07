@@ -75,7 +75,7 @@ public class NewDataObjectPopup extends Modal {
 
     public NewDataObjectPopup() {
 
-        setTitle( "Create new data object" );
+        setTitle(Constants.INSTANCE.new_dataobject_popup_title());
         setMaxHeigth((Window.getClientHeight() * 0.75) + "px");
         setBackdrop( BackdropType.STATIC );
         setKeyboard( true );
@@ -141,12 +141,13 @@ public class NewDataObjectPopup extends Modal {
         superClass[0] = superclassSelector.getSuperclassList().getValue();
         if (SuperclassSelector.NOT_SELECTED.equals(superClass[0])) superClass[0] = null;
 
+        cleanErrors();
 
         //1) validate className
         validatorService.isValidIdentifier(newName[0], new ValidatorCallback() {
             @Override
             public void onFailure() {
-                setErrorMessage(nameGroup, "Invalid data object identifier: " + newName[0] + " is not a valid Java identifier");
+                setErrorMessage(nameGroup, Constants.INSTANCE.validation_error_invalid_object_identifier(newName[0]));
             }
 
             @Override
@@ -157,7 +158,7 @@ public class NewDataObjectPopup extends Modal {
                     validatorService.isValidPackageIdentifier(newPackageName[0], new ValidatorCallback() {
                         @Override
                         public void onFailure() {
-                            setErrorMessage(newPackageGroup, "Invalid package identifier: " + newPackageName[0] + " is not a valid Java identifier");
+                            setErrorMessage(newPackageGroup, Constants.INSTANCE.validation_error_invalid_package_identifier(newPackageName[0]));
                         }
 
                         @Override
@@ -165,7 +166,7 @@ public class NewDataObjectPopup extends Modal {
                             validatorService.isUniqueEntityName(newPackageName[0], newName[0], getDataModel(), new ValidatorCallback() {
                                 @Override
                                 public void onFailure() {
-                                    setErrorMessage(nameGroup, "A data object with identifier: " + newName[0] + " already exists in package: " + newPackageName[0]);
+                                    setErrorMessage(nameGroup,  Constants.INSTANCE.validation_error_object_already_exists(newName[0], newPackageName[0]));
                                 }
 
                                 @Override
@@ -182,7 +183,7 @@ public class NewDataObjectPopup extends Modal {
                     validatorService.isUniqueEntityName(newPackageName[0], newName[0], getDataModel(), new ValidatorCallback() {
                         @Override
                         public void onFailure() {
-                            setErrorMessage(nameGroup, "A data object with identifier: " + newName[0] + " already exists in package.");
+                            setErrorMessage(nameGroup, Constants.INSTANCE.validation_error_object_already_exists(newName[0], ""));
                         }
 
                         @Override
@@ -207,8 +208,11 @@ public class NewDataObjectPopup extends Modal {
     private void clean() {
         name.setText("");
         newPackage.setText("");
-        errorMessages.setText("");
+        cleanErrors();
+    }
 
+    private void cleanErrors() {
+        errorMessages.setText("");
         nameGroup.setType(ControlGroupType.NONE);
         newPackageGroup.setType(ControlGroupType.NONE);
         errorMessagesGroup.setType(ControlGroupType.NONE);
