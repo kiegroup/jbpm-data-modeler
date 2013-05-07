@@ -65,4 +65,22 @@ public interface Constants extends Messages {
 
     public String objectEditor_action_deleteProperty();
 
+    public String new_dataobject_popup_title();
+    
+    public String new_dataobject_popup_name();
+
+    public String new_dataobject_placeholder();
+    
+    public String new_dataobject_popup_new_package();
+    
+    public String new_dataobject_popup_existing_package();
+
+    public String new_dataobject_popup_superclass();
+
+    public String validation_error_invalid_object_identifier(String name);
+
+    public String validation_error_invalid_package_identifier(String packageName);
+
+    public String validation_error_object_already_exists(String name, String packageName);
+
 }
