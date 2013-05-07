@@ -31,6 +31,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DataObjectEditor extends Composite {
@@ -80,6 +81,8 @@ public class DataObjectEditor extends Composite {
     private Caller<DataModelerService> modelerService;
 
     private DataObjectEditorErrorPopup ep = new DataObjectEditorErrorPopup();
+    
+    private Map<String, AnnotationDefinitionTO> annotationDefinitions = new HashMap<String, AnnotationDefinitionTO>();
 
     private static DataObjectDetailEditorUIBinder uiBinder = GWT.create(DataObjectDetailEditorUIBinder.class);
 
@@ -120,9 +123,27 @@ public class DataObjectEditor extends Composite {
         this.dataModel = dataModel;
         superclassSelector.setDataModel(dataModel);
 
+        modelerService.call(
+                new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
+                    @Override
+                    public void callback(Map<String, AnnotationDefinitionTO> defs) {
+                        setAnnotationDefinitions(defs);
+                    }
+                },
+                new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
+        ).getAnnotationDefinitions();
+        
         //como me registro para saber el cambio en la clase:
         //todo en el lugar que toque.
 //        superclassSelector.getSuperclassList().addChangeHandler(null);
+    }
+
+    public void setAnnotationDefinitions(Map<String, AnnotationDefinitionTO> annotationDefinitions) {
+        this.annotationDefinitions = annotationDefinitions;
+    }
+
+    public Map<String, AnnotationDefinitionTO> getAnnotationDefinitions() {
+        return annotationDefinitions;
     }
 
     // event Observers
@@ -232,18 +253,7 @@ public class DataObjectEditor extends Composite {
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _label != null && !"".equals(_label) ) {
-                modelerService.call(
-                    new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
-                        @Override
-                        public void callback(Map<String, AnnotationDefinitionTO> defs) {
-                            AnnotationDefinitionTO def = defs.get(AnnotationDefinitionTO.LABEL_ANNOTATION);
-                            AnnotationTO annotation = new AnnotationTO(def);
-                            annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _label);
-                            getDataObject().addAnnotation(annotation);
-                        }
-                    },
-                    new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
-                ).getAnnotationDefinitions();
+                getDataObject().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _label );
             }
         }
     }
@@ -258,18 +268,7 @@ public class DataObjectEditor extends Composite {
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _description != null && !"".equals(_description) ) {
-                modelerService.call(
-                        new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
-                            @Override
-                            public void callback(Map<String, AnnotationDefinitionTO> defs) {
-                                AnnotationDefinitionTO def = defs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION);
-                                AnnotationTO annotation = new AnnotationTO(def);
-                                annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _description);
-                                getDataObject().addAnnotation(annotation);
-                            }
-                        },
-                        new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
-                ).getAnnotationDefinitions();
+                getDataObject().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _description );
             }
         }
     }

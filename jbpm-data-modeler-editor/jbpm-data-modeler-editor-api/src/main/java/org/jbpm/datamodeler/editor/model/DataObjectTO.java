@@ -165,6 +165,13 @@ public class DataObjectTO {
     public void addAnnotation(AnnotationTO annotation) {
         annotations.add(annotation);
     }
+    
+    public AnnotationTO addAnnotation(AnnotationDefinitionTO annotationDefinitionTO, String memberName, Object value) {
+        AnnotationTO annotation = new AnnotationTO(annotationDefinitionTO);
+        annotation.setValue(memberName, value);
+        addAnnotation(annotation);
+        return annotation;
+    }
 
     public void removeAnnotation(AnnotationTO annotation) {
         if (annotation != null) {
