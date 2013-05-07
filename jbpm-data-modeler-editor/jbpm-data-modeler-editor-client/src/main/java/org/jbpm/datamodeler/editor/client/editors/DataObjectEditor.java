@@ -4,6 +4,8 @@ import com.github.gwtbootstrap.client.ui.ListBox;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,7 +40,7 @@ public class DataObjectEditor extends Composite {
 
     };
 
-    private static DataObjectDetailEditorUIBinder uiBinder = GWT.create(DataObjectDetailEditorUIBinder.class);
+    public static final String NOT_SELECTED = "NOT_SELECTED";
 
     @UiField
     TextBox name;
@@ -67,9 +69,6 @@ public class DataObjectEditor extends Composite {
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
 
-    @Inject
-    private Caller<DataModelerService> modelerService;
-
     DataObjectTO dataObject;
 
     DataModelTO dataModel;
@@ -77,10 +76,27 @@ public class DataObjectEditor extends Composite {
     @Inject
     private ValidatorService validatorService;
 
+    @Inject
+    private Caller<DataModelerService> modelerService;
+
     private DataObjectEditorErrorPopup ep = new DataObjectEditorErrorPopup();
+
+    private static DataObjectDetailEditorUIBinder uiBinder = GWT.create(DataObjectDetailEditorUIBinder.class);
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
+
+        roleSelector.addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                roleChanged(event);
+            }
+        });
+        // TODO Change this when necessary (for now hardcoded here)
+        roleSelector.addItem("", NOT_SELECTED);
+        roleSelector.addItem("Fact", "Fact");
+        roleSelector.addItem("Event", "Event");
+        roleSelector.setSelectedValue(NOT_SELECTED);
     }
 
     @PostConstruct
@@ -131,6 +147,10 @@ public class DataObjectEditor extends Composite {
             if (annotation != null) {
                 description.setText(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
             }
+            annotation = dataObject.getAnnotation(AnnotationDefinitionTO.ROLE_ANNOTATION);
+            if (annotation != null) {
+                roleSelector.setSelectedValue(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
+            }
         }
     }
 
@@ -150,7 +170,7 @@ public class DataObjectEditor extends Composite {
     }
 
     // Event handlers
-
+    // TODO load the AnnotationDefinitionTOs somewhere to avoid unnecessary repeated trips to the server
     @UiHandler("name")
     void nameChanged(final ValueChangeEvent<String> event) {
         // Set widgets to errorpopup for styling purposes etc.
@@ -254,12 +274,38 @@ public class DataObjectEditor extends Composite {
         }
     }
 
+    void roleChanged(final ChangeEvent event) {
+        final String _role = roleSelector.getValue();
+        AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.ROLE_ANNOTATION);
+
+        if (annotation != null) {
+            if ( _role != null && !NOT_SELECTED.equals(_role) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _role);
+            else getDataObject().removeAnnotation(annotation);
+        } else {
+            if ( _role != null && !NOT_SELECTED.equals(_role) ) {
+                modelerService.call(
+                        new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
+                            @Override
+                            public void callback(Map<String, AnnotationDefinitionTO> defs) {
+                                AnnotationDefinitionTO def = defs.get(AnnotationDefinitionTO.ROLE_ANNOTATION);
+                                AnnotationTO annotation = new AnnotationTO(def);
+                                annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _role);
+                                getDataObject().addAnnotation(annotation);
+                            }
+                        },
+                        new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
+                ).getAnnotationDefinitions();
+            }
+        }
+    }
+
     private void clean() {
         name.setText(null);
         label.setText(null);
         description.setText(null);
         // TODO selectors
         superclassSelector.setDataObject(null);
+        roleSelector.setSelectedValue(NOT_SELECTED);
     }
 
     private class DataObjectEditorErrorPopup extends ErrorPopup {
