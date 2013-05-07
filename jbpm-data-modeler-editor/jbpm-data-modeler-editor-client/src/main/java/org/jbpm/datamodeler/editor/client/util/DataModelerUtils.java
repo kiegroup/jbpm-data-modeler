@@ -28,4 +28,8 @@ public class DataModelerUtils {
             return null;
         }
     }
+
+    public String[] getPackageTerms(String packageName) {
+        return packageName.split("\\.");
+    }
 }

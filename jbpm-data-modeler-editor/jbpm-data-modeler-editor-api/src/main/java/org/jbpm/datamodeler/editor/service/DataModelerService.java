@@ -37,7 +37,10 @@ public interface DataModelerService {
 
     List<PropertyTypeTO> getBasePropertyTypes();
 
+    // TODO erase method
     Boolean isValidIdentifier(String identifier);
+
+    Map<String, Boolean> evaluateIdentifiers(String[] identifiers);
 
     Map<String, AnnotationDefinitionTO> getAnnotationDefinitions();
 

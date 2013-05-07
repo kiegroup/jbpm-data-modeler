@@ -3,6 +3,7 @@ package org.jbpm.datamodeler.editor.client.validation;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
+import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -10,6 +11,7 @@ import org.jbpm.datamodeler.editor.service.DataModelerService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.Map;
 
 
 @ApplicationScoped
@@ -21,7 +23,8 @@ public class ValidatorService {
     public ValidatorService() {
     }
 
-    //TODO Generify this!!
+    // TODO Generify this!!
+    // TODO replace this service call by a call to evaluateIdentifiers
     public void isValidIdentifier(String identifier, final ValidatorCallback callback) {
         modelerService.call(
             new RemoteCallback<Boolean>() {
@@ -29,8 +32,7 @@ public class ValidatorService {
                 public void callback(Boolean b) {
                     if (b) {
                         callback.onSuccess();
-                    }
-                    else {
+                    } else {
                         callback.onFailure();
                     }
                 }
@@ -41,12 +43,24 @@ public class ValidatorService {
     }
     
     public void isValidPackageIdentifier(String identifier, final ValidatorCallback callback) {
-        //complete implementation.
-        if ("error".equals(identifier)) {
-            callback.onFailure();
-        } else {
-            callback.onSuccess();
-        }
+        String[] packageTerms = DataModelerUtils.getInstance().getPackageTerms(identifier);
+        modelerService.call(
+                new RemoteCallback<Map<String, Boolean>>() {
+                    @Override
+                    public void callback(Map<String, Boolean> evaluatedTerms) {
+                        // TODO the service is prepared for term-based evaluation, but for now the callback
+                        // doesn't support returning params
+                        boolean nok = evaluatedTerms.containsValue(Boolean.FALSE);
+                        if (nok) {
+                            callback.onFailure();
+                        } else {
+                            callback.onSuccess();
+                        }
+                    }
+                },
+                new DataModelerErrorCallback("An error occurred during the server validation process")
+        )
+        .evaluateIdentifiers(packageTerms);
     }
 
 

@@ -357,6 +357,17 @@ public class DataModelerServiceImpl implements DataModelerService {
     }
 
     @Override
+    public Map<String, Boolean> evaluateIdentifiers(String[] identifiers) {
+        Map<String, Boolean> result = new HashMap<String, Boolean>(identifiers.length);
+        if (identifiers != null && identifiers.length > 0) {
+            for (String s : identifiers) {
+                result.put(s, ValidationUtils.isJavaIdentifier(s));
+            }
+        }
+        return result;
+    }
+
+    @Override
     public Map<String, AnnotationDefinitionTO> getAnnotationDefinitions() {
         Map<String, AnnotationDefinitionTO> annotations = new HashMap<String, AnnotationDefinitionTO>();
         DataModelOracleDriver oracleDriver = new DataModelOracleDriver();
