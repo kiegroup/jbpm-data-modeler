@@ -18,9 +18,11 @@
     <name>Jbpm Data Modeler</name>
     <description>Data modeling tool for jbpm releated projects</description>
 
+    <!--
     <properties>
         <bootstrap.version>2.2.1.0-20130213.031020-23</bootstrap.version>
     </properties>
+    -->
 
     <modules>
         <module>jbpm-data-modeler-core</module>
