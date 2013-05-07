@@ -18,9 +18,11 @@
                     <b:CellTable ui:field="dataObjectsTable" styleName="table table-bordered table-striped table-hover"/>
 
                 </gwt:ScrollPanel>
+                    <br></br>
+                    <b:Button ui:field="newEntityButton" styleName="btn btn-primary" text="{i18n.modelBrowser_create}"/>
                 </div>
 
-                <b:Button ui:field="newEntityButton" styleName="btn btn-primary" text="{i18n.modelBrowser_create}"/>
+
 
             </gwt:HTMLPanel>
         </gwt:VerticalPanel>

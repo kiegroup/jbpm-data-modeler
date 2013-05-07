@@ -20,44 +20,44 @@
                 </tr>
             </thead>
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="titleLabel" text="Name"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="titleLabel" text="Name"/>
                 </td>
                 <td>
-                    <b:TextBox ui:field="name"></b:TextBox>
+                    <b:TextBox ui:field="name" styleName="span10"></b:TextBox>
                 </td>
             </tr>
 
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="shortNameLabel" text="Short name"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="shortNameLabel" text="Short name"/>
                 </td>
                 <td>
-                    <b:TextBox ui:field="shortName"></b:TextBox>
+                    <b:TextBox ui:field="shortName" styleName="span10"></b:TextBox>
                 </td>
             </tr>
 
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="descriptionLabel" text="Description"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="descriptionLabel" text="Description"/>
                 </td>
                 <td>
-                    <b:TextArea ui:field="description"></b:TextArea>
+                    <b:TextArea ui:field="description" styleName="span10"></b:TextArea>
                 </td>
             </tr>
 
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="typeLabel" text="Type"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="typeLabel" text="Type"/>
                 </td>
                 <td>
-                    <b:ListBox ui:field="typeSelector"></b:ListBox>
+                    <b:ListBox ui:field="typeSelector" styleName="span10"></b:ListBox>
                 </td>
             </tr>
 
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="equalsLabel" text="Equals"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="equalsLabel" text="Equals"/>
                 </td>
                 <td>
                     <b:CheckBox ui:field="equalsSelector"></b:CheckBox>
@@ -65,8 +65,8 @@
             </tr>
 
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="requiredLabel" text="Required"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="requiredLabel" text="Required"/>
                 </td>
                 <td>
                     <b:CheckBox ui:field="requiredSelector"></b:CheckBox>
@@ -74,11 +74,11 @@
             </tr>
 
             <tr>
-                <td style="white-space: nowrap;">
-                    <gwt:Label ui:field="positionLabel" text="@Position"  />
+                <td style="white-space: nowrap; vertical-align: top;">
+                    <gwt:Label ui:field="positionLabel" text="@Position"/>
                 </td>
                 <td>
-                    <b:TextBox ui:field="positionText"></b:TextBox>
+                    <b:TextBox ui:field="positionText" styleName="span10"></b:TextBox>
                 </td>
             </tr>
 

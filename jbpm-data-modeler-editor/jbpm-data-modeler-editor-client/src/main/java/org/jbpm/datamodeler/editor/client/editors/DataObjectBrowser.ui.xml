@@ -22,43 +22,44 @@
                             <b:CellTable ui:field="dataObjectPropertiesTable" styleName="table table-bordered table-striped table-hover"/>
                             </gwt:ScrollPanel>
                             <!--b:SimplePager ui:field="pager" display="{dataObjectPropertiesTable}"  /-->
+                            <h5>
+                                <gwt:Label text="{i18n.objectEditor_createProperty}"/>
+                            </h5>
+
+                            <gwt:VerticalPanel styleName="row-fluid">
+                                <gwt:TextBox ui:field="newPropertyName" styleName="span6"></gwt:TextBox>
+                                <gwt:HTMLPanel>
+                                    <div class="well span7">
+                                        <table class="row-fluid span7">
+                                            <tr>
+                                                <td class="span3">
+                                                    <b:RadioButton ui:field="newPropertyBasicType" name="typeMode" text="{i18n.objectEditor_basicType}" />
+                                                </td>
+                                                <td class="span4">
+                                                    <b:ListBox ui:field="newPropertyType"></b:ListBox>
+                                                </td>
+                                                <td class="span3">
+                                                    <b:CheckBox ui:field="newPropertyIsMultiple" text="{i18n.objectEditor_multiple}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="span3" colspan="2">
+                                                    <b:RadioButton ui:field="newPropertyDataObjectType" name="typeMode" text="{i18n.objectEditor_dataObjectType}"/>
+                                                </td>
+                                                <td colspan="1">
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </gwt:HTMLPanel>
+                            </gwt:VerticalPanel>
+                            <b:Button ui:field="newPropertyButton" styleName="btn btn-primary" text="{i18n.objectEditor_create}"/>
+
+
                         </div>
                     </gwt:HTMLPanel>
 
-                    <gwt:HTMLPanel styleName="well">
-                        <h5>
-                            <gwt:Label text="{i18n.objectEditor_createProperty}"/>
-                        </h5>
 
-                        <gwt:VerticalPanel styleName="row-fluid">
-                            <gwt:TextBox ui:field="newPropertyName" styleName="span6"></gwt:TextBox>
-                            <gwt:HTMLPanel>
-                                <div class="well span7">
-                                    <table class="row-fluid span7">
-                                        <tr>
-                                            <td class="span3">
-                                                <b:RadioButton ui:field="newPropertyBasicType" name="typeMode" text="{i18n.objectEditor_basicType}" />
-                                            </td>
-                                            <td class="span4">
-                                                <b:ListBox ui:field="newPropertyType"></b:ListBox>
-                                            </td>
-                                            <td class="span3">
-                                                <b:CheckBox ui:field="newPropertyIsMultiple" text="{i18n.objectEditor_multiple}"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="span3" colspan="2">
-                                                <b:RadioButton ui:field="newPropertyDataObjectType" name="typeMode" text="{i18n.objectEditor_dataObjectType}"/>
-                                            </td>
-                                            <td colspan="1">
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </gwt:HTMLPanel>
-                        </gwt:VerticalPanel>
-                        <b:Button ui:field="newPropertyButton" styleName="btn btn-primary" text="{i18n.objectEditor_create}"/>
-                    </gwt:HTMLPanel>
                 </gwt:VerticalPanel>
             </b:Column>
 
