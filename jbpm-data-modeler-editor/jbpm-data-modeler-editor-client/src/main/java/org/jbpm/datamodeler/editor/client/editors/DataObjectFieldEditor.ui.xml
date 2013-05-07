@@ -6,7 +6,7 @@
 
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
 
-    <gwt:HTMLPanel styleName="well container row-fluid">
+    <gwt:HTMLPanel styleName="well container row-fluid ">
 
         <table class="row-fluid span12">
             <thead>
