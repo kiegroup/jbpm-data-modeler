@@ -91,6 +91,13 @@ public class DataObjectEditor extends Composite {
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
 
+        superclassSelector.getSuperclassList().addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                superClassChanged(event);
+            }
+        });
+
         roleSelector.addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
@@ -107,6 +114,13 @@ public class DataObjectEditor extends Composite {
     @PostConstruct
     void init() {
         packageSelectorPanel.add(packageSelector);
+        // TODO o bien mover todos los addChangehandlers aquí, o bien mover éste al initWidget()
+        packageSelector.getPackageList().addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                packageChanged(event);
+            }
+        });
     }
        
     public DataObjectTO getDataObject() {
@@ -123,6 +137,7 @@ public class DataObjectEditor extends Composite {
 
     public void setDataModel(DataModelTO dataModel) {
         this.dataModel = dataModel;
+        packageSelector.setDataModel(dataModel);
         superclassSelector.setDataModel(dataModel);
 
         modelerService.call(
@@ -134,10 +149,6 @@ public class DataObjectEditor extends Composite {
                 },
                 new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
         ).getAnnotationDefinitions();
-        
-        //como me registro para saber el cambio en la clase:
-        //todo en el lugar que toque.
-//        superclassSelector.getSuperclassList().addChangeHandler(null);
     }
 
     public void setAnnotationDefinitions(Map<String, AnnotationDefinitionTO> annotationDefinitions) {
@@ -159,17 +170,23 @@ public class DataObjectEditor extends Composite {
         clean();
         if (dataObject != null) {
             setDataObject(dataObject);
-            superclassSelector.setDataObject(dataObject);
 
             name.setText(dataObject.getName());
+
             AnnotationTO annotation = dataObject.getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
             if (annotation != null) {
                 label.setText(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
             }
+
             annotation = dataObject.getAnnotation(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION);
             if (annotation != null) {
                 description.setText(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
             }
+
+            packageSelector.setDataObject(dataObject);
+
+            superclassSelector.setDataObject(dataObject);
+
             annotation = dataObject.getAnnotation(AnnotationDefinitionTO.ROLE_ANNOTATION);
             if (annotation != null) {
                 roleSelector.setSelectedValue(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
@@ -193,7 +210,7 @@ public class DataObjectEditor extends Composite {
     }
 
     // Event handlers
-    // TODO load the AnnotationDefinitionTOs somewhere to avoid unnecessary repeated trips to the server
+
     @UiHandler("name")
     void nameChanged(final ValueChangeEvent<String> event) {
         // Set widgets to errorpopup for styling purposes etc.
@@ -275,6 +292,24 @@ public class DataObjectEditor extends Composite {
         }
     }
 
+    private void packageChanged(ChangeEvent event) {
+        final String packageName = packageSelector.getPackageList().getValue();
+        if (packageName != null &&
+                !"".equals(packageName) &&
+                !PackageSelector.NOT_SELECTED.equals(packageName))
+            getDataObject().setPackageName(packageName);
+        else getDataObject().setPackageName(null);
+    }
+
+    private void superClassChanged(ChangeEvent event) {
+        final String superClass = superclassSelector.getSuperclassList().getValue();
+        if (superClass != null &&
+                !"".equals(superClass) &&
+                !SuperclassSelector.NOT_SELECTED.equals(superClass))
+            getDataObject().setSuperClassName(superClass);
+        else getDataObject().setSuperClassName(null);
+    }
+
     void roleChanged(final ChangeEvent event) {
         final String _role = roleSelector.getValue();
         AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.ROLE_ANNOTATION);
@@ -293,7 +328,7 @@ public class DataObjectEditor extends Composite {
         name.setText(null);
         label.setText(null);
         description.setText(null);
-        // TODO selectors
+        packageSelector.setDataObject(null);
         superclassSelector.setDataObject(null);
         roleSelector.setSelectedValue(NOT_SELECTED);
     }
