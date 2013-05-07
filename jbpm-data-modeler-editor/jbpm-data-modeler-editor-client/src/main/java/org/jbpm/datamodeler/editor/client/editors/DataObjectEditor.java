@@ -121,10 +121,15 @@ public class DataObjectEditor extends Composite {
         if (dataObject != null) {
             setDataObject(dataObject);
             superclassSelector.setDataObject(dataObject);
+
             name.setText(dataObject.getName());
-            AnnotationTO labelAnnotation = dataObject.getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
-            if (labelAnnotation != null) {
-                label.setText(labelAnnotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
+            AnnotationTO annotation = dataObject.getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
+            if (annotation != null) {
+                label.setText(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
+            }
+            annotation = dataObject.getAnnotation(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION);
+            if (annotation != null) {
+                description.setText(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString());
             }
         }
     }
@@ -197,14 +202,13 @@ public class DataObjectEditor extends Composite {
         });
     }
 
-
     @UiHandler("label")
     void labelChanged(final ValueChangeEvent<String> event) {
         final String _label = label.getValue();
         AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
 
         if (annotation != null) {
-            if ( _label != null && !"".equals(annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM)) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _label);
+            if ( _label != null && !"".equals(_label) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _label);
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _label != null && !"".equals(_label) ) {
@@ -224,11 +228,38 @@ public class DataObjectEditor extends Composite {
         }
     }
 
+    @UiHandler("description")
+    void descriptionChanged(final ValueChangeEvent<String> event) {
+        final String _description = description.getValue();
+        AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION);
+
+        if (annotation != null) {
+            if ( _description != null && !"".equals(_description) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _description);
+            else getDataObject().removeAnnotation(annotation);
+        } else {
+            if ( _description != null && !"".equals(_description) ) {
+                modelerService.call(
+                        new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
+                            @Override
+                            public void callback(Map<String, AnnotationDefinitionTO> defs) {
+                                AnnotationDefinitionTO def = defs.get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION);
+                                AnnotationTO annotation = new AnnotationTO(def);
+                                annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _description);
+                                getDataObject().addAnnotation(annotation);
+                            }
+                        },
+                        new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
+                ).getAnnotationDefinitions();
+            }
+        }
+    }
+
     private void clean() {
         name.setText(null);
         label.setText(null);
         description.setText(null);
         // TODO selectors
+        superclassSelector.setDataObject(null);
     }
 
     private class DataObjectEditorErrorPopup extends ErrorPopup {
