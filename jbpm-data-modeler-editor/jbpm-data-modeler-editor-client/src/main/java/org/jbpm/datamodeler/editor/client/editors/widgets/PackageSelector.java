@@ -13,11 +13,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
-import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
+import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.uberfire.client.common.Popup;
 
-import javax.enterprise.event.Observes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +40,8 @@ public class PackageSelector extends Composite {
     public static final String DEFAULT_PACKAGE = "defaultpkg";
     
     private DataModelTO dataModel;
+
+    private DataObjectTO dataObject;
 
     public PackageSelector() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -72,6 +73,7 @@ public class PackageSelector extends Composite {
             HorizontalPanel dataPanel = new HorizontalPanel();
 
             //final Label newPackageLabel = new Label("new")
+
             final TextBox newPackageName = new TextBox();
             final Button newPackageButton = new Button("Add");
             dataPanel.add(newPackageName);
@@ -137,6 +139,21 @@ public class PackageSelector extends Composite {
         initList();
     }
 
+    public DataObjectTO getDataObject() {
+        return dataObject;
+    }
+
+    public void setDataObject(DataObjectTO dataObject) {
+        this.dataObject = dataObject;
+        initList();
+
+        if (dataObject != null && dataObject.getPackageName() != null && !"".equals(dataObject.getPackageName())) {
+            packageList.setSelectedValue(dataObject.getPackageName());
+        } else {
+            packageList.setSelectedValue(NOT_SELECTED);
+        }
+    }
+
     private void initList() {
         packageList.clear();
         List<String> packageNames = new ArrayList<String>();
@@ -157,9 +174,4 @@ public class PackageSelector extends Composite {
         }
     }
 
-    //even observers
-
-    private void onModelEven(@Observes DataModelerEvent event) {
-        int i = 0;
-    }
 }
