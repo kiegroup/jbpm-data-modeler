@@ -13,18 +13,20 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 import org.jboss.errai.bus.client.api.RemoteCallback;
-import org.jboss.errai.enterprise.client.cdi.AbstractErraiCDITest;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
-import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectDeletedEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
-import org.jbpm.datamodeler.editor.model.*;
+import org.jbpm.datamodeler.editor.model.AnnotationDefinitionTO;
+import org.jbpm.datamodeler.editor.model.AnnotationTO;
+import org.jbpm.datamodeler.editor.model.DataModelTO;
+import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
 
 import javax.annotation.PostConstruct;
@@ -282,18 +284,7 @@ public class DataObjectEditor extends Composite {
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _role != null && !NOT_SELECTED.equals(_role) ) {
-                modelerService.call(
-                        new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
-                            @Override
-                            public void callback(Map<String, AnnotationDefinitionTO> defs) {
-                                AnnotationDefinitionTO def = defs.get(AnnotationDefinitionTO.ROLE_ANNOTATION);
-                                AnnotationTO annotation = new AnnotationTO(def);
-                                annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, _role);
-                                getDataObject().addAnnotation(annotation);
-                            }
-                        },
-                        new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
-                ).getAnnotationDefinitions();
+                getDataObject().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _role );
             }
         }
     }
