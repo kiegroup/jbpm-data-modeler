@@ -19,7 +19,6 @@ package org.jbpm.datamodeler.editor.client.editors;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
-import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
@@ -73,9 +72,6 @@ public class DataModelerScreenPresenter {
 
     @Inject
     private Caller<DataModelerService> modelerService;
-
-    @Inject
-    private ValidatorService validatorService;
 
     private Menus menus;
 
