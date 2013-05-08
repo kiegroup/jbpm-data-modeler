@@ -78,6 +78,8 @@ public class ValidatorService {
         else callback.onFailure();
     }
 
+    // TODO add a validation in order to avoid cyclic extensions
+
     public void isUniqueAttributeName(String name, DataObjectTO object, ValidatorCallback callback) {
         for (ObjectPropertyTO prop : object.getProperties()) {
             if (prop.getName().equalsIgnoreCase(name)) {

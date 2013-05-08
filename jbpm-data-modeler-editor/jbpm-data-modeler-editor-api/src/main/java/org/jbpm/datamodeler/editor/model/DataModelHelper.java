@@ -12,6 +12,8 @@ public class DataModelHelper {
 
     public void dataObjectUnReferenced(String objectClassName, String subjectClassName) {}
 
+    public void dataObjectExtended(String parentClassName, String siblingClassName, Boolean _extends) {}
+
     public void dataObjectDeleted(String objectClassName) {}
 
     public void dataObjectCreated(String objectClassName) {}
@@ -21,6 +23,8 @@ public class DataModelHelper {
     public void dataObjectUnSelected(String objectClassName) {}
 
     public Boolean isDataObjectReferenced(String objectClassName) {return Boolean.FALSE;}
+
+    public Boolean isBeingExtended(String parentClassName) {return Boolean.FALSE;}
 
     public Boolean objectCanBeDeleted(String className) {return Boolean.FALSE;}
 

@@ -39,6 +39,9 @@ public class DataObjectFieldEditor extends Composite {
     private static DataObjectFieldEditorUIBinder uiBinder = GWT.create(DataObjectFieldEditorUIBinder.class);
 
     @UiField
+    Label titleLabel;
+
+    @UiField
     TextBox name;
 
     @UiField
@@ -55,6 +58,9 @@ public class DataObjectFieldEditor extends Composite {
 
     @UiField
     CheckBox requiredSelector;
+
+    @UiField
+    Label positionLabel;
 
     @UiField
     TextBox positionText;
@@ -127,7 +133,7 @@ public class DataObjectFieldEditor extends Composite {
     }
 
     private void notifyFieldChange(String memberName, Object oldValue, Object newValue) {
-        // TODO getDataModel().getHelper().dataModelChanged();
+        getDataModel().getHelper().dataModelChanged();
         dataModelerEventEvent.fire(new DataObjectFieldChangeEvent(DataModelerEvent.DATA_OBJECT_FIELD_EDITOR, getDataModel(), getDataObject(), getObjectField(), memberName, oldValue, newValue));
     }
 
@@ -176,18 +182,42 @@ public class DataObjectFieldEditor extends Composite {
     // Event handlers
     @UiHandler("name")
     void nameChanged(ValueChangeEvent<String> event) {
+        // Set widgets to errorpopup for styling purposes etc.
+        ep.setTitleWidget(titleLabel);
+        ep.setValueWidget(name);
 
-        //TODO add validation.
-        //Nombre correcto y no repetidas
+        final String oldValue = getObjectField().getName();
+        final String newValue = name.getValue();
 
-        String oldValue = objectField.getName();
-
-        boolean validationOk = true;
-
-        if (validationOk) {
-            objectField.setName(event.getValue());
-            notifyFieldChange("name", oldValue, getObjectField().getName());
+        // In case an invalid name (entered before), was corrected to the original value, don't do anything but reset the label style
+        if (oldValue.equalsIgnoreCase(newValue)) {
+            titleLabel.setStyleName(null);
+            return;
         }
+
+        validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
+            @Override
+            public void onFailure() {
+                ep.showMessage("Invalid data attribute identifier: " + newValue + " is not a valid Java identifier");
+            }
+
+            @Override
+            public void onSuccess() {
+                validatorService.isUniqueAttributeName(newValue, getDataObject(), new ValidatorCallback() {
+                    @Override
+                    public void onFailure() {
+                        ep.showMessage("An object attribute with identifier: " + newValue + " already exists in the data object.");
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        titleLabel.setStyleName(null);
+                        objectField.setName(newValue);
+                        notifyFieldChange("name", oldValue, getObjectField().getName());
+                    }
+                });
+            }
+        });
     }
 
     @UiHandler("label")
@@ -231,9 +261,25 @@ public class DataObjectFieldEditor extends Composite {
 
     @UiHandler("positionText")
     void positionChanged(final ValueChangeEvent<String> event) {
-        final String position = positionText.getValue();
+        // Set widgets to errorpopup for styling purposes etc.
+        ep.setTitleWidget(positionLabel);
+        ep.setValueWidget(positionText);
 
-        validatorService.isValidPosition(position, new ValidatorCallback() {
+
+        AnnotationTO annotation = getObjectField().getAnnotation(AnnotationDefinitionTO.POSITION_ANNOTATON);
+        String oldPosition = "";
+        if (annotation != null) {
+            oldPosition = annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM).toString();
+        }
+        final String newPosition = positionText.getValue();
+
+        // In case an invalid position (entered before), was corrected to the original value, don't do anything but reset the label style
+        if (oldPosition.equalsIgnoreCase(newPosition)) {
+            positionLabel.setStyleName(null);
+            return;
+        }
+
+        validatorService.isValidPosition(newPosition, new ValidatorCallback() {
             @Override
             public void onFailure() {
                 ep.showMessage("Illegal position specified, should be zero or a positive integer");
@@ -244,11 +290,11 @@ public class DataObjectFieldEditor extends Composite {
                 AnnotationTO annotation = getObjectField().getAnnotation(AnnotationDefinitionTO.POSITION_ANNOTATON);
 
                 if (annotation != null) {
-                    if ( position != null && !"".equals(position) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, position);
+                    if ( newPosition != null && !"".equals(newPosition) ) annotation.setValue(AnnotationDefinitionTO.VALUE_PARAM, newPosition);
                     else getObjectField().removeAnnotation(annotation);
                 } else {
-                    if ( position != null && !"".equals(position) ) {
-                        getObjectField().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, position );
+                    if ( newPosition != null && !"".equals(newPosition) ) {
+                        getObjectField().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, newPosition );
                     }
                 }
             }
@@ -288,76 +334,4 @@ public class DataObjectFieldEditor extends Composite {
             valueWidget = null;
         }
     }
-
-    /*    VALIDACIONES QUE ESTABAN EN EL PRESENTER
-
-   public PropertyEditorListener getDataObjectFieldEditorListener() {
-       return new PropertyEditorListener() {
-
-           @Override
-           public boolean doBeforePropertyChange(final PropertyEditor source, final String propertyName, final Object pendingValue, final Object currentValue, final List<PropertyChangeError> errors) {
-               validatorService.isValidIdentifier(pendingValue.toString(), new ValidatorCallback() {
-                   public boolean returnValue(boolean b) {
-                       return b;
-                   }
-
-                   @Override
-                   public void onFailure() {
-                       errors.add(new PropertyChangeError("Invalid data object attribute identifier: " + pendingValue + " is not a valid Java identifier"));
-                       returnValue(false);
-                   }
-
-                   @Override
-                   public void onSuccess() {
-                       validatorService.isUniqueEntityName(null, pendingValue.toString(), getDataModel(), new ValidatorCallback() {
-                           @Override
-                           public void onFailure() {
-                               errors.add(new PropertyChangeError("An attribute with identifier: " + pendingValue + " already exists in the data object."));
-                               returnValue(false);
-                           }
-
-                           @Override
-                           public void onSuccess() {
-                               returnValue(true);
-                           }
-                       });
-                   }
-               });
-               return false;
-               //TODO Implement validation for the properties of a data object
-               //ej...
-//                if ("name".equals(propertyName) && ("void".equals(pendingValue) || "int".equals(pendingValue) || "boolean".equals(pendingValue)) ) {
-//                    errors.add(new PropertyChangeError("Invalid name"));
-//                    return false;
-//                }
-//
-//                return true;
-           }
-
-           @Override
-           public void onPropertyChange(PropertyEditor source, String propertyName, Object newValue, Object currentValue) {
-               //TODO Implement change for a data object property
-               //Window.alert("data object field property change, propertyName: " + propertyName + ", newValue: " + newValue + ", currentValue: " + currentValue);
-               changeSelectedDataObjectFieldProperty(propertyName, newValue, currentValue);
-           }
-       };
-   }
-
-   private void changeSelectedDataObjectProperty(String propertyName, Object newValue, Object currentValue) {
-       //TODO improve this
-       if ("name".equals(propertyName)) {
-           selectionModel.getSelectedObject().setName(newValue.toString());
-       }
-       view.refreshObjectEditor();
-   }
-
-   private void changeSelectedDataObjectFieldProperty(String propertyName, Object newValue, Object currentValue) {
-       //TODO improve this
-       if ("name".equals(propertyName)) {
-           selectionModel.getSelectedProperty().setName(newValue.toString());
-       }
-       view.refreshObjectEditor();
-   }
-
-    */
 }

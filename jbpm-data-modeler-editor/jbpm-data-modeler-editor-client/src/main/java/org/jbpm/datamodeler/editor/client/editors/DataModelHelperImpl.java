@@ -19,6 +19,8 @@ public class DataModelHelperImpl extends DataModelHelper {
     private Map<String, Set<String>> referencedBy = new HashMap<String, Set<String>>(10);
     // Map linking DataObjects with the Objects they are referencing by (e.g. u.v.B --> {x.y.A} means B references A)
     private Map<String, Set<String>> references = new HashMap<String, Set<String>>(10);
+    // Map that keep account of the siblings a parent class has.
+    private Map<String, Set<String>> siblingsMap = new HashMap<String, Set<String>>(10);
     // List of all class names that coexist within a project
     private List<String> classNames = new ArrayList<String>(10);
 
@@ -34,7 +36,7 @@ public class DataModelHelperImpl extends DataModelHelper {
 
     public Boolean objectCanBeDeleted(String className) {
         Set<String> refs = referencedBy.get(className);
-        if (refs != null && refs.size() > 0) return false;
+        if ( (refs != null && refs.size() > 0) || siblingsMap.containsKey(className)) return false;
         return true;
     }
 
@@ -58,6 +60,11 @@ public class DataModelHelperImpl extends DataModelHelper {
     @Override
     public void dataObjectUnReferenced(String objectClassName, String subjectClassName) {
         objectUnReferenced(objectClassName, subjectClassName);
+    }
+
+    @Override
+    public void dataObjectExtended(String parentClassName, String siblingClassName, Boolean _extends) {
+        objectExtended(parentClassName, siblingClassName, _extends);
     }
 
     @Override
@@ -93,16 +100,11 @@ public class DataModelHelperImpl extends DataModelHelper {
         return refdBy != null && refdBy.size() > 0;
     }
 
-//    private void onDataObjectChanged(@Observes DataObjectChangeEvent event) {
-//        if (event.isFrom(dataModel)) {
-//            String propName = event.getPropertyName();
-//            if ("name".equalsIgnoreCase(propName) ||
-//                "packageName".equalsIgnoreCase(propName) ||
-//                "superClassName".equalsIgnoreCase(propName)) {
-//                reset();
-//            }
-//        }
-//    }
+    @Override
+    public Boolean isBeingExtended(String parentClassName) {
+        Set s = siblingsMap.get(parentClassName);
+        return s != null && s.size() > 0;
+    }
 
     public void init(DataModelTO dataModel) {
         this.dataModel = dataModel;
@@ -126,14 +128,6 @@ public class DataModelHelperImpl extends DataModelHelper {
         }
     }
 
-//    private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
-//        if (event.isFrom(dataModel)) {
-//            if (event.getCurrentDataObject() != null) {
-//                currentDataObject = event.getCurrentDataObject();
-//            } else currentDataObject = null;
-//        }
-//    }
-
     private void objectReferenced(String objectClassName, String subjectClassName) {
         Set<String> refs = referencedBy.get(objectClassName);
         if (refs == null) refs = new HashSet<String>();
@@ -156,6 +150,22 @@ public class DataModelHelperImpl extends DataModelHelper {
         if (refs != null && refs.size() > 0) {
             refs.remove(objectClassName);
         } else notification.fire(new NotificationEvent("Error de-referencing data object (referring object)."));
+    }
+
+    private void objectExtended(String parentClassName, String siblingClassName, Boolean _extends) {
+        Set<String> _siblings = siblingsMap.get(parentClassName);
+
+        if (_extends) {
+            if (_siblings != null ) _siblings.add(siblingClassName);
+            else {
+                _siblings = new HashSet<String>();
+                _siblings.add(siblingClassName);
+                siblingsMap.put(parentClassName, _siblings);
+            }
+        } else {
+            if (_siblings != null && _siblings.size() > 0) _siblings.remove(siblingClassName);
+            else notification.fire(new NotificationEvent("Superclass referencing error"));
+        }
     }
 
     private void objectDeleted(String subjectClassName) {

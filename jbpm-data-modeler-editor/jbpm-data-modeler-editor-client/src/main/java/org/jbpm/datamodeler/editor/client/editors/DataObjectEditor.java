@@ -267,7 +267,7 @@ public class DataObjectEditor extends Composite {
 
     @UiHandler("label")
     void labelChanged(final ValueChangeEvent<String> event) {
-        final String _label = label.getValue();
+        String _label = label.getValue();
         AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.LABEL_ANNOTATION);
 
         if (annotation != null) {
@@ -282,7 +282,7 @@ public class DataObjectEditor extends Composite {
 
     @UiHandler("description")
     void descriptionChanged(final ValueChangeEvent<String> event) {
-        final String _description = description.getValue();
+        String _description = description.getValue();
         AnnotationTO annotation = getDataObject().getAnnotation(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION);
 
         if (annotation != null) {
@@ -304,14 +304,14 @@ public class DataObjectEditor extends Composite {
         validatorService.canChangeObjectPackage(getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
+                ep.showAsError(false);
                 ep.showMessage("Cannot change this object's package because it is being referenced from other DataObjects");
+                packageSelector.getPackageList().setSelectedValue(getDataObject().getPackageName());
             }
 
             @Override
             public void onSuccess() {
-                if (packageName != null &&
-                        !"".equals(packageName) &&
-                        !PackageSelector.NOT_SELECTED.equals(packageName))
+                if (packageName != null && !"".equals(packageName) && !PackageSelector.NOT_SELECTED.equals(packageName))
                     getDataObject().setPackageName(packageName);
                 else getDataObject().setPackageName(null);
             }
@@ -319,12 +319,22 @@ public class DataObjectEditor extends Composite {
     }
 
     private void superClassChanged(ChangeEvent event) {
-        final String superClass = superclassSelector.getSuperclassList().getValue();
-        if (superClass != null &&
-                !"".equals(superClass) &&
-                !SuperclassSelector.NOT_SELECTED.equals(superClass))
-            getDataObject().setSuperClassName(superClass);
-        else getDataObject().setSuperClassName(null);
+        String newSuperClass = superclassSelector.getSuperclassList().getValue();
+        String oldSuperClass = getDataObject().getSuperClassName();
+
+        if (newSuperClass != null && !"".equals(newSuperClass) && !SuperclassSelector.NOT_SELECTED.equals(newSuperClass)) {
+            getDataObject().setSuperClassName(newSuperClass);
+
+            // Remove former extension refs if superclass has changed
+            if (oldSuperClass != null && !"".equals(oldSuperClass))
+                getDataModel().getHelper().dataObjectExtended(oldSuperClass, getDataObject().getClassName(), false);
+
+            getDataModel().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), true);
+
+        } else {
+            getDataObject().setSuperClassName(null);
+            getDataModel().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), false);
+        }
     }
 
     void roleChanged(final ChangeEvent event) {
@@ -354,6 +364,7 @@ public class DataObjectEditor extends Composite {
     private class DataObjectEditorErrorPopup extends ErrorPopup {
         private Widget titleWidget;
         private Widget valueWidget;
+        private boolean showErrorStyle = true;
         private DataObjectEditorErrorPopup() {
             setAfterCloseEvent(new Command() {
                 @Override
@@ -361,15 +372,17 @@ public class DataObjectEditor extends Composite {
                     titleWidget.setStyleName("text-error");
                     if (valueWidget instanceof Focusable) ((FocusWidget)valueWidget).setFocus(true);
                     if (valueWidget instanceof ValueBoxBase) ((ValueBoxBase)valueWidget).selectAll();
-                    clearWidgets();
+                    reset();
                 }
             });
         }
         private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;}
         private void setValueWidget(Widget valueWidget){this.valueWidget = valueWidget;}
-        private void clearWidgets() {
+        private void showAsError(boolean showError){this.showErrorStyle = showError;}
+        private void reset() {
             titleWidget = null;
             valueWidget = null;
+            showErrorStyle = true;
         }
     }
 }
