@@ -14,65 +14,44 @@ import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.uberfire.client.common.Popup;
+import org.uberfire.client.mvp.Command;
 
 import javax.inject.Inject;
 
 
 public class NewPackagePopup extends Popup {
 
-    TextBox newPackageName;
+    private TextBox newPackageName = new TextBox();
 
-    public Button newPackageButton;
+    private Button newPackageButton = new Button("Add");
 
-    String packageName;
+    private String packageName;
 
-    HelpInline errorMessages;
+    private HelpInline errorMessages = new HelpInline();
 
-    ControlGroup newPackageControlGroup;
+    private ControlGroup newPackageControlGroup = new ControlGroup();
 
-    ControlGroup errorMessagesGroup;
+    private ControlGroup errorMessagesGroup = new ControlGroup();
+
+    private VerticalPanel mainPanel = new VerticalPanel();
+
+    private HorizontalPanel dataPanel = new HorizontalPanel();
+
+    private Command afterAddCommand;
 
     @Inject
     ValidatorService validatorService;
 
     public NewPackagePopup() {
         setModal(true);
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    @Override
-    public String getTitle() {
-        return "New package";
-    }
-
-    @Override
-    public Widget getContent() {
-
-        VerticalPanel mainPanel = new VerticalPanel();
-        HorizontalPanel dataPanel = new HorizontalPanel();
-
-        newPackageName = new TextBox();
-        newPackageButton = new Button("Add");
-        errorMessages = new HelpInline();
-        newPackageControlGroup = new ControlGroup();
-        errorMessagesGroup = new ControlGroup();
 
         newPackageControlGroup.add(newPackageName);
-
         errorMessagesGroup.add(errorMessages);
-
         dataPanel.add(newPackageControlGroup);
         dataPanel.add(newPackageButton);
         mainPanel.add(dataPanel);
         mainPanel.add(errorMessagesGroup);
-        
+
         newPackageButton.addClickHandler(new ClickHandler() {
 
             @Override
@@ -91,11 +70,38 @@ public class NewPackagePopup extends Popup {
                         setPackageName(packgeName);
                         clean();
                         hide();
+                        if (afterAddCommand != null) {
+                            afterAddCommand.execute();
+                        }
                     }
                 });
             }
         });
+    }
 
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
+    public Command getAfterAddCommand() {
+        return afterAddCommand;
+    }
+
+    public void setAfterAddCommand(Command afterAddCommand) {
+        this.afterAddCommand = afterAddCommand;
+    }
+
+    @Override
+    public String getTitle() {
+        return "New package";
+    }
+
+    @Override
+    public Widget getContent() {
         return mainPanel;
     }
 

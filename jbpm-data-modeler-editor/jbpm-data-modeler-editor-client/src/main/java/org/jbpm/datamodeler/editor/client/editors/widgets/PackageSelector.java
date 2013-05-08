@@ -13,7 +13,9 @@ import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
+import org.uberfire.client.mvp.Command;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,52 +48,48 @@ public class PackageSelector extends Composite {
     private DataModelTO dataModel;
 
     private DataObjectTO dataObject;
-    
-    private String newPackageName;
 
     public PackageSelector() {
         initWidget(uiBinder.createAndBindUi(this));
         
         packageList.addItem("", NOT_SELECTED);
         packageList.addItem(DEFAULT_PACKAGE, DEFAULT_PACKAGE);
+    }
 
+    @PostConstruct
+    private void init() {
+        Command command = new Command() {
+            @Override
+            public void execute() {
+                String newPackage = newPackagePopup.getPackageName();
+                processNewPackage(newPackage);
+            }
+        };
+        newPackagePopup.setAfterAddCommand(command);
+    }
+
+    private void processNewPackage(String newPackageName) {
+        if (newPackageName != null && !"".equals(newPackageName.trim())) {
+            boolean exists = false;
+            newPackageName = newPackageName.trim();
+            int count = packageList.getItemCount();
+            if (count > 0) {
+                for (int i = 0; i < count; i++) {
+                    if ((exists = newPackageName.equals(packageList.getValue(i)))) break;
+                }
+            }
+            if (exists) {
+                packageList.setSelectedValue(newPackageName);
+            } else {
+                packageList.addItem(newPackageName, newPackageName);
+                packageList.setSelectedValue(newPackageName);
+            }
+        }
     }
 
     @UiHandler("newPackage")
     void createNewPackage(ClickEvent event) {
-        //newPackagePopup.setAfterShow();
         newPackagePopup.show();
-
-        /*
-        final NewPackagePopup packagePopup = new NewPackagePopup();
-        packagePopup.newPackageButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-
-                setNewPackageName(null);
-                final String packgeName = packagePopup.newPackageName.getText() != null ? packagePopup.newPackageName.getText().trim() : "";
-                validatorService.isValidPackageIdentifier(packgeName, new ValidatorCallback() {
-                    @Override
-                    public void onFailure() {
-                        packagePopup.setErrorMessage(Constants.INSTANCE.validation_error_invalid_package_identifier(packgeName));
-                    }
-
-                    @Override
-                    public void onSuccess() {
-                        setNewPackageName(packgeName);
-                        packagePopup.clean();
-                        packagePopup.setVisible(false);
-                    }
-                });
-            }
-        });
-        
-        packagePopup.
-        packagePopup.show();
-        Window.alert("procesar paquete: " + newPackageName);
-        */
-
     }
 
     public void enableCreatePackage(boolean enable) {
@@ -126,10 +124,6 @@ public class PackageSelector extends Composite {
         }
     }
             
-    private void setNewPackageName(String newPackageName) {
-        this.newPackageName = newPackageName;
-    }
-
     private void initList() {
         packageList.clear();
         List<String> packageNames = new ArrayList<String>();
