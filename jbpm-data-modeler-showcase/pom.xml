@@ -129,6 +129,30 @@
             <artifactId>errai-data-binding</artifactId>
         </dependency>
 
+
+        <!--
+        <dependency>
+            <groupId>org.guvnor</groupId>
+            <artifactId>guvnor-inbox-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.guvnor</groupId>
+            <artifactId>guvnor-inbox-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.guvnor</groupId>
+            <artifactId>guvnor-inbox-backend</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.guvnor</groupId>
+            <artifactId>guvnor-inbox-backend</artifactId>
+        </dependency>
+        -->
+
+
         <!--dependency>
             <groupId>com.github.gwtbootstrap</groupId>
             <artifactId>gwt-bootstrap</artifactId>
@@ -190,6 +214,7 @@
             <artifactId>guvnor-core-services-backend</artifactId>
         </dependency>
 
+
         <dependency>
             <groupId>org.kie.guvnor</groupId>
             <artifactId>guvnor-project-editor-client</artifactId>
@@ -198,12 +223,14 @@
             <groupId>org.kie.guvnor</groupId>
             <artifactId>guvnor-project-editor-backend</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.kie.guvnor</groupId>
+            <groupId>org.guvnor</groupId>
             <artifactId>guvnor-m2repo-editor-client</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.kie.guvnor</groupId>
+            <groupId>org.guvnor</groupId>
             <artifactId>guvnor-m2repo-editor-backend</artifactId>
             <exclusions>
                 <exclusion>
@@ -212,6 +239,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.kie.guvnor</groupId>
             <artifactId>guvnor-metadata-widget</artifactId>
@@ -358,8 +386,8 @@
                         <compileSourcesArtifact>org.kie.guvnor:guvnor-project-editor-client</compileSourcesArtifact>
                         <compileSourcesArtifact>org.kie.guvnor:guvnor-project-config-editor-api</compileSourcesArtifact>
                         <compileSourcesArtifact>org.kie.guvnor:guvnor-project-config-editor-client</compileSourcesArtifact>
-                        <compileSourcesArtifact>org.kie.guvnor:guvnor-m2repo-editor-api</compileSourcesArtifact>
-                        <compileSourcesArtifact>org.kie.guvnor:guvnor-m2repo-editor-client</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.guvnor:guvnor-m2repo-editor-api</compileSourcesArtifact>
+                        <compileSourcesArtifact>org.guvnor:guvnor-m2repo-editor-client</compileSourcesArtifact>
                         <compileSourcesArtifact>org.kie.guvnor:guvnor-explorer-client</compileSourcesArtifact>
                         <compileSourcesArtifact>org.kie.guvnor:guvnor-explorer-client</compileSourcesArtifact>
 

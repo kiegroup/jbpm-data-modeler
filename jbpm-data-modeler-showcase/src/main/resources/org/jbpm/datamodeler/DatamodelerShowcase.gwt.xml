@@ -10,9 +10,11 @@
     <inherits name="org.uberfire.UberfireWorkbench"/>
     <inherits name="org.uberfire.UberfireWidgetsCore"/>
     <inherits name="org.uberfire.UberfireBackend"/>
+    <inherits name="org.uberfire.UberfireWidgetsCommons"/>
 
     <!-- Infrastructure -->
     <inherits name="org.drools.guvnor.models.commons.DroolsGuvnorModelsCommon"/>
+
     <inherits name="org.kie.guvnor.project.GuvnorProjectAPI"/>
     <inherits name='org.kie.guvnor.datamodel.GuvnorDataModelAPI'/>
     <inherits name="org.kie.guvnor.commons.data.GuvnorCommonsData"/>
@@ -32,7 +34,10 @@
     <!-- projects -->
 
     <inherits name="org.kie.guvnor.metadata.GuvnorMetadataWidget"/>
-    <inherits name="org.kie.guvnor.m2repo.GuvnorM2RepoEditorClient"/>
+    <!--inherits name="org.kie.guvnor.m2repo.GuvnorM2RepoEditorClient"/-->
+
+    <inherits name="org.guvnor.m2repo.GuvnorM2RepoEditorClient"/>
+
     <inherits name="org.kie.guvnor.projecteditor.GuvnorProjectEditorClient"/>
     <inherits name="org.kie.guvnor.projectconfigscreen.GuvnorProjectConfigScreenClient"/>
     <inherits name="org.kie.guvnor.configresource.GuvnorConfigResourceWidget"/>
@@ -49,36 +54,5 @@
     <!-- Specify the paths for translatable code -->
     <source path='client'/>
     <source path='shared'/>
-
-
-    <!--
-
-        <inherits name="org.jboss.errai.enterprise.CDI"/>
-        <inherits name='org.jboss.errai.bus.ErraiBus'/>
-
-        <inherits name="org.uberfire.security.UberfireSecurityClient"/>
-
-        <inherits name="org.uberfire.UberfireWorkbench"/>
-        <inherits name="org.uberfire.UberfireWidgetsCore"/>
-        <inherits name="org.uberfire.UberfireBackend"/>
-
-        &lt;!&ndash; Infrastructure &ndash;&gt;
-        <inherits name="org.kie.guvnor.project.GuvnorProjectAPI"/>
-        <inherits name='org.kie.guvnor.datamodel.GuvnorDataModelAPI'/>
-        <inherits name="org.kie.guvnor.commons.data.GuvnorCommonsData"/>
-        <inherits name="org.kie.guvnor.commons.service.GuvnorCommonsServicesAPI"/>
-        <inherits name="org.kie.guvnor.services.GuvnorCoreServicesAPI"/>
-        <inherits name="org.kie.guvnor.commons.ui.GuvnorCommonsUI"/>
-        <inherits name="org.kie.guvnor.commons.security.GuvnorCommonsSecurity"/>
-
-        &lt;!&ndash; projects &ndash;&gt;
-        <inherits name="org.kie.guvnor.metadata.GuvnorMetadataWidget"/>
-        <inherits name="org.kie.guvnor.m2repo.GuvnorM2RepoEditorClient"/>
-        <inherits name="org.kie.guvnor.projecteditor.GuvnorProjectEditorClient"/>
-        <inherits name="org.kie.guvnor.projectconfigscreen.GuvnorProjectConfigScreenClient"/>
-        <inherits name="org.kie.guvnor.configresource.GuvnorConfigResourceWidget"/>
-        <inherits name="org.kie.guvnor.explorer.GuvnorExplorerClient"/>
-    -->
-
 
 </module>
