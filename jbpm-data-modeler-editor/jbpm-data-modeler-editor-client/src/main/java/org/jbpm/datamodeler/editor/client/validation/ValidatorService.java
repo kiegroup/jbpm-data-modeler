@@ -88,14 +88,32 @@ public class ValidatorService {
         callback.onSuccess();
     }
 
+    public void isValidPosition(String position, ValidatorCallback callback) {
+        int i = -1;
+        if (position == null || position.length() == 0) i = 0;  // null or empty String is allowed
+        try {
+            i = Integer.parseInt(position, 10);
+        } catch (NumberFormatException e) {}
+        if (i < 0) callback.onFailure();
+        else callback.onSuccess();
+    }
+
     public void canDeleteDataObject(DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
         if (model.getHelper().objectCanBeDeleted(object.getClassName())) callback.onSuccess();
         else callback.onFailure();
     }
 
     public void canChangeObjectName(DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        Boolean referenced = model.getHelper().isDataObjectReferenced(object.getClassName());
-        if (!referenced) callback.onSuccess();
+        if (!isDataObjectReferenced(object, model)) callback.onSuccess();
         else callback.onFailure();
+    }
+
+    public void canChangeObjectPackage(DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
+        if (!isDataObjectReferenced(object, model)) callback.onSuccess();
+        else callback.onFailure();
+    }
+
+    public Boolean isDataObjectReferenced(DataObjectTO object, DataModelTO model) {
+        return model.getHelper().isDataObjectReferenced(object.getClassName());
     }
 }

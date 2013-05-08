@@ -58,6 +58,9 @@ public class DataObjectEditor extends Composite {
     TextArea description;
 
     @UiField
+    Label packageNameLabel;
+
+    @UiField
     SimplePanel packageSelectorPanel;
 
     @Inject
@@ -159,7 +162,7 @@ public class DataObjectEditor extends Composite {
         return annotationDefinitions;
     }
 
-    // event Observers
+    // Event observers
     private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
         if (event.isFrom(getDataModel())) {
             loadDataObject(event.getCurrentDataObject());
@@ -293,12 +296,26 @@ public class DataObjectEditor extends Composite {
     }
 
     private void packageChanged(ChangeEvent event) {
+        // Set widgets to errorpopup for styling purposes etc.
+        ep.setTitleWidget(packageNameLabel);
+        ep.setValueWidget(packageSelector);
+
         final String packageName = packageSelector.getPackageList().getValue();
-        if (packageName != null &&
-                !"".equals(packageName) &&
-                !PackageSelector.NOT_SELECTED.equals(packageName))
-            getDataObject().setPackageName(packageName);
-        else getDataObject().setPackageName(null);
+        validatorService.canChangeObjectPackage(getDataObject(), getDataModel(), new ValidatorCallback() {
+            @Override
+            public void onFailure() {
+                ep.showMessage("Cannot change this object's package because it is being referenced from other DataObjects");
+            }
+
+            @Override
+            public void onSuccess() {
+                if (packageName != null &&
+                        !"".equals(packageName) &&
+                        !PackageSelector.NOT_SELECTED.equals(packageName))
+                    getDataObject().setPackageName(packageName);
+                else getDataObject().setPackageName(null);
+            }
+        });
     }
 
     private void superClassChanged(ChangeEvent event) {
@@ -333,6 +350,7 @@ public class DataObjectEditor extends Composite {
         roleSelector.setSelectedValue(NOT_SELECTED);
     }
 
+    // TODO extract this to parent widget to avoid duplicate code
     private class DataObjectEditorErrorPopup extends ErrorPopup {
         private Widget titleWidget;
         private Widget valueWidget;

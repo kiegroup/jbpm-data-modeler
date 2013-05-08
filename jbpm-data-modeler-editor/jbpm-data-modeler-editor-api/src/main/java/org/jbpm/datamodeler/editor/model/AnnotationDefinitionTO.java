@@ -25,7 +25,7 @@ public class AnnotationDefinitionTO {
     
     public static final String ROLE_ANNOTATION = "org.jbpm.datamodeler.annotations.Role";
     
-    public static final String POSITION_ANNOTATON = "org.jbpm.datamodeler.annotations.Position";
+    public static final String POSITION_ANNOTATON = "org.kie.api.definition.type.Position";
 
     public static final String LABEL_ANNOTATION = "org.jbpm.datamodeler.annotations.Label";
 

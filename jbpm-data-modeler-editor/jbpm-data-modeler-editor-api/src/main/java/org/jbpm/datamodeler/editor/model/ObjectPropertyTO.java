@@ -108,15 +108,36 @@ public class ObjectPropertyTO {
     }
 
     public AnnotationTO getAnnotation(String annotationClassName) {
-        if (annotationClassName == null) return null;
-
-        for (AnnotationTO annotation : annotations) {
-            if (annotationClassName.equals(annotation.getClassName())) return annotation;
-        }
-        return null;
+        AnnotationTO annotation = null;
+        int index = _getAnnotation(annotationClassName);
+        if (index >= 0) annotation = annotations.get(_getAnnotation(annotationClassName));
+        return annotation;
     }
 
     public void addAnnotation(AnnotationTO annotation) {
         annotations.add(annotation);
+    }
+
+    public AnnotationTO addAnnotation(AnnotationDefinitionTO annotationDefinitionTO, String memberName, Object value) {
+        AnnotationTO annotation = new AnnotationTO(annotationDefinitionTO);
+        annotation.setValue(memberName, value);
+        addAnnotation(annotation);
+        return annotation;
+    }
+
+    public void removeAnnotation(AnnotationTO annotation) {
+        if (annotation != null) {
+            int index = _getAnnotation(annotation.getClassName());
+            if (index >= 0) annotations.remove(index);
+        }
+    }
+
+    private Integer _getAnnotation(String annotationClassName) {
+        if (annotationClassName == null || "".equals(annotationClassName)) return -1;
+        for (int i = 0; i < annotations.size(); i++) {
+            AnnotationTO _annotation = annotations.get(i);
+            if (annotationClassName.equals(_annotation.getClassName())) return i;
+        }
+        return -1;
     }
 }

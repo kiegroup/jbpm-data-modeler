@@ -30,10 +30,10 @@
 
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
-                    <gwt:Label ui:field="shortNameLabel" text="Short name"/>
+                    <gwt:Label ui:field="labelLabel" text="Label"/>
                 </td>
                 <td>
-                    <b:TextBox ui:field="shortName" styleName="span10"></b:TextBox>
+                    <b:TextBox ui:field="label" styleName="span10"></b:TextBox>
                 </td>
             </tr>
 
