@@ -105,6 +105,7 @@ public class DataModelerServiceImpl implements DataModelerService {
             DataModelTO dataModelTO = DataModelerServiceHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
             dataModelTO.setDefaultPackage(DEFAULT_GUVNOR_PKG);
 
+            //TODO remove this print
             printProjectDataModelOracle(path);
 
             return dataModelTO;
@@ -136,9 +137,6 @@ public class DataModelerServiceImpl implements DataModelerService {
             GenerationContext generationContext = new GenerationContext(dataModelDomain);
             ServiceGenerationListener generationListener = new ServiceGenerationListener(javaPath);
             generationContext.setGenerationListener(generationListener);
-
-            //This output path is only for testing purposes, TODO REMOVE IT!
-            generationContext.setOutputPath("/tmp");
 
             invalidateDMOProjectCache.fire( new InvalidateDMOProjectCacheEvent( projectPath ) );
 
@@ -196,7 +194,7 @@ public class DataModelerServiceImpl implements DataModelerService {
         for (DataObjectTO dataObject : deletedObjects) {
             if (dataObject.isPersistent()) {
                 filePath = calculateFilePath(dataObject.getOriginalClassName(), javaPath);
-                if (dataModel.getDataObjectByClassName(dataObject.getClassName()) != null) {
+                if (dataModel.getDataObjectByClassName(dataObject.getOriginalClassName()) != null) {
                     //TODO check if we need to have this level of control or instead we remove this file too.
                     //very particular case a persistent object was deleted in memory and a new one with the same name
                     //was created. At the end we will have a file update instead of a delete.
@@ -216,7 +214,7 @@ public class DataModelerServiceImpl implements DataModelerService {
                 //if the className changes the old file needs to be removed
                 filePath = calculateFilePath(dataObject.getOriginalClassName(), javaPath);
 
-                if (dataModel.getDataObjectByClassName(dataObject.getClassName()) != null) {
+                if (dataModel.getDataObjectByClassName(dataObject.getOriginalClassName()) != null) {
                     //TODO check if we need to have this level of control or instead we remove this file too.
                     //very particular case of change, a persistent object changes the name to the name of another
                     //object. A kind of name swapping...
