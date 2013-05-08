@@ -77,6 +77,13 @@ public class NewPackagePopup extends Popup {
                 });
             }
         });
+
+        super.setAfterCloseEvent(new com.google.gwt.user.client.Command() {
+            @Override
+            public void execute() {
+                clean();
+            }
+        });
     }
 
     public String getPackageName() {

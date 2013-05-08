@@ -107,7 +107,7 @@ public class DataObjectBrowser extends Composite {
 
     private List<ObjectPropertyTO> dataObjectProperties = new ArrayList<ObjectPropertyTO>();
 
-    private DataModelEditorPresenter modelEditorPresenter;
+    private DataModelerScreenPresenter modelerScreenPresenter;
 
     private List<PropertyTypeTO> baseTypes;
 
@@ -369,12 +369,12 @@ public class DataObjectBrowser extends Composite {
 
     }
 
-    public void setModelEditorPresenter(DataModelEditorPresenter modelEditorPresenter) {
-        this.modelEditorPresenter = modelEditorPresenter;
+    public void setModelerScreenPresenter(DataModelerScreenPresenter modelerScreenPresenter) {
+        this.modelerScreenPresenter = modelerScreenPresenter;
     }
 
-    public DataModelEditorPresenter getModelEditorPresenter() {
-        return modelEditorPresenter;
+    public DataModelerScreenPresenter getModelerScreenPresenter() {
+        return modelerScreenPresenter;
     }
 
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {

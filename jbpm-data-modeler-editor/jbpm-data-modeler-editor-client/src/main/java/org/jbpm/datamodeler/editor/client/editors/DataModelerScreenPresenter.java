@@ -52,11 +52,11 @@ import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleIt
 //@Dependent
 //@WorkbenchEditor(identifier = "DataModelEditor", supportedTypes = {DataModelResourceType.class })
 @WorkbenchScreen(identifier = "dataModelerScreen")
-public class DataModelEditorPresenter {
+public class DataModelerScreenPresenter {
 
-    public interface DataModelEditorView
+    public interface DataModelerScreenView
             extends
-            UberView<DataModelEditorPresenter> {
+            UberView<DataModelerScreenPresenter> {
 
         void setDataModel(DataModelTO dataModel);
 
@@ -66,7 +66,7 @@ public class DataModelEditorPresenter {
     }
 
     @Inject
-    private DataModelEditorView view;
+    private DataModelerScreenView view;
 
     @Inject
     private NewDataObjectPopup newDataObjectPopup;
@@ -101,7 +101,7 @@ public class DataModelEditorPresenter {
     }
 
     @WorkbenchPartView
-    public UberView<DataModelEditorPresenter> getView() {
+    public UberView<DataModelerScreenPresenter> getView() {
         return view;
     }
 

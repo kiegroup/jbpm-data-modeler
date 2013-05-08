@@ -93,6 +93,10 @@ public class DataObjectEditor extends Composite {
 
     public DataObjectEditor() {
         initWidget(uiBinder.createAndBindUi(this));
+    }
+
+    @PostConstruct
+    void init() {
 
         superclassSelector.getSuperclassList().addChangeHandler(new ChangeHandler() {
             @Override
@@ -112,12 +116,8 @@ public class DataObjectEditor extends Composite {
         roleSelector.addItem("Fact", "Fact");
         roleSelector.addItem("Event", "Event");
         roleSelector.setSelectedValue(NOT_SELECTED);
-    }
 
-    @PostConstruct
-    void init() {
         packageSelectorPanel.add(packageSelector);
-        // TODO o bien mover todos los addChangehandlers aquí, o bien mover éste al initWidget()
         packageSelector.getPackageList().addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {

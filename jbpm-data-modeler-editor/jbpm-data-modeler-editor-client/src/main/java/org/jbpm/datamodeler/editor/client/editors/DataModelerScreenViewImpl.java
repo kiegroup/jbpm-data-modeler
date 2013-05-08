@@ -16,33 +16,45 @@
 
 package org.jbpm.datamodeler.editor.client.editors;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
-import org.jboss.errai.ui.shared.api.annotations.DataField;
-import org.jboss.errai.ui.shared.api.annotations.Templated;
+import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
-import javax.enterprise.context.Dependent;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.List;
 
-@Dependent
-@Templated(value = "DataModelEditorViewImpl.html")
-public class DataModelEditorViewImpl extends Composite
-    implements DataModelEditorPresenter.DataModelEditorView {
+//@Dependent
+//@Templated(value = "DataModelerScreenViewImpl.html")
+public class DataModelerScreenViewImpl extends Composite
+    implements DataModelerScreenPresenter.DataModelerScreenView {
 
+    interface DataModelerScreenViewBinder
+            extends
+            UiBinder<Widget, DataModelerScreenViewImpl> {
 
-    private DataModelEditorPresenter presenter;
+    }
 
-    @DataField
-    private SimplePanel browserPanel = new SimplePanel();
+    private static DataModelerScreenViewBinder uiBinder = GWT.create(DataModelerScreenViewBinder.class);
 
-    @DataField
-    private SimplePanel dataObjectPanel = new SimplePanel();
+    private DataModelerScreenPresenter presenter;
 
-    @DataField
-    private SimplePanel propertiesPanel = new SimplePanel();
+    //@DataField
+    @UiField
+    SimplePanel browserPanel = new SimplePanel();
+
+    //@DataField
+    @UiField
+    SimplePanel dataObjectPanel = new SimplePanel();
+
+    //@DataField
+    @UiField
+    SimplePanel propertiesPanel = new SimplePanel();
 
     @Inject
     private ModelPropertiesEditor modelPropertiesEditor;
@@ -53,28 +65,37 @@ public class DataModelEditorViewImpl extends Composite
     @Inject
     private DataObjectBrowser dataObjectBrowser;
 
-    public DataModelEditorViewImpl() {
+    public DataModelerScreenViewImpl() {
+        initWidget( uiBinder.createAndBindUi( this ) );
+        /*
+        browserPanel.add(dataModelBrowser);
+        dataObjectPanel.add(dataObjectBrowser);
+        propertiesPanel.add(modelPropertiesEditor);
+        */
+    }
+
+    @PostConstruct
+    private void initUI() {
+        browserPanel.add(dataModelBrowser);
+        dataObjectPanel.add(dataObjectBrowser);
+        propertiesPanel.add(modelPropertiesEditor);
     }
 
     @Override
     public void setDataModel(DataModelTO dataModel) {
 
         dataModelBrowser.setDataModel(dataModel);
-        dataModelBrowser.setModelEditorPresenter(presenter);
+        dataModelBrowser.setModelerScreenPresenter(presenter);
 
         dataObjectBrowser.setDataModel(dataModel);
-        dataObjectBrowser.setModelEditorPresenter(presenter);
+        dataObjectBrowser.setModelerScreenPresenter(presenter);
 
         modelPropertiesEditor.setDataModel(dataModel);
     }
 
     @Override
-    public void init(final DataModelEditorPresenter presenter) {
+    public void init(final DataModelerScreenPresenter presenter) {
         this.presenter = presenter;
-        
-        browserPanel.add(dataModelBrowser);
-        dataObjectPanel.add(dataObjectBrowser);
-        propertiesPanel.add(modelPropertiesEditor);
     }
 
     @Override

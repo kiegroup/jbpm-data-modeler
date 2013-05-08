@@ -90,7 +90,7 @@ public class DataModelBrowser extends Composite {
 
     private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
 
-    private DataModelEditorPresenter modelEditorPresenter;
+    private DataModelerScreenPresenter modelerScreenPresenter;
 
     private boolean skipNextOnChange = false;
 
@@ -255,12 +255,12 @@ public class DataModelBrowser extends Composite {
 
     }
 
-    public DataModelEditorPresenter getModelEditorPresenter() {
-        return modelEditorPresenter;
+    public DataModelerScreenPresenter getModelerScreenPresenter() {
+        return modelerScreenPresenter;
     }
 
-    public void setModelEditorPresenter(DataModelEditorPresenter modelEditorPresenter) {
-        this.modelEditorPresenter = modelEditorPresenter;
+    public void setModelerScreenPresenter(DataModelerScreenPresenter modelerScreenPresenter) {
+        this.modelerScreenPresenter = modelerScreenPresenter;
     }
 
     @UiHandler("newEntityButton")
