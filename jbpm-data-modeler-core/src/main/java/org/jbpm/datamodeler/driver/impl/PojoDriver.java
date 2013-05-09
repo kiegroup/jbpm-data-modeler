@@ -89,6 +89,6 @@ public class PojoDriver implements ModelDriver {
 
     @Override
     public DataModel createModel() {
-        return new DataModelImpl(null, null);
+        return new DataModelImpl();
     }
 }

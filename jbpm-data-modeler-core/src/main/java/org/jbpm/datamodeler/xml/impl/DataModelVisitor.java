@@ -55,9 +55,9 @@ public class DataModelVisitor {
         rootNode = new XMLNode(NODE_DATA_MODEL, null);
         currentNode = rootNode;
 
-        currentNode.addAttribute(ATTR_MODEL_NAME, dataModel.getName());
-        currentNode.addAttribute(ATTR_MODEL_FORMAT, dataModel.getFormat());
-        currentNode.addAttribute(ATTR_MODEL_VERSION, dataModel.getVersion());
+        //currentNode.addAttribute(ATTR_MODEL_NAME, dataModel.getName());
+        //currentNode.addAttribute(ATTR_MODEL_FORMAT, dataModel.getFormat());
+        //currentNode.addAttribute(ATTR_MODEL_VERSION, dataModel.getVersion());
 
         //TODO check this
         //visitAttributes(currentNode, dataModel);
@@ -115,6 +115,7 @@ public class DataModelVisitor {
         return propertyNode;
     }
 
+    /*
     private void visitAttributes(XMLNode node, ModelElement element) {
         Map<String, Annotation> attributes = element.getAttributes();
         XMLNode attributeElement;
@@ -135,6 +136,7 @@ public class DataModelVisitor {
             }
         }
     }
+    */
     
     private String attrValueToString(Object value) {
         if (value != null) return value.toString();

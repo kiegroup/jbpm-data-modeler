@@ -19,12 +19,11 @@ package org.jbpm.datamodeler.xml.impl;
 import org.apache.xerces.parsers.DOMParser;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
-import org.jbpm.datamodeler.core.ModelElement;
 import org.jbpm.datamodeler.core.ObjectProperty;
 import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.xml.SerializerException;
-import org.jbpm.datamodeler.xml.util.XMLNode;
 import org.jbpm.datamodeler.xml.XMLSerializer;
+import org.jbpm.datamodeler.xml.util.XMLNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -179,8 +178,8 @@ public class XMLSerializerImpl implements XMLSerializer {
         String version = xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_VERSION);
         String name = xmlNode.getAttributes().getProperty(DataModelVisitor.ATTR_MODEL_NAME);
 
-        DataModel dataModel = ModelFactoryImpl.getInstance().newModel(name, format);
-        dataModel.setVersion(version);
+        DataModel dataModel = ModelFactoryImpl.getInstance().newModel();
+        //dataModel.setVersion(version);
 
         List<XMLNode> children = xmlNode.getChildren();
         for (XMLNode child : children) {
@@ -223,10 +222,13 @@ public class XMLSerializerImpl implements XMLSerializer {
         }
     }
 
+    /*
     protected void addAttributeFromNode(ModelElement element, XMLNode node) {
         String name = node.getAttributes().getProperty(DataModelVisitor.ATTR_NAME);
         String value = node.getAttributes().getProperty(DataModelVisitor.ATTR_VALUE);
         element.addAttribute(name, value);
     }
+
+*/
 
 }

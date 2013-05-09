@@ -211,7 +211,7 @@ public class DataModelerServiceImplOld /*implements DataModelerService*/ {
         org.kie.commons.java.nio.file.Path kiePath = paths.convert( context ).resolve( fileName );
 
         //create a default empty model.
-        DataModel dataModel = ModelFactoryImpl.getInstance().newModel(fileName);
+        DataModel dataModel = ModelFactoryImpl.getInstance().newModel();
 
         XMLSerializer serializer = new XMLSerializerImpl();
         String serializedModel;

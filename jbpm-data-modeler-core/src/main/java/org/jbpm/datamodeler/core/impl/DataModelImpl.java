@@ -16,6 +16,7 @@
 
 package org.jbpm.datamodeler.core.impl;
 
+import org.jbpm.datamodeler.commons.NamingUtils;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 
@@ -25,34 +26,7 @@ public class DataModelImpl implements DataModel {
 
     Map<String, DataObject> dataObjects = new HashMap<String, DataObject>();
 
-    String name;
-
-    String format;
-    
-    String version;
-
     public DataModelImpl() {
-
-    }
-
-    public DataModelImpl(String name, String format) {
-        this.name = name;
-        this.format = format;
-    }
-
-    @Override
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    @Override
-    public String getFormat() {
-        return format;
     }
 
     @Override
@@ -81,26 +55,9 @@ public class DataModelImpl implements DataModel {
 
     @Override
     public DataObject addDataObject(String className) {
-        StringTokenizer tokenizer = new StringTokenizer(className, ".");
-        StringBuffer packageName = new StringBuffer("");
-        String token = className;
-        while (tokenizer.hasMoreTokens()) {
-            token = tokenizer.nextToken();
-            if (tokenizer.hasMoreTokens()) {
-                if (packageName.length() > 0) packageName.append(".");
-                packageName.append(token);
-            }
-        }
-        return addDataObject(packageName.toString(), token);
+        String name = NamingUtils.getInstance().extractClassName(className);
+        String packageName = NamingUtils.getInstance().extractPackageName(className);
+        return addDataObject(packageName, name);
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
 }
