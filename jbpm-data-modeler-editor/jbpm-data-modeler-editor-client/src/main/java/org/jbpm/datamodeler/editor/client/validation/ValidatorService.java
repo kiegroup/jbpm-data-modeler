@@ -24,12 +24,12 @@ public class ValidatorService {
     }
 
     // TODO Generify this!!
-    // TODO replace this service call by a call to evaluateIdentifiers
-    public void isValidIdentifier(String identifier, final ValidatorCallback callback) {
+    public void isValidIdentifier(final String identifier, final ValidatorCallback callback) {
         modelerService.call(
-            new RemoteCallback<Boolean>() {
+            new RemoteCallback<Map<String, Boolean>>() {
                 @Override
-                public void callback(Boolean b) {
+                public void callback(Map<String, Boolean> evaluated) {
+                    boolean b = evaluated.get(identifier);
                     if (b) {
                         callback.onSuccess();
                     } else {
@@ -39,7 +39,7 @@ public class ValidatorService {
             },
             new DataModelerErrorCallback("An error occurred during the server validation process")
         )
-        .isValidIdentifier(identifier);
+        .evaluateIdentifiers(new String[]{identifier});
     }
     
     public void isValidPackageIdentifier(String identifier, final ValidatorCallback callback) {

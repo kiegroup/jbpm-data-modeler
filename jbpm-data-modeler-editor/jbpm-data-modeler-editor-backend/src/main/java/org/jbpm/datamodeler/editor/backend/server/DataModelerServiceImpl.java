@@ -350,11 +350,6 @@ public class DataModelerServiceImpl implements DataModelerService {
     }
 
     @Override
-    public Boolean isValidIdentifier(String identifier) {
-        return ValidationUtils.isJavaIdentifier(identifier);
-    }
-
-    @Override
     public Map<String, Boolean> evaluateIdentifiers(String[] identifiers) {
         Map<String, Boolean> result = new HashMap<String, Boolean>(identifiers.length);
         if (identifiers != null && identifiers.length > 0) {
