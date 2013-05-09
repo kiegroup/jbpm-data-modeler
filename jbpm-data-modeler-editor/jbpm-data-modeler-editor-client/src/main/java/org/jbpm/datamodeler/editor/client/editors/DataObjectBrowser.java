@@ -433,6 +433,21 @@ public class DataObjectBrowser extends Composite {
         if (newPropertyDataObjectType.getValue()) populateObjectTypes();
     }
 
+    private void onDataObjectPropertyChange(@Observes DataObjectFieldChangeEvent event) {
+
+        if (event.isFrom(getDataModel())) {
+            if ("name".equals(event.getPropertyName()) || "clas sName".equals(event.getPropertyName())) {
+                List<ObjectPropertyTO> props = dataObjectPropertiesProvider.getList();
+                for (int i = 0; i < props.size(); i++) {
+                    if (event.getCurrentField() == props.get(i)) {
+                        dataObjectPropertiesTable.redrawRow(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     // Event notifications
     private void notifyFieldSelected(ObjectPropertyTO selectedPropertyTO) {
         dataModelerEvent.fire(new DataObjectFieldSelectedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), getDataObject(), selectedPropertyTO));

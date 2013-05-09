@@ -304,9 +304,10 @@ public class DataObjectEditor extends Composite {
         validatorService.canChangeObjectPackage(getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
+                // Reset previous value
+                packageSelector.getPackageList().setSelectedValue(getDataObject().getPackageName());
                 ep.showAsError(false);
                 ep.showMessage("Cannot change this object's package because it is being referenced from other DataObjects");
-                packageSelector.getPackageList().setSelectedValue(getDataObject().getPackageName());
             }
 
             @Override
@@ -352,10 +353,13 @@ public class DataObjectEditor extends Composite {
     }
 
     private void clean() {
+        titleLabel.setStyleName(null);
         name.setText(null);
         label.setText(null);
         description.setText(null);
+        packageNameLabel.setStyleName(null);
         packageSelector.setDataObject(null);
+        // TODO superclassLabel when its validation is put in place
         superclassSelector.setDataObject(null);
         roleSelector.setSelectedValue(NOT_SELECTED);
     }
@@ -369,14 +373,14 @@ public class DataObjectEditor extends Composite {
             setAfterCloseEvent(new Command() {
                 @Override
                 public void execute() {
-                    titleWidget.setStyleName("text-error");
+                    if (showErrorStyle) titleWidget.setStyleName("text-error");
                     if (valueWidget instanceof Focusable) ((FocusWidget)valueWidget).setFocus(true);
                     if (valueWidget instanceof ValueBoxBase) ((ValueBoxBase)valueWidget).selectAll();
                     reset();
                 }
             });
         }
-        private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;}
+        private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;titleWidget.setStyleName(null);}
         private void setValueWidget(Widget valueWidget){this.valueWidget = valueWidget;}
         private void showAsError(boolean showError){this.showErrorStyle = showError;}
         private void reset() {

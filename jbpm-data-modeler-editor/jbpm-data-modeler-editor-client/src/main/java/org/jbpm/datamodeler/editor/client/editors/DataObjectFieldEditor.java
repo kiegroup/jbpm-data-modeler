@@ -304,11 +304,13 @@ public class DataObjectFieldEditor extends Composite {
     }
 
     private void clean() {
+        titleLabel.setStyleName(null);
         name.setText(null);
         label.setText(null);
         description.setText(null);
         // TODO typeSelector.set
         equalsSelector.setValue(Boolean.FALSE);
+        positionLabel.setStyleName(null);
         positionText.setText(null);
     }
 
@@ -327,7 +329,7 @@ public class DataObjectFieldEditor extends Composite {
                 }
             });
         }
-        private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;}
+        private void setTitleWidget(Widget titleWidget){this.titleWidget = titleWidget;titleWidget.setStyleName(null);}
         private void setValueWidget(Widget valueWidget){this.valueWidget = valueWidget;}
         private void clearWidgets() {
             titleWidget = null;

@@ -104,7 +104,7 @@ public class DataModelBrowser extends Composite {
         dataObjectsProvider.setList(dataObjects);
         dataObjectsTable.setEmptyTableWidget( new com.github.gwtbootstrap.client.ui.Label(Constants.INSTANCE.modelBrowser_emptyTable()));
 
-        //Init delete column
+        // Init delete column
         ClickableImageResourceCell clickableImageResourceCell = new ClickableImageResourceCell(true);
         final TooltipCellDecorator<ImageResource> decorator = new TooltipCellDecorator<ImageResource>(clickableImageResourceCell);
         decorator.setText(Constants.INSTANCE.modelBrowser_action_deleteDataObject());
@@ -127,7 +127,7 @@ public class DataModelBrowser extends Composite {
         dataObjectsTable.addColumn(deleteDataObjectColumnImg);
         dataObjectsTable.setColumnWidth(deleteDataObjectColumnImg, 20, Style.Unit.PX);
 
-        //Init data object column
+        // Init data object column
         final TextColumn<DataObjectTO> dataObjectColumn = new TextColumn<DataObjectTO>() {
 
             @Override
@@ -195,13 +195,13 @@ public class DataModelBrowser extends Composite {
         this.dataObjects = dataModel.getDataObjects();
         modelName.setText(dataModel.getName());
 
-        //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
+        // We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
         // to one with 3 rows and the table was sorted.
-        //Several tests has been done and the final workaround (not too bad) we found is to
-        // 1) sort the table again
-        // 2) create a new selection model
-        // 3) populate the table with new items
-        // 3) select the first row
+        // Several tests has been done and the final workaround (not too bad) we found is to
+        //  1) sort the table again
+        //  2) create a new selection model
+        //  3) populate the table with new items
+        //  3) select the first row
 
         SingleSelectionModel selectionModel2 = new SingleSelectionModel<DataObjectTO>();
         dataObjectsTable.setSelectionModel(selectionModel2);
@@ -234,7 +234,7 @@ public class DataModelBrowser extends Composite {
             selectionModel2.setSelected(sortBuffer.get(0), true);
         }
 
-        //set the first row selected again. Sounds crazy, but's part of the workaround, don't remove this line.
+        // Set the first row selected again. Sounds crazy, but it's part of the workaround, don't remove this line.
         if (dataObjects.size() > 0) {
             dataObjectsTable.setKeyboardSelectedRow(0);
         }
@@ -289,7 +289,7 @@ public class DataModelBrowser extends Composite {
         });
     }
 
-    //Event Observers
+    // Event Observers
 
     private void onDataObjectCreated(@Observes DataObjectCreatedEvent event) {
         if (event.isFrom(getDataModel())) {
@@ -326,7 +326,7 @@ public class DataModelBrowser extends Composite {
         }
     }
 
-    //Event notifications
+    // Event notifications
 
     private void notifyObjectSelected(DataObjectTO selectedObjectTO) {
         dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), selectedObjectTO));
