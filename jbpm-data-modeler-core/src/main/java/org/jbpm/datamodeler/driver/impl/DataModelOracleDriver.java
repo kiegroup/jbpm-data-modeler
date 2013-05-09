@@ -188,14 +188,9 @@ public class DataModelOracleDriver implements ModelDriver {
         return annotation;
     }
 
-    /**
-     * 
-     * @param fieldType
-     * @return
-     */
     private String getFieldType(ProjectDataModelOracle oracleDataModel, String packageName, String fieldType) {
-        //TODO review what happens if we read things like int, boolean, etc.
-
+        String primitiveClass = NamingUtils.getInstance().getClassForPrimitiveTypeId(fieldType);
+        if (primitiveClass != null) return primitiveClass;
         return fieldType;
     }
 
