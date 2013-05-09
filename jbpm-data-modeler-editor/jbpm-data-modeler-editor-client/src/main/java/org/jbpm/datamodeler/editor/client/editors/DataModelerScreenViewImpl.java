@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import java.util.List;
 
 //@Dependent
-//@Templated(value = "DataModelerScreenViewImpl.html")
 public class DataModelerScreenViewImpl extends Composite
     implements DataModelerScreenPresenter.DataModelerScreenView {
 
@@ -44,15 +43,12 @@ public class DataModelerScreenViewImpl extends Composite
 
     private DataModelerScreenPresenter presenter;
 
-    //@DataField
     @UiField
     SimplePanel browserPanel = new SimplePanel();
 
-    //@DataField
     @UiField
     SimplePanel dataObjectPanel = new SimplePanel();
 
-    //@DataField
     @UiField
     SimplePanel propertiesPanel = new SimplePanel();
 
@@ -67,11 +63,6 @@ public class DataModelerScreenViewImpl extends Composite
 
     public DataModelerScreenViewImpl() {
         initWidget( uiBinder.createAndBindUi( this ) );
-        /*
-        browserPanel.add(dataModelBrowser);
-        dataObjectPanel.add(dataObjectBrowser);
-        propertiesPanel.add(modelPropertiesEditor);
-        */
     }
 
     @PostConstruct
@@ -83,13 +74,8 @@ public class DataModelerScreenViewImpl extends Composite
 
     @Override
     public void setDataModel(DataModelTO dataModel) {
-
         dataModelBrowser.setDataModel(dataModel);
-        dataModelBrowser.setModelerScreenPresenter(presenter);
-
         dataObjectBrowser.setDataModel(dataModel);
-        dataObjectBrowser.setModelerScreenPresenter(presenter);
-
         modelPropertiesEditor.setDataModel(dataModel);
     }
 
@@ -102,10 +88,4 @@ public class DataModelerScreenViewImpl extends Composite
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
         dataObjectBrowser.setBaseTypes(baseTypes);
     }
-
-    @Override
-    public void refreshObjectEditor() {
-        dataObjectBrowser.refresh();
-    }
-
 }

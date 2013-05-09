@@ -97,8 +97,6 @@ public class DataObjectBrowser extends Composite {
 
     final PropertyTypeCell typeCell = new PropertyTypeCell(true, this);
 
-    final SingleSelectionModel<ObjectPropertyTO> selectionModel = new SingleSelectionModel<ObjectPropertyTO>();
-
     private DataModelTO dataModel;
     
     private DataObjectTO dataObject;
@@ -107,8 +105,6 @@ public class DataObjectBrowser extends Composite {
 
     private List<ObjectPropertyTO> dataObjectProperties = new ArrayList<ObjectPropertyTO>();
 
-    private DataModelerScreenPresenter modelerScreenPresenter;
-
     private List<PropertyTypeTO> baseTypes;
 
     @Inject
@@ -116,8 +112,6 @@ public class DataObjectBrowser extends Composite {
 
     @Inject
     Event<DataModelerEvent> dataModelerEvent;
-
-    private boolean skipNextOnChange = false;
 
     public DataObjectBrowser() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -219,6 +213,7 @@ public class DataObjectBrowser extends Composite {
         dataObjectPropertiesTable.getColumnSortList().push(propertyNameColumn);
 
         //Init the selection model
+        SingleSelectionModel<ObjectPropertyTO> selectionModel = new SingleSelectionModel<ObjectPropertyTO>();
         dataObjectPropertiesTable.setSelectionModel(selectionModel);
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
@@ -303,7 +298,6 @@ public class DataObjectBrowser extends Composite {
         // 2) create a new selection model
         // 3) populate the table with new items
         // 3) select the first row
-        dataObjectPropertiesTable.getColumnSortList().push(dataObjectPropertiesTable.getColumn(0));
         SingleSelectionModel selectionModel2 = new SingleSelectionModel<ObjectPropertyTO>();
         dataObjectPropertiesTable.setSelectionModel(selectionModel2);
 
@@ -366,15 +360,6 @@ public class DataObjectBrowser extends Composite {
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
         notifyFieldDeleted(objectProperty);
-
-    }
-
-    public void setModelerScreenPresenter(DataModelerScreenPresenter modelerScreenPresenter) {
-        this.modelerScreenPresenter = modelerScreenPresenter;
-    }
-
-    public DataModelerScreenPresenter getModelerScreenPresenter() {
-        return modelerScreenPresenter;
     }
 
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
@@ -382,14 +367,10 @@ public class DataObjectBrowser extends Composite {
         populateBaseTypes();
     }
 
-    public void refresh() {
-        dataObjectPropertiesProvider.refresh();
-    }
-
     private String propertyTypeDisplay(ObjectPropertyTO propertyTO) {
         String className = propertyTO.getClassName();
         if (propertyTO.isMultiple()) {
-            className += "[1..N]";
+            className += "[0..N]";
         }
         return className;
     }
@@ -435,7 +416,6 @@ public class DataObjectBrowser extends Composite {
     private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
         if (event.isFrom(getDataModel())) {            
             if (event.getCurrentDataObject() != null) {
-                boolean isFromMe = event.isFrom(DataModelerEvent.DATA_OBJECT_BROWSER);
                 setDataObject(event.getCurrentDataObject());
             } else {
                 //TODO clear the editor because any object is selected

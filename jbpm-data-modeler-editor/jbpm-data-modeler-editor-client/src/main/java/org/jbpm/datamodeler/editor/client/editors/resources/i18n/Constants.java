@@ -77,6 +77,10 @@ public interface Constants extends Messages {
 
     public String new_dataobject_popup_superclass();
 
+    public String packageSelector_popup_title();
+
+    public String packageSelector_popup_add();
+
     public String validation_error_invalid_object_identifier(String name);
 
     public String validation_error_invalid_package_identifier(String packageName);

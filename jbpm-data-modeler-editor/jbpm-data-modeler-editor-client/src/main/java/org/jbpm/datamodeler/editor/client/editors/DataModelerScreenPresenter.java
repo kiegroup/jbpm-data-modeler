@@ -49,7 +49,6 @@ import java.util.List;
 import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
 
 //@Dependent
-//@WorkbenchEditor(identifier = "DataModelEditor", supportedTypes = {DataModelResourceType.class })
 @WorkbenchScreen(identifier = "dataModelerScreen")
 public class DataModelerScreenPresenter {
 
@@ -61,7 +60,6 @@ public class DataModelerScreenPresenter {
 
         void setBaseTypes(List<PropertyTypeTO> baseTypes);
 
-        void refreshObjectEditor();
     }
 
     @Inject
@@ -78,9 +76,6 @@ public class DataModelerScreenPresenter {
     private ToolBar toolBar;
 
     @Inject
-    private DataModelEditorSelectionModel selectionModel;
-
-    @Inject
     Event<DataModelerEvent> dataModelerEvent;
 
     @Inject
@@ -90,6 +85,8 @@ public class DataModelerScreenPresenter {
     private WorkbenchContext workbenchContext;
 
     private Path currentProject;
+    
+    private DataModelTO dataModel;
 
     @WorkbenchPartTitle
     public String getTitle() {
@@ -178,14 +175,14 @@ public class DataModelerScreenPresenter {
     }
 
     public DataModelTO getDataModel() {
-        return selectionModel.getSelectedModel();
+        return dataModel;
     }
 
     private void setDataModel(DataModelTO dataModel) {
+        this.dataModel = dataModel;
         // Set data model helper before anything else
         if (dataModel != null) {
             dataModel.setHelper(new DataModelHelperImpl(dataModel));
-            selectionModel.setSelectedModel(dataModel);
             view.setDataModel(dataModel);
             if (dataModel.getDataObjects().size() > 0) {
                 dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataModel.getDataObjects().get(0)));
@@ -226,7 +223,7 @@ public class DataModelerScreenPresenter {
             ).resolveProject(newPath);
 
         } else {
-            //TODO check if this is posible. By definition we will always have a path.
+            //TODO check if this is possible. By definition we will always have a path.
         }
     }
 

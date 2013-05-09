@@ -82,7 +82,8 @@ public class DataModelBrowser extends Composite {
     @Inject
     private Event<NotificationEvent> notification;
 
-    SingleSelectionModel<DataObjectTO> selectionModel = new SingleSelectionModel<DataObjectTO>();
+    @Inject
+    private Event<DataModelerEvent> dataModelerEvent;
 
     private DataModelTO dataModel;
 
@@ -90,12 +91,7 @@ public class DataModelBrowser extends Composite {
 
     private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
 
-    private DataModelerScreenPresenter modelerScreenPresenter;
-
     private boolean skipNextOnChange = false;
-
-    @Inject
-    private Event<DataModelerEvent> dataModelerEvent;
 
     @Inject
     private NewDataObjectPopup newDataObjectPopup;
@@ -162,19 +158,13 @@ public class DataModelBrowser extends Composite {
         dataObjectColumn.setSortable(true);
         dataObjectsTable.addColumn(dataObjectColumn, Constants.INSTANCE.modelBrowser_columnName());
 
-
-        /*
-
-        ColumnSortEvent.ListHandler<ObjectPropertyTO> propertyNameColHandler = new ColumnSortEvent.ListHandler<ObjectPropertyTO>(dataObjectPropertiesProvider.getList());
-        propertyNameColHandler.setComparator(propertyNameColumn, new ObjectPropertyComparator("name"));
-        dataObjectPropertiesTable.addColumnSortHandler(propertyNameColHandler);
-         */
         ColumnSortEvent.ListHandler<DataObjectTO> dataObjectNameColHandler = new ColumnSortEvent.ListHandler<DataObjectTO>(dataObjectsProvider.getList());
         dataObjectNameColHandler.setComparator(dataObjectColumn, new DataObjectComparator());
         dataObjectsTable.addColumnSortHandler(dataObjectNameColHandler);
         dataObjectsTable.getColumnSortList().push(dataObjectColumn);
 
         //Init the selection model
+        SingleSelectionModel<DataObjectTO> selectionModel = new SingleSelectionModel<DataObjectTO>();
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
             @Override
@@ -204,8 +194,6 @@ public class DataModelBrowser extends Composite {
         this.dataModel = dataModel;
         this.dataObjects = dataModel.getDataObjects();
         modelName.setText(dataModel.getName());
-//        newDataObjectPopup.setDataModel(getDataModel());
-
 
         //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
         // to one with 3 rows and the table was sorted.
@@ -214,8 +202,6 @@ public class DataModelBrowser extends Composite {
         // 2) create a new selection model
         // 3) populate the table with new items
         // 3) select the first row
-        //dataObjectPropertiesTable.getColumnSortList().push(dataObjectPropertiesTable.getColumn(0));
-
 
         SingleSelectionModel selectionModel2 = new SingleSelectionModel<DataObjectTO>();
         dataObjectsTable.setSelectionModel(selectionModel2);
@@ -252,15 +238,6 @@ public class DataModelBrowser extends Composite {
         if (dataObjects.size() > 0) {
             dataObjectsTable.setKeyboardSelectedRow(0);
         }
-
-    }
-
-    public DataModelerScreenPresenter getModelerScreenPresenter() {
-        return modelerScreenPresenter;
-    }
-
-    public void setModelerScreenPresenter(DataModelerScreenPresenter modelerScreenPresenter) {
-        this.modelerScreenPresenter = modelerScreenPresenter;
     }
 
     @UiHandler("newEntityButton")
@@ -276,7 +253,6 @@ public class DataModelBrowser extends Composite {
             //but we want to avoid this redundant (in this case) event because the object has already been selected.
             skipNextOnChange = true;
             ((SingleSelectionModel<DataObjectTO>)dataObjectsTable.getSelectionModel()).setSelected(dataObject, true);
-            //selectionModel.setSelected(dataObject, true);
             dataObjectsTable.setKeyboardSelectedRow(index);
         }
     }

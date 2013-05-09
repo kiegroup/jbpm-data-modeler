@@ -23,7 +23,7 @@ public class NewPackagePopup extends Popup {
 
     private TextBox newPackageName = new TextBox();
 
-    private Button newPackageButton = new Button("Add");
+    private Button newPackageButton = new Button(Constants.INSTANCE.packageSelector_popup_add());
 
     private String packageName;
 
@@ -104,7 +104,7 @@ public class NewPackagePopup extends Popup {
 
     @Override
     public String getTitle() {
-        return "New package";
+        return Constants.INSTANCE.packageSelector_popup_title();
     }
 
     @Override
