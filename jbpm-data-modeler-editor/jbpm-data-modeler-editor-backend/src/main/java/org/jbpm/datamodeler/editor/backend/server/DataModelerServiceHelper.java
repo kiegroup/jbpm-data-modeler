@@ -47,7 +47,7 @@ public class DataModelerServiceHelper {
             }
         }
         //TODO remove this guarrada
-        dataModelTO.setExternalClasses(Arrays.asList("java.lang.Object", "java.util.Date"));
+        dataModelTO.setExternalClasses(Arrays.asList("java.lang.ref.PhantomReference", "java.util.regex.Matcher"));
         return dataModelTO;
     }
 
