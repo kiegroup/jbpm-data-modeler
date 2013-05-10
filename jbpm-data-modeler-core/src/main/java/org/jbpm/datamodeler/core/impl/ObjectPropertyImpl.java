@@ -63,10 +63,6 @@ public class ObjectPropertyImpl extends AbstractHasAnnotations implements Object
         this.bag = bag;
     }
 
-    public boolean getMultiple() {
-        return multiple;
-    }
-
     @Override
     public void setMultiple(boolean multiple) {
         this.multiple = multiple;

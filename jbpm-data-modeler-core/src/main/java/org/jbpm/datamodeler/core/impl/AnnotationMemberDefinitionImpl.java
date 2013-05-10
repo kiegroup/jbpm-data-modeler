@@ -1,5 +1,6 @@
 package org.jbpm.datamodeler.core.impl;
 
+import org.jbpm.datamodeler.commons.NamingUtils;
 import org.jbpm.datamodeler.core.AnnotationMemberDefinition;
 
 public class AnnotationMemberDefinitionImpl implements AnnotationMemberDefinition {
@@ -71,18 +72,7 @@ public class AnnotationMemberDefinitionImpl implements AnnotationMemberDefinitio
 
     @Override
     public boolean isPrimitiveType() {
-
-        //returns true for: byte, short, int, long, float, double, char, boolean
-
-        return
-                Byte.class.getName().equals(className) ||
-                Short.class.getName().equals(className) ||
-                Integer.class.getName().equals(className) ||
-                Long.class.getName().equals(className) ||
-                Float.class.getName().equals(className) ||
-                Double.class.getName().equals(className) ||
-                Character.class.getName().equals(className) ||
-                Boolean.class.getName().equals(className);
+        return NamingUtils.getInstance().isPrimitiveTypeClass(className);
     }
 
     @Override

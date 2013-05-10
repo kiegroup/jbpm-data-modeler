@@ -7,6 +7,15 @@ import java.util.StringTokenizer;
 
 public class NamingUtils {
 
+    public static final String BYTE  = "byte";
+    public static final String SHORT = "short";
+    public static final String INT = "int";
+    public static final String LONG = "long";
+    public static final String FLOAT = "float";
+    public static final String DOUBLE = "double";
+    public static final String CHAR = "char";
+    public static final String BOOLEAN = "boolean";
+
     public static NamingUtils getInstance() {
         return new NamingUtils();
     }
@@ -46,20 +55,45 @@ public class NamingUtils {
         return tokens;
     }
 
+    public boolean isPrimitiveTypeClass(String className) {
+        //returns true for: byte, short, int, long, float, double, char, boolean
 
-    public static void main(String args[]) {
-        System.out.println(getInstance().extractClassName("java.lang.Integer"));
-        System.out.println(getInstance().extractClassName("Integer"));
+        return
+                Byte.class.getName().equals(className) ||
+                Short.class.getName().equals(className) ||
+                Integer.class.getName().equals(className) ||
+                Long.class.getName().equals(className) ||
+                Float.class.getName().equals(className) ||
+                Double.class.getName().equals(className) ||
+                Character.class.getName().equals(className) ||
+                Boolean.class.getName().equals(className);
+    }
 
-        System.out.println(getInstance().extractPackageName("java.lang.Integer"));
-        System.out.println(getInstance().extractPackageName("Integer"));
-        List tokens = getInstance().tokenizePackageName(getInstance().extractPackageName("java.lang.Integer"));
-        tokens = getInstance().tokenizePackageName(getInstance().extractPackageName("lang.Integer"));
+    public boolean isPrimitiveTypeId(String type) {
+        //returns true for: byte, short, int, long, float, double, char, boolean
+        return
+            BYTE.equals(type) ||
+            SHORT.equals(type) ||
+            INT.equals(type) ||
+            LONG.equals(type) ||
+            FLOAT.equals(type) ||
+            DOUBLE.equals(type) ||
+            CHAR.equals(type) ||
+            BOOLEAN.equals(type);
+    }
 
-        tokens = getInstance().tokenizePackageName(getInstance().extractPackageName("Integer"));
-        tokens = getInstance().tokenizePackageName("java");
-        tokens = getInstance().tokenizePackageName("java.lang.myclasses");
-        tokens = null;
+    public String getClassForPrimitiveTypeId(String type) {
+
+        if (BYTE.equals(type)) return Byte.class.getName();
+        if (SHORT.equals(type)) return Short.class.getName();
+        if (INT.equals(type)) return Integer.class.getName();
+        if (LONG.equals(type)) return Long.class.getName();
+        if (FLOAT.equals(type)) return Float.class.getName();
+        if (DOUBLE.equals(type)) return Double.class.getName();
+        if (CHAR.equals(type)) return Character.class.getName();
+        if (BOOLEAN.equals(type)) return Boolean.class.getName();
+
+        return null;
     }
     
 }

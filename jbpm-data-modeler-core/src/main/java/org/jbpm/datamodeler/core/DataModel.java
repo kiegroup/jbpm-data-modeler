@@ -18,25 +18,7 @@ package org.jbpm.datamodeler.core;
 
 import java.util.Set;
 
-public interface DataModel extends HasName {
-
-    /**
-     * This is an internal value that specifies the format used for the model. In the future this
-     * format attribute can enable model migration from an old format N to a newer format N+1.
-     *
-     * @return The model format.
-     *
-     */
-    String getFormat();
-
-    /**
-     * Specifies model version.
-     *
-     * @param version
-     */
-    void setVersion(String version);
-    
-    String getVersion();
+public interface DataModel {
 
     Set<DataObject> getDataObjects();
 

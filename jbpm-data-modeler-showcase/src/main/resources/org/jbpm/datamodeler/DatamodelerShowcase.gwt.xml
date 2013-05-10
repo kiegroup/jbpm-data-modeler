@@ -13,7 +13,7 @@
     <inherits name="org.uberfire.UberfireWidgetsCommons"/>
 
     <!-- Infrastructure -->
-    <inherits name="org.drools.guvnor.models.commons.DroolsGuvnorModelsCommon"/>
+    <!--inherits name="org.drools.guvnor.models.commons.DroolsGuvnorModelsCommon"/-->
 
     <inherits name="org.kie.guvnor.project.GuvnorProjectAPI"/>
     <inherits name='org.kie.guvnor.datamodel.GuvnorDataModelAPI'/>
@@ -24,9 +24,9 @@
     <inherits name="org.kie.guvnor.commons.security.GuvnorCommonsSecurity"/>
 
 
-    <inherits name="org.drools.guvnor.models.testscenarios.DroolsGuvnorModelsTestScenarios"/>
+    <!--inherits name="org.drools.guvnor.models.testscenarios.DroolsGuvnorModelsTestScenarios"/-->
 
-    <inherits name='org.kie.guvnor.testscenario.TestScenarioEditorAPI'/>
+    <!--inherits name='org.kie.guvnor.testscenario.TestScenarioEditorAPI'/-->
 
     <!--inherits name="org.kie.guvnor.testscenario.GuvnorTestScenarioEditorClient"/-->
 

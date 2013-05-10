@@ -19,42 +19,14 @@ package org.jbpm.datamodeler.core.impl;
 import org.jbpm.datamodeler.core.*;
 
 
-public class ModelFactoryImpl implements ModelFactory, ModelElementFactory {
+public class ModelFactoryImpl implements ModelFactory {
     
-    private static String CURRENT_FORMAT = "1";
-
     public static ModelFactory getInstance() {
         return new ModelFactoryImpl();
     }
 
-    static ModelElementFactory getElementFactoryInstance() {
-        return new ModelFactoryImpl();
-    }
-
     @Override
-    public DataModel newModel(String name, String format) {
-        return new DataModelImpl(name, format);
-    }
-
-    @Override
-    public DataModel newModel(String name) {
-        return new DataModelImpl(name, CURRENT_FORMAT);
-    }
-    
-
-    @Override
-    public DataObject newDataObject(String packageName, String name) {
-        return new DataObjectImpl(packageName, name);
-    }
-
-    @Override
-    public ObjectProperty newProperty(String name, String className, boolean multiple) {
-        return new ObjectPropertyImpl(name, className, multiple);
-    }
-
-    @Override
-    public Annotation newAttribute(AnnotationDefinition annotationDefinition) {
-        Annotation annotation = new AnnotationImpl(annotationDefinition);
-        return annotation;
+    public DataModel newModel() {
+        return new DataModelImpl();
     }
 }

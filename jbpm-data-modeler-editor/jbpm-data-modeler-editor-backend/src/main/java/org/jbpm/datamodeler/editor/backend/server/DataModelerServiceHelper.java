@@ -16,7 +16,7 @@ public class DataModelerServiceHelper {
     }
 
     public DataModel to2Domain(DataModelTO dataModelTO) {
-        DataModel dataModel = ModelFactoryImpl.getInstance().newModel(dataModelTO.getName());
+        DataModel dataModel = ModelFactoryImpl.getInstance().newModel();
         List<DataObjectTO> dataObjects = dataModelTO.getDataObjects();
         DataObject dataObject;
 
@@ -30,7 +30,7 @@ public class DataModelerServiceHelper {
     }
 
     public DataModelTO domain2To(DataModel dataModel, Integer status) {
-        DataModelTO dataModelTO = new DataModelTO(dataModel.getName());
+        DataModelTO dataModelTO = new DataModelTO();
         List<DataObject> dataObjects = new ArrayList<DataObject>();
         dataObjects.addAll(dataModel.getDataObjects());
 
