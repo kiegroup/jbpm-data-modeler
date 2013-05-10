@@ -110,4 +110,32 @@ public class FileScanner {
         }
         return results;
     }
+
+    public boolean cleanEmptyDirectories(final IOService ioService, Path rootPath) throws IOException {
+        if (rootPath != null && Files.isDirectory(rootPath)) {
+            if (isEmpty(ioService, rootPath)) {
+                Files.delete(rootPath);
+                return true;
+            } else {
+                final DirectoryStream<Path> children = ioService.newDirectoryStream(rootPath);
+                for (Path child : children) {
+                    cleanEmptyDirectories(ioService, child);
+                }
+                if (isEmpty(ioService, rootPath)) {
+                    Files.delete(rootPath);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isEmpty(final IOService ioService, Path dirPath) throws IOException {
+        if (dirPath == null) return true;
+
+        final DirectoryStream<Path> children = ioService.newDirectoryStream(dirPath);
+        if (children == null) return true;        
+        Iterator<Path> iterator = children.iterator();
+        return iterator == null || !iterator.hasNext();
+    }
 }

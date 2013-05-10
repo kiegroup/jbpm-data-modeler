@@ -24,7 +24,6 @@ import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.guvnor.datamodel.events.InvalidateDMOProjectCacheEvent;
-import org.kie.guvnor.datamodel.model.ModelField;
 import org.kie.guvnor.datamodel.oracle.ProjectDataModelOracle;
 import org.kie.guvnor.datamodel.service.DataModelService;
 import org.kie.guvnor.project.service.ProjectService;
@@ -104,9 +103,6 @@ public class DataModelerServiceImpl implements DataModelerService {
             //Objects read from persistent .java format are tagged as PERSISTENT objects
             DataModelTO dataModelTO = DataModelerServiceHelper.getInstance().domain2To(dataModel, DataObjectTO.PERSISTENT);
             dataModelTO.setDefaultPackage(DEFAULT_GUVNOR_PKG);
-
-            //TODO remove this print
-            printProjectDataModelOracle(path);
 
             return dataModelTO;
 
@@ -451,48 +447,5 @@ public class DataModelerServiceImpl implements DataModelerService {
         }
         return results;
     }
-
-
-    public void printProjectDataModelOracle(Path projectPath) {
-
-        if (dataModelService != null) {
-            //DataModelOracle dataModelOracle = dataModelService.getDataModel(projectService.resolveProject(projectPath));
-            ProjectDataModelOracle dataModelOracle = dataModelService.getProjectDataModel(projectPath);
-
-            if (dataModelOracle != null) {
-                String[] factTypes = dataModelOracle.getFactTypes();
-                logger.debug("*********************** Project Fact types");
-                for (int i = 0; factTypes != null && i < factTypes.length; i++) {
-                    logger.debug(factTypes[i]);
-                }
-
-                logger.debug("*********************** External Fact types");
-                //String externalFactTypes[] = dataModelOracle..getExternalFactTypes();
-                //or (int i = 0; externalFactTypes != null && i < externalFactTypes.length; i++) {
-                    //logger.debug(externalFactTypes[i]);
-                //}
-                /**
-                logger.debug("*********************** All Fact types");
-                String allFactTypes[] = dataModelOracle.getAllFactTypes();
-                for (int i = 0; allFactTypes != null && i < allFactTypes.length; i++) {
-                    logger.debug(allFactTypes[i]);
-                } **/
-
-                logger.debug("*********************** Project Fact types structure");
-                Map<String, ModelField[]> fields = dataModelOracle.getModelFields();
-                for (int i = 0; factTypes != null && i < factTypes.length; i++) {
-                    logger.debug("******* Fields for: " +  factTypes[i]);
-                    ModelField[] factFields = fields.get(factTypes[i]);
-                    logger.debug("******* fields size: " + (factFields != null ? factFields.length : 0));
-                    for (int j = 0; factFields != null && j < factFields.length; j++) {
-                        logger.debug("******** " + factFields[j]);
-                    }
-                }
-            }
-        } else {
-            logger.error("dataModelService wasn't Injected");
-        }
-    }
-
 
 }
