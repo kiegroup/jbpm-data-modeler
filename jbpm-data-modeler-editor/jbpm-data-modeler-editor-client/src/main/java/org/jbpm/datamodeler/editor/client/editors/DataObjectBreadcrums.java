@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
+import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
@@ -65,11 +66,11 @@ public class DataObjectBreadcrums extends Breadcrumbs {
         if (currentPosition >= 0) {
             if (currentPosition < (buffer.size()-1)) {
                 //the element exists in the buffer and isn't the last.
-                //remove it from current positon.
+                //remove it from current position.
                 buffer.remove(currentPosition);
                 addElement = true;
             } else {
-                //the elements is allready in the last position
+                //the elements is already in the last position
                 addElement = false;
             }
         } else {
@@ -83,16 +84,7 @@ public class DataObjectBreadcrums extends Breadcrumbs {
                 buffer.remove(0);
             }
 
-            //create the new widget
-            NavLink navLink = new NavLink(dataObject.getName());
-            navLink.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    adjustNavigation(dataObject);
-                    notifyObjectSelected(dataObject);
-                }
-            });
-            buffer.add(new BufferElement(dataObject, navLink));
+            buffer.add(new BufferElement(dataObject));
 
             rebuild();
         }
@@ -126,9 +118,8 @@ public class DataObjectBreadcrums extends Breadcrumbs {
         DataObjectTO dataObject;
         Widget widget;
 
-        BufferElement(DataObjectTO dataObject, Widget widget) {
+        BufferElement(DataObjectTO dataObject) {
             this.dataObject = dataObject;
-            this.widget = widget;
         }
 
         public DataObjectTO getDataObject() {
@@ -140,11 +131,16 @@ public class DataObjectBreadcrums extends Breadcrumbs {
         }
 
         public Widget getWidget() {
-            return widget;
-        }
-
-        public void setWidget(Widget widget) {
-            this.widget = widget;
+            //create the new widget
+            NavLink navLink = new NavLink(dataObject.getName());
+            navLink.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    adjustNavigation(dataObject);
+                    notifyObjectSelected(dataObject);
+                }
+            });
+            return navLink;
         }
     }
 
@@ -169,6 +165,14 @@ public class DataObjectBreadcrums extends Breadcrumbs {
                     clear();
                     add(event.getCurrentDataObject());
                 }
+            }
+        }
+    }
+
+    private void onDataObjectChange(@Observes DataObjectChangeEvent event) {
+        if (event.isFrom(getDataModel())) {
+            if ("name".equals(event.getPropertyName())) {
+                rebuild();
             }
         }
     }

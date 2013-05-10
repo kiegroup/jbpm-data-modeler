@@ -304,7 +304,7 @@ public class DataObjectBrowser extends Composite {
     
     private void setDataObject(DataObjectTO dataObject) {
         this.dataObject = dataObject;
-        objectName.setText(dataObject.getName() + "::" + dataObject.getPackageName());
+        objectName.setText(getDataObjectFullName());
 
         //We create a new selection model due to a bug found in GWT when we change e.g. from one data object with 9 rows
         // to one with 3 rows and the table was sorted.
@@ -448,6 +448,14 @@ public class DataObjectBrowser extends Composite {
         if (newPropertyDataObjectType.getValue()) populateObjectTypes();
     }
 
+    private void onDataObjectChange(@Observes DataObjectChangeEvent event) {
+        if (event.isFrom(getDataModel())) {
+            if ("name".equals(event.getPropertyName()) || "packageName".equals(event.getPropertyName())) {
+                objectName.setText(getDataObjectFullName());
+            }
+        }
+    }
+
     private void onDataObjectPropertyChange(@Observes DataObjectFieldChangeEvent event) {
         if (event.isFrom(getDataModel())) {
             if ("name".equals(event.getPropertyName()) || "className".equals(event.getPropertyName())) {
@@ -475,4 +483,8 @@ public class DataObjectBrowser extends Composite {
         dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), dataObject));
     }
 
+
+    private String getDataObjectFullName() {
+        return dataObject.getName() + "::" + dataObject.getPackageName();
+    }
 }

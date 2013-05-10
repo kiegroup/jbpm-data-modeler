@@ -300,7 +300,8 @@ public class DataObjectEditor extends Composite {
         ep.setTitleWidget(packageNameLabel);
         ep.setValueWidget(packageSelector);
 
-        final String packageName = packageSelector.getPackageList().getValue();
+        final String oldPackageName = getDataObject().getPackageName();
+        final String newPackageName = packageSelector.getPackageList().getValue();
         validatorService.canChangeObjectPackage(getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
@@ -312,9 +313,10 @@ public class DataObjectEditor extends Composite {
 
             @Override
             public void onSuccess() {
-                if (packageName != null && !"".equals(packageName) && !PackageSelector.NOT_SELECTED.equals(packageName))
-                    getDataObject().setPackageName(packageName);
+                if (newPackageName != null && !"".equals(newPackageName) && !PackageSelector.NOT_SELECTED.equals(newPackageName))
+                    getDataObject().setPackageName(newPackageName);
                 else getDataObject().setPackageName(null);
+                notifyObjectChange("packageName", oldPackageName, newPackageName);
             }
         });
     }
