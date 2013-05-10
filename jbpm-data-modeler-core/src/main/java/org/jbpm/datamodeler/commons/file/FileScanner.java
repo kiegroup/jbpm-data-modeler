@@ -1,11 +1,11 @@
 package org.jbpm.datamodeler.commons.file;
 
 import org.kie.commons.io.IOService;
+import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.DirectoryStream;
 import org.kie.commons.java.nio.file.Files;
 import org.kie.commons.java.nio.file.Path;
 
-import org.kie.commons.java.nio.IOException;
 import java.util.*;
 
 public class FileScanner {
@@ -111,18 +111,25 @@ public class FileScanner {
         return results;
     }
 
-    public boolean cleanEmptyDirectories(final IOService ioService, Path rootPath) throws IOException {
+    public boolean cleanEmptyDirectories(final IOService ioService, Path rootPath, boolean deleteRoot, List<String> deleteableFiles) throws IOException {
+        DirDescriptor dirDescriptor;
         if (rootPath != null && Files.isDirectory(rootPath)) {
-            if (isEmpty(ioService, rootPath)) {
-                Files.delete(rootPath);
-                return true;
-            } else {
-                final DirectoryStream<Path> children = ioService.newDirectoryStream(rootPath);
+
+            final DirectoryStream<Path> children = ioService.newDirectoryStream(rootPath);
+            if (children != null) {
                 for (Path child : children) {
-                    cleanEmptyDirectories(ioService, child);
+                    if (Files.isDirectory(child)) {
+                        cleanEmptyDirectories(ioService, child, true, deleteableFiles);
+                    }
                 }
-                if (isEmpty(ioService, rootPath)) {
-                    Files.delete(rootPath);
+            }
+            dirDescriptor = isDeleteableDir(ioService, rootPath, deleteableFiles);
+            if (dirDescriptor.isDeleteable()) {
+                for (Path child : dirDescriptor.getChildren()) {
+                    ioService.delete(child);
+                }
+                if (deleteRoot) {
+                    ioService.delete(rootPath);
                     return true;
                 }
             }
@@ -130,11 +137,78 @@ public class FileScanner {
         return false;
     }
 
+    public DirDescriptor isDeleteableDir(final IOService ioService, Path dirPath, List<String> deleteableFiles) throws IOException {
+        DirDescriptor dirDescriptor = new DirDescriptor(dirPath);
+        boolean deleteable = false;
+
+        if (dirPath == null) {
+            deleteable = true;
+        } else {
+            final DirectoryStream<Path> children = ioService.newDirectoryStream(dirPath);
+            if (children == null) {
+                deleteable = true;
+            } else {
+                Iterator<Path> iterator = children.iterator();
+                if (iterator == null) {
+                    deleteable = true;
+                } else {
+                    deleteable = true;
+                    for (Path child : children) {
+                        if (Files.isDirectory(child)) {
+                            dirDescriptor.setDeleteable(false);
+                            return dirDescriptor;
+                        }
+                        for (String deleteableFile : deleteableFiles) {
+                            if (!child.getFileName().endsWith(deleteableFile)) {
+                                dirDescriptor.setDeleteable(false);
+                                return dirDescriptor;
+                            } else {
+                                dirDescriptor.addChild(child);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        dirDescriptor.setDeleteable(deleteable);
+        return dirDescriptor;
+    }
+    
+    class DirDescriptor {
+
+        private boolean deleteable = false;
+        
+        private List<Path> children = new ArrayList<Path>();
+
+        private Path path;
+
+        DirDescriptor(Path path) {
+            this.path = path;
+        }
+
+        public boolean isDeleteable() {
+            return deleteable;
+        }
+
+        public void setDeleteable(boolean deleteable) {
+            this.deleteable = deleteable;
+        }
+
+        public List<Path> getChildren() {
+            return children;
+        }
+
+        public void addChild(Path child) {
+            children.add(child);
+        }
+
+    }
+
     public boolean isEmpty(final IOService ioService, Path dirPath) throws IOException {
         if (dirPath == null) return true;
 
         final DirectoryStream<Path> children = ioService.newDirectoryStream(dirPath);
-        if (children == null) return true;        
+        if (children == null) return true;
         Iterator<Path> iterator = children.iterator();
         return iterator == null || !iterator.hasNext();
     }

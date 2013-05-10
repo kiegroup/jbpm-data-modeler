@@ -1,6 +1,7 @@
 package org.jbpm.datamodeler.editor.backend.server;
 
 import org.jboss.errai.bus.server.annotations.Service;
+import org.jboss.errai.reflections.vfs.Vfs;
 import org.jbpm.datamodeler.codegen.GenerationContext;
 import org.jbpm.datamodeler.codegen.GenerationEngine;
 import org.jbpm.datamodeler.codegen.GenerationListener;
@@ -139,6 +140,8 @@ public class DataModelerServiceImpl implements DataModelerService {
             GenerationEngine generationEngine = GenerationEngine.getInstance();
             generationEngine.generate(generationContext);
 
+            cleanupEmptyDirs(javaPath);
+
             fileChanges.addAll(generationListener.getFileChanges());
             notifyFileChanges(fileChanges);
 
@@ -225,6 +228,13 @@ public class DataModelerServiceImpl implements DataModelerService {
         }
 
         return  fileChanges;
+    }
+
+    private void cleanupEmptyDirs(org.kie.commons.java.nio.file.Path pojectPath) {
+        FileScanner fileScanner = new FileScanner();
+        List<String> deleteableFiles = new ArrayList<String>();
+        deleteableFiles.add(".gitignore");
+        fileScanner.cleanEmptyDirectories(ioService, pojectPath, false, deleteableFiles);
     }
 
     @Override
