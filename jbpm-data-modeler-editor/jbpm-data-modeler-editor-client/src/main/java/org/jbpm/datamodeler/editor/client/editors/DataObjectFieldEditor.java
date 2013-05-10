@@ -356,8 +356,8 @@ public class DataObjectFieldEditor extends Composite {
             for (String typeName : typeNames) {
                 String _typeName = dmu.extractClassName(typeName);
                 typeSelector.addItem(_typeName, typeName);
-                _typeName = _typeName + DataModelerUtils.MULTIPLE;
-                typeSelector.addItem(_typeName, _typeName);
+//                _typeName = _typeName + DataModelerUtils.MULTIPLE;
+//                typeSelector.addItem(_typeName, _typeName);
             }
 
             // Second add all model types, ordered
