@@ -182,9 +182,14 @@ public class GenerationEngine {
 
     public void generateSubTemplate(GenerationContext generationContext, String template) throws Exception {
         //read the template to use
-        String templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
-        Template t = velocityEngine.getTemplate(templatePath);
-        t.merge(generationContext.getVelocityContext(), generationContext.getCurrentOutput());
+        String templatePath = null;
+        try {         
+            templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
+            Template t = velocityEngine.getTemplate(templatePath);
+            t.merge(generationContext.getVelocityContext(), generationContext.getCurrentOutput());
+        } catch (Exception e) {
+            logger.error("An error was produced during template generation: template: " + template + ", templatePath: " + templatePath, e);
+        }
     }
 
     /**
