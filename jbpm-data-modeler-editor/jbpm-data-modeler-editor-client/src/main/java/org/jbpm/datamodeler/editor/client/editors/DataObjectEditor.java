@@ -256,7 +256,7 @@ public class DataObjectEditor extends Composite {
                             public void onSuccess() {
                                 titleLabel.setStyleName(null);
                                 dataObject.setName(newValue);
-                                notifyObjectChange("name", oldValue, getDataObject().getName());
+                                notifyObjectChange("name", oldValue, newValue);
                             }
                         });
                     }

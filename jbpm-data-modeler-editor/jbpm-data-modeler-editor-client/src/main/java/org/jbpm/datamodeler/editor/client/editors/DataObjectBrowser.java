@@ -38,6 +38,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
+import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorCallback;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.events.*;
@@ -254,11 +255,14 @@ public class DataObjectBrowser extends Composite {
     }
 
     private void populateObjectTypes() {
-        List<DataObjectTO> dataObjects = dataModel.getDataObjects();
         newPropertyType.clear();
+        List<DataObjectTO> dataObjects = dataModel.getDataObjects();
         for (DataObjectTO dataObject : dataObjects) {
             newPropertyType.addItem(dataObject.getName(), dataObject.getClassName());
-        }        
+        }
+        for (String extClass : dataModel.getExternalClasses()) {
+            newPropertyType.addItem(DataModelerUtils.EXTERNAL_PREFIX + extClass, extClass);
+        }
     }
 
     private void createNewProperty(final DataObjectTO dataObject, final String propertyName, final String propertyType, final boolean multiple, final boolean baseType) {
@@ -370,7 +374,7 @@ public class DataObjectBrowser extends Composite {
     private String propertyTypeDisplay(ObjectPropertyTO propertyTO) {
         String className = propertyTO.getClassName();
         if (propertyTO.isMultiple()) {
-            className += "[0..N]";
+            className += DataModelerUtils.MULTIPLE;
         }
         return className;
     }
@@ -434,9 +438,8 @@ public class DataObjectBrowser extends Composite {
     }
 
     private void onDataObjectPropertyChange(@Observes DataObjectFieldChangeEvent event) {
-
         if (event.isFrom(getDataModel())) {
-            if ("name".equals(event.getPropertyName()) || "clas sName".equals(event.getPropertyName())) {
+            if ("name".equals(event.getPropertyName()) || "className".equals(event.getPropertyName())) {
                 List<ObjectPropertyTO> props = dataObjectPropertiesProvider.getList();
                 for (int i = 0; i < props.size(); i++) {
                     if (event.getCurrentField() == props.get(i)) {

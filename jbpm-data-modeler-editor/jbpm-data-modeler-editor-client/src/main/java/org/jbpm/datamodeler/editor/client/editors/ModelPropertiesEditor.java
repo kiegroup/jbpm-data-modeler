@@ -9,9 +9,11 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
+import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.List;
 
 
 public class ModelPropertiesEditor extends Composite {
@@ -66,5 +68,9 @@ public class ModelPropertiesEditor extends Composite {
         this.dataModel = dataModel;
         objectProperties.setDataModel(dataModel);
         fieldProperties.setDataModel(dataModel);
+    }
+
+    public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
+        fieldProperties.setBaseTypes(baseTypes);
     }
 }
