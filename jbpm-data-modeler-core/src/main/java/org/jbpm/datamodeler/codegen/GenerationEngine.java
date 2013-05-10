@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -45,7 +44,7 @@ public class GenerationEngine {
 
     private static boolean inited = false;
 
-    public static GenerationEngine getInstance() {
+    public static GenerationEngine getInstance() throws Exception {
         if (singleton == null) {
             singleton = new GenerationEngine();
             singleton.init();
@@ -56,7 +55,7 @@ public class GenerationEngine {
     /**
      * Initializes the code generation engine
      */
-    private void init() {
+    private void init() throws Exception {
         if (!inited) {
             // Init velocity engine
             Properties properties = new Properties();
@@ -132,7 +131,7 @@ public class GenerationEngine {
      * @throws java.io.IOException
      *
      */
-    public void generateAsset(GenerationContext generationContext, String template, String filePath) throws IOException {
+    public void generateAsset(GenerationContext generationContext, String template, String filePath) throws Exception {
 
         //read the template to use
         String templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
@@ -157,31 +156,31 @@ public class GenerationEngine {
         }
     }
 
-    public void generateAttribute(GenerationContext generationContext, ObjectProperty attribute, String template) throws IOException {
+    public void generateAttribute(GenerationContext generationContext, ObjectProperty attribute, String template) throws Exception {
         generateSubTemplate(generationContext, template);
     }
 
-    public void generateSetterGetter(GenerationContext generationContext, ObjectProperty attribute, String template) throws IOException {
+    public void generateSetterGetter(GenerationContext generationContext, ObjectProperty attribute, String template) throws Exception {
         generateSubTemplate(generationContext, template);
     }
 
-    public void generateEquals(GenerationContext generationContext, String template) throws IOException {
+    public void generateEquals(GenerationContext generationContext, String template) throws Exception {
         generateSubTemplate(generationContext, template);
     }
 
-    public void generateHashCode(GenerationContext generationContext, String template) throws IOException {
+    public void generateHashCode(GenerationContext generationContext, String template) throws Exception {
         generateSubTemplate(generationContext, template);
     }
     
-    public void generateTypeAnnotation(GenerationContext generationContext, Annotation annotation, String template) throws IOException {
+    public void generateTypeAnnotation(GenerationContext generationContext, Annotation annotation, String template) throws Exception {
         generateSubTemplate(generationContext, template);
     }
 
-    public void generateFieldAnnotation(GenerationContext generationContext, Annotation annotation, String template) throws IOException {
+    public void generateFieldAnnotation(GenerationContext generationContext, Annotation annotation, String template) throws Exception {
         generateSubTemplate(generationContext, template);
     }
 
-    public void generateSubTemplate(GenerationContext generationContext, String template) throws IOException {
+    public void generateSubTemplate(GenerationContext generationContext, String template) throws Exception {
         //read the template to use
         String templatePath = getFullVelocityPath(generationContext.getTemplatesPath(), template);
         Template t = velocityEngine.getTemplate(templatePath);
