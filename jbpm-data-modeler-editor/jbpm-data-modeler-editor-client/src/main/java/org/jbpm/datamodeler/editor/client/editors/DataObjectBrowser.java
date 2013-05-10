@@ -49,9 +49,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class DataObjectBrowser extends Composite {
@@ -256,12 +254,25 @@ public class DataObjectBrowser extends Composite {
 
     private void populateObjectTypes() {
         newPropertyType.clear();
-        List<DataObjectTO> dataObjects = dataModel.getDataObjects();
-        for (DataObjectTO dataObject : dataObjects) {
-            newPropertyType.addItem(dataObject.getName(), dataObject.getClassName());
-        }
-        for (String extClass : dataModel.getExternalClasses()) {
-            newPropertyType.addItem(DataModelerUtils.EXTERNAL_PREFIX + extClass, extClass);
+        SortedSet<String> typeNames = new TreeSet<String>();
+        if (dataModel != null) {
+            // Add all model types, ordered
+            typeNames.clear();
+            for (DataObjectTO dataObject : dataModel.getDataObjects()) {
+                typeNames.add(dataObject.getClassName());
+            }
+            for (String typeName : typeNames) {
+                newPropertyType.addItem(typeName, typeName);
+            }
+
+            // Then add all external types, ordered
+            typeNames.clear();
+            for (String extClass : dataModel.getExternalClasses()) {
+                typeNames.add(extClass);
+            }
+            for (String typeName : typeNames) {
+                newPropertyType.addItem(DataModelerUtils.EXTERNAL_PREFIX + typeName, typeName);
+            }
         }
     }
 
