@@ -3,7 +3,7 @@ package org.jbpm.datamodeler.editor.client.util;
 public class DataModelerUtils {
 
     public static final String EXTERNAL_PREFIX = "- ext - ";
-    public static final String MULTIPLE = "[0..N]";
+    public static final String MULTIPLE = " [0..N]";
 
     public static DataModelerUtils getInstance() {
         return new DataModelerUtils();

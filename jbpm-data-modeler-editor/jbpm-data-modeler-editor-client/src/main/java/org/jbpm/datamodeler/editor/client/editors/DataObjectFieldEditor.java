@@ -182,7 +182,8 @@ public class DataObjectFieldEditor extends Composite {
                 description.setText( (String) annotation.getValue(AnnotationDefinitionTO.VALUE_PARAM));
             }
 
-            typeSelector.setSelectedValue(getObjectField().getClassName());
+            String type = getObjectField().getClassName() + (getObjectField().isMultiple() ? DataModelerUtils.MULTIPLE:"");
+            typeSelector.setSelectedValue(type);
 
             annotation = objectField.getAnnotation(AnnotationDefinitionTO.EQUALS_ANNOTATION);
             if (annotation != null) {
@@ -272,6 +273,13 @@ public class DataObjectFieldEditor extends Composite {
     private void typeChanged(ChangeEvent event) {
         String oldValue = getObjectField().getClassName();
         String type = typeSelector.getValue();
+        int i = type.lastIndexOf(DataModelerUtils.MULTIPLE);
+        if (i >= 0) {
+            type = type.substring(0, i);
+            getObjectField().setMultiple(true);
+        } else {
+            getObjectField().setMultiple(false);
+        }
         getObjectField().setClassName(type);
 
         // Un-reference former type reference and set the new one
@@ -346,13 +354,18 @@ public class DataObjectFieldEditor extends Composite {
             }
             DataModelerUtils dmu = DataModelerUtils.getInstance();
             for (String typeName : typeNames) {
-                typeSelector.addItem(dmu.extractClassName(typeName), typeName);
+                String _typeName = dmu.extractClassName(typeName);
+                typeSelector.addItem(_typeName, typeName);
+                _typeName = _typeName + DataModelerUtils.MULTIPLE;
+                typeSelector.addItem(_typeName, _typeName);
             }
 
             // Second add all model types, ordered
             typeNames.clear();
             for (DataObjectTO dataObject : dataModel.getDataObjects()) {
-                typeNames.add(dataObject.getClassName());
+                String className = dataObject.getClassName();
+                typeNames.add(className);
+                typeNames.add(className + DataModelerUtils.MULTIPLE);
             }
             for (String typeName : typeNames) {
                 typeSelector.addItem(typeName, typeName);
@@ -361,10 +374,11 @@ public class DataObjectFieldEditor extends Composite {
             // Then add all external types, ordered
             typeNames.clear();
             for (String extClass : dataModel.getExternalClasses()) {
-                typeNames.add(extClass);
+                typeNames.add(DataModelerUtils.EXTERNAL_PREFIX + extClass);
+                typeNames.add(DataModelerUtils.EXTERNAL_PREFIX + extClass + DataModelerUtils.MULTIPLE);
             }
             for (String typeName : typeNames) {
-                typeSelector.addItem(DataModelerUtils.EXTERNAL_PREFIX + typeName, typeName);
+                typeSelector.addItem(typeName, typeName);
             }
         }
     }
