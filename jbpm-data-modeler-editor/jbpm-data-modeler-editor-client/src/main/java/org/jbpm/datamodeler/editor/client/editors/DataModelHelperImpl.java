@@ -24,9 +24,6 @@ public class DataModelHelperImpl extends DataModelHelper {
     // List of all class names that coexist within a project
     private List<String> classNames = new ArrayList<String>(10);
 
-    @Inject
-    private Event<NotificationEvent> notification;
-
     public DataModelHelperImpl() {
     }
 
@@ -144,12 +141,14 @@ public class DataModelHelperImpl extends DataModelHelper {
         Set<String> refs = referencedBy.get(objectClassName);
         if (refs != null && refs.size() > 0) {
             refs.remove(subjectClassName);
-        } else notification.fire(new NotificationEvent("Error de-referencing data object (referenced object)."));
+        }
+//        else ("Error de-referencing data object (referenced object)."));
 
         refs = references.get(subjectClassName);
         if (refs != null && refs.size() > 0) {
             refs.remove(objectClassName);
-        } else notification.fire(new NotificationEvent("Error de-referencing data object (referring object)."));
+        }
+//        else ("Error de-referencing data object (referring object)."));
     }
 
     private void objectExtended(String parentClassName, String siblingClassName, Boolean _extends) {
@@ -164,7 +163,7 @@ public class DataModelHelperImpl extends DataModelHelper {
             }
         } else {
             if (_siblings != null && _siblings.size() > 0) _siblings.remove(siblingClassName);
-            else notification.fire(new NotificationEvent("Superclass referencing error"));
+//            else ("Superclass referencing error"));
         }
     }
 
@@ -174,7 +173,8 @@ public class DataModelHelperImpl extends DataModelHelper {
         if (refs != null) {
             for (String objectClassName : refs) {
                 Set objRefs = referencedBy.get(objectClassName);
-                if (!objRefs.remove(subjectClassName)) notification.fire(new NotificationEvent("Reference-error when deleting data object (referring object)."));
+                objRefs.remove(subjectClassName);
+//              if (!objRefs.remove(subjectClassName)) ("Reference-error when deleting data object (referring object)."));
             }
             refs.remove(subjectClassName);
         }
