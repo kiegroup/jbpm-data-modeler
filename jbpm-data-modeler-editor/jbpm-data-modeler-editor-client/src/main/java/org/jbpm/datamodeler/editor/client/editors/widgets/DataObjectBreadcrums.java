@@ -5,6 +5,7 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectChangeEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
@@ -25,8 +26,8 @@ public class DataObjectBreadcrums extends Breadcrumbs {
 
     @Inject
     private Event<DataModelerEvent> dataModelerEvent;
-    
-    private DataModelTO dataModel;
+
+    private DataModelerContext context;
 
     public DataObjectBreadcrums(int size) {
         super();
@@ -39,6 +40,14 @@ public class DataObjectBreadcrums extends Breadcrumbs {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public DataModelerContext getContext() {
+        return context;
+    }
+
+    public void setContext(DataModelerContext context) {
+        this.context = context;
     }
 
     @Override
@@ -144,12 +153,8 @@ public class DataObjectBreadcrums extends Breadcrumbs {
         }
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
-    }
-
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
+    private DataModelTO getDataModel() {
+        return getContext().getDataModel();
     }
 
     // Event Observers

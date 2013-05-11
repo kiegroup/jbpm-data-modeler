@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.util.ObjectPropertyComparator;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
@@ -97,9 +98,9 @@ public class DataObjectBrowser extends Composite {
 
     final PropertyTypeCell typeCell = new PropertyTypeCell(true, this);
 
-    private DataModelTO dataModel;
-    
     private DataObjectTO dataObject;
+
+    private DataModelerContext context;
 
     private ListDataProvider<ObjectPropertyTO> dataObjectPropertiesProvider = new ListDataProvider<ObjectPropertyTO>();
 
@@ -241,9 +242,13 @@ public class DataObjectBrowser extends Composite {
         breadCrumbsPanel.add(dataObjectNavigation);
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
-        dataObjectNavigation.setDataModel(dataModel);
+    public DataModelerContext getContext() {
+        return context;
+    }
+
+    public void setContext(DataModelerContext context) {
+        this.context = context;
+        dataObjectNavigation.setContext(context);
     }
 
     private void populateBaseTypes() {
@@ -256,10 +261,10 @@ public class DataObjectBrowser extends Composite {
     private void populateObjectTypes() {
         newPropertyType.clear();
         SortedSet<String> typeNames = new TreeSet<String>();
-        if (dataModel != null) {
+        if (getDataModel() != null) {
             // Add all model types, ordered
             typeNames.clear();
-            for (DataObjectTO dataObject : dataModel.getDataObjects()) {
+            for (DataObjectTO dataObject : getDataModel().getDataObjects()) {
                 typeNames.add(dataObject.getClassName());
             }
             for (String typeName : typeNames) {
@@ -268,7 +273,7 @@ public class DataObjectBrowser extends Composite {
 
             // Then add all external types, ordered
             typeNames.clear();
-            for (String extClass : dataModel.getExternalClasses()) {
+            for (String extClass : getDataModel().getExternalClasses()) {
                 typeNames.add(extClass);
             }
             for (String typeName : typeNames) {
@@ -358,7 +363,7 @@ public class DataObjectBrowser extends Composite {
     private void addDataObjectProperty(ObjectPropertyTO objectProperty) {
         dataObject.getProperties().add(objectProperty);
 
-        if (!objectProperty.isBaseType()) getDataModel().getHelper().dataObjectReferenced(objectProperty.getClassName(), dataObject.getClassName());
+        if (!objectProperty.isBaseType()) getContext().getHelper().dataObjectReferenced(objectProperty.getClassName(), dataObject.getClassName());
 
         dataObjectPropertiesProvider.getList().add(objectProperty);
         dataObjectPropertiesProvider.flush();
@@ -370,7 +375,7 @@ public class DataObjectBrowser extends Composite {
         
         dataObject.getProperties().remove(objectProperty);
 
-        getDataModel().getHelper().dataObjectUnReferenced(objectProperty.getClassName(), dataObject.getClassName());
+        getContext().getHelper().dataObjectUnReferenced(objectProperty.getClassName(), dataObject.getClassName());
 
         dataObjectPropertiesProvider.getList().remove(index);
         dataObjectPropertiesProvider.flush();
@@ -391,8 +396,8 @@ public class DataObjectBrowser extends Composite {
         return className;
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    private DataModelTO getDataModel() {
+        return context.getDataModel();
     }
 
     public DataObjectTO getDataObject() {
@@ -401,7 +406,7 @@ public class DataObjectBrowser extends Composite {
 
     public void onTypeCellSelection(ObjectPropertyTO property) {
 
-        DataObjectTO dataObject = dataModel.getDataObjectByClassName(property.getClassName());
+        DataObjectTO dataObject = getDataModel().getDataObjectByClassName(property.getClassName());
         if (dataObject != null) {
             notifyObjectSelected(dataObject);
         }

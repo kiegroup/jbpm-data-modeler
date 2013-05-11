@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.Widget;
 import org.jbpm.datamodeler.editor.client.editors.widgets.DataModelBrowser;
 import org.jbpm.datamodeler.editor.client.editors.widgets.DataObjectBrowser;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ModelPropertiesEditor;
-import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
@@ -76,10 +75,10 @@ public class DataModelerScreenViewImpl extends Composite
     }
 
     @Override
-    public void setDataModel(DataModelTO dataModel) {
-        dataModelBrowser.setDataModel(dataModel);
-        dataObjectBrowser.setDataModel(dataModel);
-        modelPropertiesEditor.setDataModel(dataModel);
+    public void setContext(DataModelerContext context) {
+        dataModelBrowser.setContext(context);
+        dataObjectBrowser.setContext(context);
+        modelPropertiesEditor.setContext(context);
     }
 
     @Override

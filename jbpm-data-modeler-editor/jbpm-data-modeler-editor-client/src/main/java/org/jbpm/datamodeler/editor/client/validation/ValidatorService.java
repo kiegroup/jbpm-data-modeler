@@ -4,6 +4,7 @@ import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
 import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
+import org.jbpm.datamodeler.editor.client.editors.DataModelHelper;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
@@ -100,22 +101,22 @@ public class ValidatorService {
         else callback.onSuccess();
     }
 
-    public void canDeleteDataObject(DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        if (model.getHelper().objectCanBeDeleted(object.getClassName())) callback.onSuccess();
+    public void canDeleteDataObject(DataModelHelper helper, DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
+        if (helper.objectCanBeDeleted(object.getClassName())) callback.onSuccess();
         else callback.onFailure();
     }
 
-    public void canChangeObjectName(DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        if (!isDataObjectReferenced(object, model)) callback.onSuccess();
+    public void canChangeObjectName(DataModelHelper helper, DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
+        if (!isDataObjectReferenced(helper, object, model)) callback.onSuccess();
         else callback.onFailure();
     }
 
-    public void canChangeObjectPackage(DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        if (!isDataObjectReferenced(object, model)) callback.onSuccess();
+    public void canChangeObjectPackage(DataModelHelper helper, DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
+        if (!isDataObjectReferenced(helper, object, model)) callback.onSuccess();
         else callback.onFailure();
     }
 
-    public Boolean isDataObjectReferenced(DataObjectTO object, DataModelTO model) {
-        return model.getHelper().isDataObjectReferenced(object.getClassName());
+    public Boolean isDataObjectReferenced(DataModelHelper helper, DataObjectTO object, DataModelTO model) {
+        return helper.isDataObjectReferenced(object.getClassName());
     }
 }

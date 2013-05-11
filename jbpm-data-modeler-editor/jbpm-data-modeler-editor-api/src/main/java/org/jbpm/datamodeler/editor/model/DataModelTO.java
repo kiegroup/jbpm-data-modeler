@@ -41,8 +41,6 @@ public class DataModelTO {
     private List<DataObjectTO> deletedDataObjects = new ArrayList<DataObjectTO>();
     
     private String defaultPackage;
-
-    private DataModelHelper helper;
     
     private static int modelIds = 0;
 
@@ -117,14 +115,6 @@ public class DataModelTO {
 
     public void setExternalClasses(List<String> externalClasses) {
         this.externalClasses = externalClasses;
-    }
-
-    public DataModelHelper getHelper() {
-        return helper;
-    }
-
-    public void setHelper(DataModelHelper helper) {
-        this.helper = helper;
     }
 
     public int getId() {

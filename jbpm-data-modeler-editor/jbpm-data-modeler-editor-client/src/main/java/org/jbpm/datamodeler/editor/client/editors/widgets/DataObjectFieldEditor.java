@@ -16,6 +16,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
@@ -75,9 +76,6 @@ public class DataObjectFieldEditor extends Composite {
     @Inject
     private ValidatorService validatorService;
 
-    @Inject
-    private Caller<DataModelerService> modelerService;
-
     private DataObjectFieldEditorErrorPopup ep = new DataObjectFieldEditorErrorPopup();
 
     private Map<String, AnnotationDefinitionTO> annotationDefinitions = new HashMap<String, AnnotationDefinitionTO>();
@@ -86,7 +84,7 @@ public class DataObjectFieldEditor extends Composite {
 
     private ObjectPropertyTO objectField;
 
-    private DataModelTO dataModel;
+    private DataModelerContext context;
 
     private List<String> baseTypes;
 
@@ -117,33 +115,17 @@ public class DataObjectFieldEditor extends Composite {
         this.objectField = objectField;
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public DataModelerContext getContext() {
+        return context;
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
-
-        modelerService.call(
-                new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
-                    @Override
-                    public void callback(Map<String, AnnotationDefinitionTO> defs) {
-                        setAnnotationDefinitions(defs);
-                    }
-                },
-                new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
-        ).getAnnotationDefinitions();
+    public void setContext(DataModelerContext context) {
+        this.context = context;
         initTypeList();
     }
 
-    // Event notifications
-
-    public void setAnnotationDefinitions(Map<String, AnnotationDefinitionTO> annotationDefinitions) {
-        this.annotationDefinitions = annotationDefinitions;
-    }
-
-    public Map<String, AnnotationDefinitionTO> getAnnotationDefinitions() {
-        return annotationDefinitions;
+    private DataModelTO getDataModel() {
+        return getContext().getDataModel();
     }
 
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {
@@ -153,8 +135,10 @@ public class DataObjectFieldEditor extends Composite {
         }
     }
 
+    // Event notifications
+
     private void notifyFieldChange(String memberName, Object oldValue, Object newValue) {
-        getDataModel().getHelper().dataModelChanged();
+        getContext().getHelper().dataModelChanged();
         dataModelerEventEvent.fire(new DataObjectFieldChangeEvent(DataModelerEvent.DATA_OBJECT_FIELD_EDITOR, getDataModel(), getDataObject(), getObjectField(), memberName, oldValue, newValue));
     }
 
@@ -251,7 +235,7 @@ public class DataObjectFieldEditor extends Composite {
             else getObjectField().removeAnnotation(annotation);
         } else {
             if ( _label != null && !"".equals(_label) ) {
-                getObjectField().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _label );
+                getObjectField().addAnnotation(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _label );
             }
         }
     }
@@ -266,7 +250,7 @@ public class DataObjectFieldEditor extends Composite {
             else getObjectField().removeAnnotation(annotation);
         } else {
             if ( _description != null && !"".equals(_description) ) {
-                getObjectField().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _description );
+                getObjectField().addAnnotation(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _description );
             }
         }
     }
@@ -285,8 +269,8 @@ public class DataObjectFieldEditor extends Composite {
 
         // Un-reference former type reference and set the new one
         if (!baseTypes.contains(type)) {
-            getDataModel().getHelper().dataObjectUnReferenced(oldValue, getDataObject().getClassName());
-            getDataModel().getHelper().dataObjectReferenced(type, getDataObject().getClassName());
+            getContext().getHelper().dataObjectUnReferenced(oldValue, getDataObject().getClassName());
+            getContext().getHelper().dataObjectReferenced(type, getDataObject().getClassName());
         }
         notifyFieldChange("className", oldValue, type);
     }
@@ -297,7 +281,7 @@ public class DataObjectFieldEditor extends Composite {
         AnnotationTO annotation = getObjectField().getAnnotation(AnnotationDefinitionTO.EQUALS_ANNOTATION);
 
         if (annotation != null && !setEquals) getObjectField().removeAnnotation(annotation);
-        else if (annotation == null && setEquals) getObjectField().addAnnotation(new AnnotationTO(getAnnotationDefinitions().get(AnnotationDefinitionTO.EQUALS_ANNOTATION)));
+        else if (annotation == null && setEquals) getObjectField().addAnnotation(new AnnotationTO(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.EQUALS_ANNOTATION)));
     }
 
     @UiHandler("positionText")
@@ -335,7 +319,7 @@ public class DataObjectFieldEditor extends Composite {
                     else getObjectField().removeAnnotation(annotation);
                 } else {
                     if ( newPosition != null && !"".equals(newPosition) ) {
-                        getObjectField().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, newPosition );
+                        getObjectField().addAnnotation(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.POSITION_ANNOTATON), AnnotationDefinitionTO.VALUE_PARAM, newPosition );
                     }
                 }
             }
@@ -348,7 +332,7 @@ public class DataObjectFieldEditor extends Composite {
         typeSelector.clear();
 
         SortedSet<String> typeNames = new TreeSet<String>();
-        if (dataModel != null) {
+        if (getDataModel() != null) {
             // First add all base types, ordered
             for (String baseType : baseTypes) {
                 typeNames.add(baseType);
@@ -363,7 +347,7 @@ public class DataObjectFieldEditor extends Composite {
 
             // Second add all model types, ordered
             typeNames.clear();
-            for (DataObjectTO dataObject : dataModel.getDataObjects()) {
+            for (DataObjectTO dataObject : getDataModel().getDataObjects()) {
                 String className = dataObject.getClassName();
                 typeNames.add(className);
                 typeNames.add(className + DataModelerUtils.MULTIPLE);
@@ -374,7 +358,7 @@ public class DataObjectFieldEditor extends Composite {
 
             // Then add all external types, ordered
             typeNames.clear();
-            for (String extClass : dataModel.getExternalClasses()) {
+            for (String extClass : getDataModel().getExternalClasses()) {
                 typeNames.add(DataModelerUtils.EXTERNAL_PREFIX + extClass);
                 typeNames.add(DataModelerUtils.EXTERNAL_PREFIX + extClass + DataModelerUtils.MULTIPLE);
             }

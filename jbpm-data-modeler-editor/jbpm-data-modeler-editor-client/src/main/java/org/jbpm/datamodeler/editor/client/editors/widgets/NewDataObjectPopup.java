@@ -11,6 +11,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
@@ -71,7 +72,7 @@ public class NewDataObjectPopup extends Modal {
 
     private DataObjectTO dataObject;
 
-    private DataModelTO dataModel;
+    private DataModelerContext context;
 
     public NewDataObjectPopup() {
 
@@ -115,18 +116,18 @@ public class NewDataObjectPopup extends Modal {
         });
     }
 
-    public DataObjectTO getDataObject() {
-        return dataObject;
+    public DataModelerContext getContext() {
+        return context;
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public void setContext(DataModelerContext context) {
+        this.context = context;
+        superclassSelector.setContext(context);
+        packageSelector.setContext(context);
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
-        superclassSelector.setDataModel(dataModel);
-        packageSelector.setDataModel(dataModel);
+    private DataModelTO getDataModel() {
+        return getContext().getDataModel();
     }
 
     private void onOk() {
@@ -230,7 +231,7 @@ public class NewDataObjectPopup extends Modal {
     }
 
     private void notifyObjectCreated(DataObjectTO createdObjectTO) {
-        getDataModel().getHelper().dataObjectCreated(createdObjectTO.getClassName());
+        getContext().getHelper().dataObjectCreated(createdObjectTO.getClassName());
         dataModelerEvent.fire(new DataObjectCreatedEvent(DataModelerEvent.NEW_DATA_OBJECT_POPUP, getDataModel(), createdObjectTO));
         notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_created(createdObjectTO.getName())));
     }

@@ -8,7 +8,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import org.jbpm.datamodeler.editor.model.DataModelTO;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
@@ -38,7 +38,7 @@ public class ModelPropertiesEditor extends Composite {
     @Inject
     private DataObjectFieldEditor fieldProperties;
 
-    private DataModelTO dataModel;
+    private DataModelerContext context;
 
     public ModelPropertiesEditor() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -60,14 +60,14 @@ public class ModelPropertiesEditor extends Composite {
         tabPanel.selectTab(0);
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public DataModelerContext getContext() {
+        return context;
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
-        objectProperties.setDataModel(dataModel);
-        fieldProperties.setDataModel(dataModel);
+    public void setContext(DataModelerContext context) {
+        this.context = context;
+        objectProperties.setContext(context);
+        fieldProperties.setContext(context);
     }
 
     public void setBaseTypes(List<PropertyTypeTO> baseTypes) {

@@ -22,6 +22,7 @@ import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.widgets.NewDataObjectPopup;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
+import org.jbpm.datamodeler.editor.model.AnnotationDefinitionTO;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 import org.jbpm.datamodeler.editor.service.DataModelerService;
@@ -46,6 +47,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.uberfire.client.workbench.widgets.menu.MenuFactory.newSimpleItem;
 
@@ -57,7 +59,7 @@ public class DataModelerScreenPresenter {
             extends
             UberView<DataModelerScreenPresenter> {
 
-        void setDataModel(DataModelTO dataModel);
+        void setContext(DataModelerContext context);
 
         void setBaseTypes(List<PropertyTypeTO> baseTypes);
 
@@ -88,6 +90,8 @@ public class DataModelerScreenPresenter {
     private Path currentProject;
     
     private DataModelTO dataModel;
+
+    private DataModelerContext context;
 
     @WorkbenchPartTitle
     public String getTitle() {
@@ -159,18 +163,30 @@ public class DataModelerScreenPresenter {
         ).getBasePropertyTypes();
 
         modelerService.call(
-                new RemoteCallback<DataModelTO>() {
-
+                new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
                     @Override
-                    public void callback(DataModelTO dataModel) {
-                        BusyPopup.close();
-                        setDataModel(dataModel);
-                        notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_loaded(path.toString())));
-                    }
+                    public void callback(final Map<String, AnnotationDefinitionTO> defs) {
 
+                        modelerService.call(
+                                new RemoteCallback<DataModelTO>() {
+
+                                    @Override
+                                    public void callback(DataModelTO dataModel) {
+                                        BusyPopup.close();
+                                        setDataModel(dataModel, defs);
+                                        notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_loaded(path.toString())));
+                                    }
+
+                                },
+                                new DataModelerErrorCallback("An error was produced when the requested data model was loaded from server.")
+                        ).loadModel(path);
+
+                    }
                 },
-                new DataModelerErrorCallback("An error was produced when the requested data model was loaded from server.")
-        ).loadModel(path);
+                new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
+        ).getAnnotationDefinitions();
+
+
 
         currentProject = path;
     }
@@ -179,12 +195,17 @@ public class DataModelerScreenPresenter {
         return dataModel;
     }
 
-    private void setDataModel(DataModelTO dataModel) {
+    public DataModelerContext getContext() {
+        return context;
+    }
+
+    private void setDataModel(DataModelTO dataModel, Map<String, AnnotationDefinitionTO> annotationDefinitions) {
         this.dataModel = dataModel;
+
         // Set data model helper before anything else
         if (dataModel != null) {
-            dataModel.setHelper(new DataModelHelperImpl(dataModel));
-            view.setDataModel(dataModel);
+            context = new DataModelerContext(dataModel, annotationDefinitions);
+            view.setContext(context);
             if (dataModel.getDataObjects().size() > 0) {
                 dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataModel.getDataObjects().get(0)));
             }
@@ -192,7 +213,7 @@ public class DataModelerScreenPresenter {
     }
 
     private void onNewDataObject() {
-        newDataObjectPopup.setDataModel(getDataModel());
+        newDataObjectPopup.setContext(getContext());
         newDataObjectPopup.show();
     }
 

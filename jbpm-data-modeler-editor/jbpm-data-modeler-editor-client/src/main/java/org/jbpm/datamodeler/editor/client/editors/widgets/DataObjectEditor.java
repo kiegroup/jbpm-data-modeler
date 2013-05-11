@@ -14,6 +14,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
@@ -77,18 +78,13 @@ public class DataObjectEditor extends Composite {
     Event<DataModelerEvent> dataModelerEvent;
 
     DataObjectTO dataObject;
-
-    DataModelTO dataModel;
+    
+    DataModelerContext context;
 
     @Inject
     private ValidatorService validatorService;
 
-    @Inject
-    private Caller<DataModelerService> modelerService;
-
     private DataObjectEditorErrorPopup ep = new DataObjectEditorErrorPopup();
-    
-    private Map<String, AnnotationDefinitionTO> annotationDefinitions = new HashMap<String, AnnotationDefinitionTO>();
 
     private static DataObjectDetailEditorUIBinder uiBinder = GWT.create(DataObjectDetailEditorUIBinder.class);
 
@@ -135,39 +131,18 @@ public class DataObjectEditor extends Composite {
         this.dataObject = dataObject;
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public DataModelerContext getContext() {
+        return context;
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
-        packageSelector.setDataModel(dataModel);
-        superclassSelector.setDataModel(dataModel);
-
-        modelerService.call(
-                new RemoteCallback<Map<String, AnnotationDefinitionTO>>() {
-                    @Override
-                    public void callback(Map<String, AnnotationDefinitionTO> defs) {
-                        setAnnotationDefinitions(defs);
-                    }
-                },
-                new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
-        ).getAnnotationDefinitions();
+    public void setContext(DataModelerContext context) {
+        this.context = context;
+        packageSelector.setContext(context);
+        superclassSelector.setContext(context);
     }
 
-    public void setAnnotationDefinitions(Map<String, AnnotationDefinitionTO> annotationDefinitions) {
-        this.annotationDefinitions = annotationDefinitions;
-    }
-
-    public Map<String, AnnotationDefinitionTO> getAnnotationDefinitions() {
-        return annotationDefinitions;
-    }
-
-    // Event observers
-    private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
-        if (event.isFrom(getDataModel())) {
-            loadDataObject(event.getCurrentDataObject());
-        }
+    private DataModelTO getDataModel() {
+        return getContext().getDataModel();
     }
 
     private void loadDataObject(DataObjectTO dataObject) {
@@ -198,6 +173,14 @@ public class DataObjectEditor extends Composite {
         }
     }
 
+    // Event observers
+
+    private void onDataObjectSelected(@Observes DataObjectSelectedEvent event) {
+        if (event.isFrom(getDataModel())) {
+            loadDataObject(event.getCurrentDataObject());
+        }
+    }
+
     private void onDataObjectDeleted(@Observes DataObjectDeletedEvent event) {
         // When all objects from current model have been deleted clean
         if (event.isFrom(getDataModel())) {
@@ -209,7 +192,7 @@ public class DataObjectEditor extends Composite {
 
     // Event notifications
     private void notifyObjectChange(String memberName, Object oldValue, Object newValue) {
-        getDataModel().getHelper().dataModelChanged();
+        getContext().getHelper().dataModelChanged();
         dataModelerEvent.fire(new DataObjectChangeEvent(DataModelerEvent.DATA_OBJECT_EDITOR, getDataModel(), getDataObject(), memberName, oldValue, getDataObject().getName()));
     }
 
@@ -231,7 +214,7 @@ public class DataObjectEditor extends Composite {
             return;
         }
         // Otherwise validate
-        validatorService.canChangeObjectName(getDataObject(), getDataModel(), new ValidatorCallback() {
+        validatorService.canChangeObjectName(getContext().getHelper(), getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
                 ep.showMessage("Cannot change this object's name because it is being referenced from other DataObjects");
@@ -276,7 +259,7 @@ public class DataObjectEditor extends Composite {
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _label != null && !"".equals(_label) ) {
-                getDataObject().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _label );
+                getDataObject().addAnnotation(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.LABEL_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _label );
             }
         }
     }
@@ -291,7 +274,7 @@ public class DataObjectEditor extends Composite {
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _description != null && !"".equals(_description) ) {
-                getDataObject().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _description );
+                getDataObject().addAnnotation(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.DESCRIPTION_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _description );
             }
         }
     }
@@ -303,7 +286,7 @@ public class DataObjectEditor extends Composite {
 
         final String oldPackageName = getDataObject().getPackageName();
         final String newPackageName = packageSelector.getPackageList().getValue();
-        validatorService.canChangeObjectPackage(getDataObject(), getDataModel(), new ValidatorCallback() {
+        validatorService.canChangeObjectPackage(getContext().getHelper(), getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
                 // Reset previous value
@@ -331,13 +314,13 @@ public class DataObjectEditor extends Composite {
 
             // Remove former extension refs if superclass has changed
             if (oldSuperClass != null && !"".equals(oldSuperClass))
-                getDataModel().getHelper().dataObjectExtended(oldSuperClass, getDataObject().getClassName(), false);
+                getContext().getHelper().dataObjectExtended(oldSuperClass, getDataObject().getClassName(), false);
 
-            getDataModel().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), true);
+            getContext().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), true);
 
         } else {
             getDataObject().setSuperClassName(null);
-            getDataModel().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), false);
+            getContext().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), false);
         }
     }
 
@@ -350,7 +333,7 @@ public class DataObjectEditor extends Composite {
             else getDataObject().removeAnnotation(annotation);
         } else {
             if ( _role != null && !NOT_SELECTED.equals(_role) ) {
-                getDataObject().addAnnotation(getAnnotationDefinitions().get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _role );
+                getDataObject().addAnnotation(getContext().getAnnotationDefinitions().get(AnnotationDefinitionTO.ROLE_ANNOTATION), AnnotationDefinitionTO.VALUE_PARAM, _role );
             }
         }
     }

@@ -6,13 +6,10 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import org.jbpm.datamodeler.editor.events.DataModelerEvent;
-import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 
-import javax.enterprise.event.Observes;
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,8 +25,9 @@ public class SuperclassSelector extends Composite {
     @UiField
     ListBox superclassList;
 
-    DataModelTO dataModel;
-    DataObjectTO dataObject;
+    private DataModelerContext context;
+
+    private DataObjectTO dataObject;
 
     private static SuperclassSelectorUIBinder uiBinder = GWT.create(SuperclassSelectorUIBinder.class);
 
@@ -44,12 +42,12 @@ public class SuperclassSelector extends Composite {
         return superclassList;
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public DataModelerContext getContext() {
+        return context;
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
+    public void setContext(DataModelerContext context) {
+        this.context = context;
         initList();
     }
 
@@ -63,12 +61,16 @@ public class SuperclassSelector extends Composite {
         }
     }
 
+    private DataModelTO getDataModel() {
+        return getContext() != null ? getContext().getDataModel() : null;
+    }
+
     private void initList() {
         superclassList.clear();
 
         List<String> classNames = new ArrayList<String>();
-        if (dataModel != null) {
-            for (String className : dataModel.getHelper().getClassList()) {
+        if (getDataModel() != null) {
+            for (String className : getContext().getHelper().getClassList()) {
                 if (dataObject != null && className.equalsIgnoreCase(dataObject.getClassName())) continue;
                 classNames.add(className);
             }

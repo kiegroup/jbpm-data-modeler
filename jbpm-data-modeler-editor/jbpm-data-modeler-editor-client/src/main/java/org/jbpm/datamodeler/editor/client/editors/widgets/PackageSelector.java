@@ -11,6 +11,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
 import org.jbpm.datamodeler.editor.client.validation.ValidatorService;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
@@ -46,10 +47,10 @@ public class PackageSelector extends Composite {
 
     public static final String NOT_SELECTED = "NOT_SELECTED";
     public static final String DEFAULT_PACKAGE = "defaultpkg";
-    
-    private DataModelTO dataModel;
 
     private DataObjectTO dataObject;
+
+    private DataModelerContext context;
 
     public PackageSelector() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -103,13 +104,17 @@ public class PackageSelector extends Composite {
         return packageList;
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public DataModelerContext getContext() {
+        return context;
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
+    public void setContext(DataModelerContext context) {
+        this.context = context;
         initList();
+    }
+
+    private DataModelTO getDataModel() {
+        return getContext() != null ? getContext().getDataModel() : null;
     }
 
     public DataObjectTO getDataObject() {
@@ -130,9 +135,9 @@ public class PackageSelector extends Composite {
     private void initList() {
         packageList.clear();
         List<String> packageNames = new ArrayList<String>();
-        if (dataModel != null) {
+        if (getDataModel() != null) {
             String packageName;
-            for (String className : dataModel.getHelper().getClassList()) {
+            for (String className : getContext().getHelper().getClassList()) {
                 packageName = DataModelerUtils.getInstance().extractPackageName(className);
                 if (packageName != null && !DEFAULT_PACKAGE.equals(packageName) && !packageNames.contains(packageName)) {
                     packageNames.add(packageName);

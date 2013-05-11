@@ -38,6 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
 import org.jbpm.datamodeler.editor.client.util.DataObjectComparator;
@@ -86,13 +87,13 @@ public class DataModelBrowser extends Composite {
     @Inject
     private Event<DataModelerEvent> dataModelerEvent;
 
-    private DataModelTO dataModel;
-
     private ListDataProvider<DataObjectTO> dataObjectsProvider = new ListDataProvider<DataObjectTO>();
 
     private List<DataObjectTO> dataObjects = new ArrayList<DataObjectTO>();
 
     private boolean skipNextOnChange = false;
+
+    private DataModelerContext context;
 
     @Inject
     private NewDataObjectPopup newDataObjectPopup;
@@ -187,12 +188,20 @@ public class DataModelBrowser extends Composite {
         newEntityButton.setIcon(IconType.PLUS_SIGN);
     }
 
-    public DataModelTO getDataModel() {
-        return dataModel;
+    public void setContext(DataModelerContext context) {
+        this.context = context;
+        loadDataModel(context.getDataModel());
     }
 
-    public void setDataModel(DataModelTO dataModel) {
-        this.dataModel = dataModel;
+    public DataModelerContext getContext() {
+        return context;
+    }
+
+    private DataModelTO getDataModel() {
+        return context.getDataModel();
+    }
+
+    private void loadDataModel(DataModelTO dataModel) {
         this.dataObjects = dataModel.getDataObjects();
         modelName.setText(dataModel.getName());
 
@@ -243,7 +252,7 @@ public class DataModelBrowser extends Composite {
 
     @UiHandler("newEntityButton")
     void newEntityClick( ClickEvent event ) {
-        newDataObjectPopup.setDataModel(getDataModel());
+        newDataObjectPopup.setContext(getContext());
         newDataObjectPopup.show();
     }
 
@@ -271,7 +280,7 @@ public class DataModelBrowser extends Composite {
 
     private void deleteDataObject(final DataObjectTO dataObjectTO, final int index) {
 
-        validatorService.canDeleteDataObject(dataObjectTO, getDataModel(), new ValidatorCallback() {
+        validatorService.canDeleteDataObject(getContext().getHelper(), dataObjectTO, getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
                 ErrorPopup.showMessage("The data object with identifier: " + dataObjectTO.getName() + " cannot be deleted because it is still referenced within the model.");
@@ -334,7 +343,7 @@ public class DataModelBrowser extends Composite {
     }
 
     private void notifyObjectDeleted(DataObjectTO dataObject) {
-        getDataModel().getHelper().dataObjectDeleted(dataObject.getClassName());
+        getContext().getHelper().dataObjectDeleted(dataObject.getClassName());
         dataModelerEvent.fire(new DataObjectDeletedEvent(DataModelerEvent.DATA_MODEL_BROWSER, getDataModel(), dataObject));
         notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataObject_deleted(dataObject.getName())));
     }

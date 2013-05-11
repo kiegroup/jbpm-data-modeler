@@ -1,16 +1,12 @@
 package org.jbpm.datamodeler.editor.client.editors;
 
-import org.jbpm.datamodeler.editor.model.DataModelHelper;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.DataObjectTO;
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
-import org.uberfire.client.workbench.widgets.events.NotificationEvent;
 
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import java.util.*;
 
-public class DataModelHelperImpl extends DataModelHelper {
+public class DataModelHelper {
 
     private DataModelTO dataModel;
     private DataObjectTO currentDataObject;
@@ -24,10 +20,10 @@ public class DataModelHelperImpl extends DataModelHelper {
     // List of all class names that coexist within a project
     private List<String> classNames = new ArrayList<String>(10);
 
-    public DataModelHelperImpl() {
+    public DataModelHelper() {
     }
 
-    public DataModelHelperImpl(DataModelTO dataModel) {
+    public DataModelHelper(DataModelTO dataModel) {
         init(dataModel);
     }
 
@@ -44,38 +40,31 @@ public class DataModelHelperImpl extends DataModelHelper {
     // TODO change from listener methods to event observers
     // DataModelHelper methods
 
-    @Override
     public void dataModelChanged() {
         reset();
     }
 
-    @Override
     public void dataObjectReferenced(String objectClassName, String subjectClassName) {
         objectReferenced(objectClassName, subjectClassName);
     }
 
-    @Override
     public void dataObjectUnReferenced(String objectClassName, String subjectClassName) {
         objectUnReferenced(objectClassName, subjectClassName);
     }
 
-    @Override
     public void dataObjectExtended(String parentClassName, String siblingClassName, Boolean _extends) {
         objectExtended(parentClassName, siblingClassName, _extends);
     }
 
-    @Override
     public void dataObjectDeleted(String objectClassName) {
         objectDeleted(objectClassName);
     }
 
-    @Override
     public void dataObjectCreated(String objectClassName) {
         //TODO Review if this invocation is correct.
         reset();
     }
 
-    @Override
     public void dataObjectSelected(String objectClassName) {
         //TODO  Review if this invocation is correct.
         //JAN, cuando puse este codigo, este metodo no se invoca en ningun lugar del proyecto.
@@ -83,7 +72,6 @@ public class DataModelHelperImpl extends DataModelHelper {
         reset();
     }
 
-    @Override
     public void dataObjectUnSelected(String objectClassName) {
         //TODO Review if this invocation is correct.
         //JAN, cuando puse este codigo, este metodo tampoco se invoca en ningun lugar del proyecto.
@@ -91,13 +79,11 @@ public class DataModelHelperImpl extends DataModelHelper {
         reset();
     }
 
-    @Override
     public Boolean isDataObjectReferenced(String objectClassName) {
         Set refdBy = referencedBy.get(objectClassName);
         return refdBy != null && refdBy.size() > 0;
     }
 
-    @Override
     public Boolean isBeingExtended(String parentClassName) {
         Set s = siblingsMap.get(parentClassName);
         return s != null && s.size() > 0;
