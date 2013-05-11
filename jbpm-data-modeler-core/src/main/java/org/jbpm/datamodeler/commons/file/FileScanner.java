@@ -129,7 +129,9 @@ public class FileScanner {
                     ioService.delete(child);
                 }
                 if (deleteRoot) {
-                    ioService.delete(rootPath);
+                    //Invoke deleteIfExists because when the the last child is removede and JGit filesystem
+                    //is installed the directory is removed automatically
+                    ioService.deleteIfExists(rootPath);
                     return true;
                 }
             }
@@ -141,35 +143,32 @@ public class FileScanner {
         DirDescriptor dirDescriptor = new DirDescriptor(dirPath);
         boolean deleteable = false;
 
-        if (dirPath == null) {
+        final DirectoryStream<Path> children = ioService.newDirectoryStream(dirPath);
+        if (children == null) {
             deleteable = true;
         } else {
-            final DirectoryStream<Path> children = ioService.newDirectoryStream(dirPath);
-            if (children == null) {
+            Iterator<Path> iterator = children.iterator();
+            if (iterator == null) {
                 deleteable = true;
             } else {
-                Iterator<Path> iterator = children.iterator();
-                if (iterator == null) {
-                    deleteable = true;
-                } else {
-                    deleteable = true;
-                    for (Path child : children) {
-                        if (Files.isDirectory(child)) {
+                deleteable = true;
+                for (Path child : children) {
+                    if (Files.isDirectory(child)) {
+                        dirDescriptor.setDeleteable(false);
+                        return dirDescriptor;
+                    }
+                    for (String deleteableFile : deleteableFiles) {
+                        if (!child.getFileName().endsWith(deleteableFile)) {
                             dirDescriptor.setDeleteable(false);
                             return dirDescriptor;
-                        }
-                        for (String deleteableFile : deleteableFiles) {
-                            if (!child.getFileName().endsWith(deleteableFile)) {
-                                dirDescriptor.setDeleteable(false);
-                                return dirDescriptor;
-                            } else {
-                                dirDescriptor.addChild(child);
-                            }
+                        } else {
+                            dirDescriptor.addChild(child);
                         }
                     }
                 }
             }
         }
+
         dirDescriptor.setDeleteable(deleteable);
         return dirDescriptor;
     }
