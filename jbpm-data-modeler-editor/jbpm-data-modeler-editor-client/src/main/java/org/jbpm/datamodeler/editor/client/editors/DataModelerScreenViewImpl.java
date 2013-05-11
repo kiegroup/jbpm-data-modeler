@@ -22,6 +22,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.client.editors.widgets.DataModelBrowser;
+import org.jbpm.datamodeler.editor.client.editors.widgets.DataObjectBrowser;
+import org.jbpm.datamodeler.editor.client.editors.widgets.ModelPropertiesEditor;
 import org.jbpm.datamodeler.editor.model.DataModelTO;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 

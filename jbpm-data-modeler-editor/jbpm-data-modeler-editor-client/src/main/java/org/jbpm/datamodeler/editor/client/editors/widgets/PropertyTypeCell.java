@@ -1,4 +1,4 @@
-package org.jbpm.datamodeler.editor.client.editors;
+package org.jbpm.datamodeler.editor.client.editors.widgets;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.ValueUpdater;

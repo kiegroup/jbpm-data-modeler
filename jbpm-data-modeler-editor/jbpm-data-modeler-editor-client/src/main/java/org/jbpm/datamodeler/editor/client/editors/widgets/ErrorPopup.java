@@ -10,13 +10,6 @@ import org.uberfire.client.common.Popup;
 import org.uberfire.client.resources.CommonImages;
 import org.uberfire.client.resources.i18n.CommonConstants;
 
-/**
- * Created with IntelliJ IDEA.
- * User: jschatte
- * Date: 29/04/13
- * Time: 17:15
- * To change this template use File | Settings | File Templates.
- */
 public class ErrorPopup extends Popup {
 
     private VerticalPanel body = new VerticalPanel();

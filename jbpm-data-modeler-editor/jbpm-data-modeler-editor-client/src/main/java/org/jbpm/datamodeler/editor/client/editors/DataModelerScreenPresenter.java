@@ -19,6 +19,7 @@ package org.jbpm.datamodeler.editor.client.editors;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
+import org.jbpm.datamodeler.editor.client.editors.widgets.NewDataObjectPopup;
 import org.jbpm.datamodeler.editor.events.DataModelerEvent;
 import org.jbpm.datamodeler.editor.events.DataObjectSelectedEvent;
 import org.jbpm.datamodeler.editor.model.DataModelTO;

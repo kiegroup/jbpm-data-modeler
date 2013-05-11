@@ -1,4 +1,4 @@
-package org.jbpm.datamodeler.editor.client.editors;
+package org.jbpm.datamodeler.editor.client.util;
 
 import org.jbpm.datamodeler.editor.model.ObjectPropertyTO;
 import java.util.Comparator;

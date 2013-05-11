@@ -9,13 +9,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
-/**
- * Created with IntelliJ IDEA.
- * User: nmirasch
- * Date: 4/11/13
- * Time: 5:56 PM
- * To change this template use File | Settings | File Templates.
- */
 @ApplicationScoped
 public class ApplicationScopedProvider {
     private final DefaultSystemRepository systemRepository = new DefaultSystemRepository();

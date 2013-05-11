@@ -1,9 +1,10 @@
-package org.jbpm.datamodeler.editor.client.editors;
+package org.jbpm.datamodeler.editor.client.editors.remove;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.jbpm.datamodeler.editor.client.editors.widgets.DataObjectEditor;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 
 import javax.enterprise.context.Dependent;

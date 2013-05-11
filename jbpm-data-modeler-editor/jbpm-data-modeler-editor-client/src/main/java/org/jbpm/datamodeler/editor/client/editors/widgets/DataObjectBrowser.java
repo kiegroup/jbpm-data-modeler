@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jbpm.datamodeler.editor.client.editors;
+package org.jbpm.datamodeler.editor.client.editors.widgets;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.jbpm.datamodeler.editor.client.util.ObjectPropertyComparator;
 import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.resources.images.ImagesResources;
 import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;

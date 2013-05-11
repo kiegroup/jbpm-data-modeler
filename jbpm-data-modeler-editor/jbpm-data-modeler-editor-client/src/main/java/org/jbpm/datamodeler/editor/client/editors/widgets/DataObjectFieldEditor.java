@@ -1,4 +1,4 @@
-package org.jbpm.datamodeler.editor.client.editors;
+package org.jbpm.datamodeler.editor.client.editors.widgets;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ListBox;
@@ -16,6 +16,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.*;
 import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
+import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
