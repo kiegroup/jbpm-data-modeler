@@ -2,6 +2,7 @@ package org.jbpm.datamodeler.editor.client.editors.resources.i18n;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Messages;
+import com.sun.jmx.snmp.SnmpString;
 
 public interface Constants extends Messages {
 
@@ -32,6 +33,8 @@ public interface Constants extends Messages {
     public String modelEditor_notification_dataModel_loaded(String name);
 
     public String modelEditor_notification_dataModel_saved();
+
+    public String modelEditor_discard_changes_message();
 
     public String modelBrowser_modelUnknown();
 

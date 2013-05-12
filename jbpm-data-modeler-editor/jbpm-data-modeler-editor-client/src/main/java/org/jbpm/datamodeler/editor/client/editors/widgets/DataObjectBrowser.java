@@ -369,6 +369,7 @@ public class DataObjectBrowser extends Composite {
         dataObjectPropertiesProvider.flush();
         dataObjectPropertiesProvider.refresh();
         dataObjectPropertiesTable.setKeyboardSelectedRow(dataObjectPropertiesProvider.getList().size() - 1);
+        notifyFieldCreated(objectProperty);
     }
 
     private void deleteDataObjectProperty(ObjectPropertyTO objectProperty, int index) {
@@ -485,10 +486,13 @@ public class DataObjectBrowser extends Composite {
         dataModelerEvent.fire(new DataObjectFieldDeletedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), getDataObject(), deletedPropertyTO));
     }
 
+    private void notifyFieldCreated(ObjectPropertyTO createdPropertyTO) {
+        dataModelerEvent.fire(new DataObjectFieldCreatedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), getDataObject(), createdPropertyTO));
+    }
+
     private void notifyObjectSelected(DataObjectTO dataObject) {
         dataModelerEvent.fire(new DataObjectSelectedEvent(DataModelerEvent.DATA_OBJECT_BROWSER, getDataModel(), dataObject));
     }
-
 
     private String getDataObjectFullName() {
         return dataObject.getName() + "::" + dataObject.getPackageName();

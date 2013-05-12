@@ -19,15 +19,19 @@ package org.jbpm.datamodeler.editor.client.editors;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.widgets.DataModelBrowser;
 import org.jbpm.datamodeler.editor.client.editors.widgets.DataObjectBrowser;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ModelPropertiesEditor;
+import org.jbpm.datamodeler.editor.events.*;
 import org.jbpm.datamodeler.editor.model.PropertyTypeTO;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import java.util.List;
 
@@ -63,6 +67,8 @@ public class DataModelerScreenViewImpl extends Composite
     @Inject
     private DataObjectBrowser dataObjectBrowser;
 
+    private DataModelerContext context;
+
     public DataModelerScreenViewImpl() {
         initWidget( uiBinder.createAndBindUi( this ) );
     }
@@ -76,6 +82,7 @@ public class DataModelerScreenViewImpl extends Composite
 
     @Override
     public void setContext(DataModelerContext context) {
+        this.context = context;
         dataModelBrowser.setContext(context);
         dataObjectBrowser.setContext(context);
         modelPropertiesEditor.setContext(context);
@@ -91,4 +98,41 @@ public class DataModelerScreenViewImpl extends Composite
         dataObjectBrowser.setBaseTypes(baseTypes);
         modelPropertiesEditor.setBaseTypes(baseTypes);
     }
+
+    @Override
+    public boolean confirmClose() {
+        return Window.confirm( Constants.INSTANCE.modelEditor_discard_changes_message());
+    }
+
+    private void updateChangeStatus(DataModelerEvent event) {
+        if (context != null && event.isFrom(context.getDataModel())) {
+            context.setDirty(true);
+        }
+    }
+
+    // event observers
+    private void onDataObjectCreated(@Observes DataObjectCreatedEvent event) {
+        updateChangeStatus(event);
+    }
+
+    private void onDataObjectChange(@Observes DataObjectChangeEvent event) {
+        updateChangeStatus(event);
+    }
+
+    private void onDataObjectDeleted(@Observes DataObjectDeletedEvent event) {
+        updateChangeStatus(event);
+    }
+
+    private void onDataObjectFieldCreated(@Observes DataObjectFieldCreatedEvent event) {
+        updateChangeStatus(event);
+    }
+    
+    private void onDataObjectFieldChange(@Observes DataObjectFieldChangeEvent event) {
+        updateChangeStatus(event);
+    }
+
+    private void onDataObjectFieldDeleted(@Observes DataObjectFieldDeletedEvent event) {
+        updateChangeStatus(event);
+    }
+
 }

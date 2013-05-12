@@ -63,6 +63,8 @@ public class DataModelerScreenPresenter {
 
         void setBaseTypes(List<PropertyTypeTO> baseTypes);
 
+        boolean confirmClose();
+
     }
 
     @Inject
@@ -112,13 +114,14 @@ public class DataModelerScreenPresenter {
 
     @IsDirty
     public boolean isDirty() {
-        //TODO implement dirty status management
-        return false;
+        return getContext() != null ? getContext().isDirty() : false;
     }
 
     @OnMayClose
     public boolean onMayClose() {
-        //TODO implement dirty status management
+        if ( isDirty() ) {
+            return view.confirmClose();
+        }
         return true;
     }
 
@@ -131,6 +134,7 @@ public class DataModelerScreenPresenter {
                 public void callback(Object response) {
                     BusyPopup.close();
                     restoreModelStatus();
+                    getContext().setDirty(false);
                     notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_saved()));
                 }
             },
