@@ -495,6 +495,8 @@ public class DataObjectBrowser extends Composite {
     }
 
     private String getDataObjectFullName() {
-        return dataObject.getName() + "::" + dataObject.getPackageName();
+        String objectName = dataObject.getName();
+        String packageName = dataObject.getPackageName();
+        return objectName + ( (packageName != null && !"".equals(packageName)) ? "::" + packageName : "" );
     }
 }
