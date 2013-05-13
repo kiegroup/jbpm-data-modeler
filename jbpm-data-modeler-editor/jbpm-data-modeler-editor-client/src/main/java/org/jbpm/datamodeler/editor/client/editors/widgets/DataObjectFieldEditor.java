@@ -78,9 +78,6 @@ public class DataObjectFieldEditor extends Composite {
     CheckBox equalsSelector;
 
     @UiField
-    CheckBox requiredSelector;
-
-    @UiField
     Label positionLabel;
 
     @UiField

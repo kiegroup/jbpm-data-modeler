@@ -86,17 +86,6 @@
             </tr>
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
-                    <gwt:Label ui:field="requiredLabel" text="Required"/>
-                </td>
-                <td style="padding-left: 4px;">
-                    <b:CheckBox ui:field="requiredSelector"></b:CheckBox>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="padding: 3px;"></td>
-            </tr>
-            <tr>
-                <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="positionLabel" text="@Position"/>
                 </td>
                 <td style="padding-left: 4px;">
