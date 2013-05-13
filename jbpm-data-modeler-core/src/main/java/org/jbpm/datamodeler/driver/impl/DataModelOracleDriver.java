@@ -283,10 +283,10 @@ public class DataModelOracleDriver implements ModelDriver {
             ioService.write(destFilePath, content);
 
             if (!exists) {
-                logger.debug("Genertion listener created a new file: " + destFilePath);
+                if (logger.isDebugEnabled()) logger.debug("Genertion listener created a new file: " + destFilePath);
                 fileChanges.add(new FileChangeDescriptor(destFilePath, FileChangeDescriptor.ADD));
             } else {
-                logger.debug("Generation listener modified file: " + destFilePath);
+                if (logger.isDebugEnabled()) logger.debug("Generation listener modified file: " + destFilePath);
                 fileChanges.add(new FileChangeDescriptor(destFilePath, FileChangeDescriptor.UPDATE));
             }
         }
