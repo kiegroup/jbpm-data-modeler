@@ -29,7 +29,7 @@ public class PropertyTypeFactoryImpl implements PropertyTypeFactory {
 
         baseTypes.add(new PropertyTypeImpl(String.class.getSimpleName(), String.class.getName()));
         baseTypes.add(new PropertyTypeImpl(Boolean.class.getSimpleName(), Boolean.class.getName()));
-        baseTypes.add(new PropertyTypeImpl(BigDecimal.class.getSimpleName(), Boolean.class.getName()));
+        baseTypes.add(new PropertyTypeImpl(BigDecimal.class.getSimpleName(), BigDecimal.class.getName()));
 
         for (PropertyType type : baseTypes) {
             baseTypesByClass.put(type.getClassName(), type);
