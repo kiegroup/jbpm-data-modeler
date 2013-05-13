@@ -33,6 +33,6 @@ public class DataModelerUtils {
     }
 
     public String[] getPackageTerms(String packageName) {
-        return packageName.split("\\.");
+        return packageName.split("\\.", -1);
     }
 }
