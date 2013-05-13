@@ -26,7 +26,7 @@ public class ValidationUtils {
     public static Boolean isJavaIdentifier(String s) {
         if (StringUtils.isBlank(s)) return false;
         if (!SourceVersion.isName(s)) return false;
-        for (int i = 1; i < s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             if (!CharUtils.isAsciiPrintable(s.charAt(i))) return false;
         }
         return true;
