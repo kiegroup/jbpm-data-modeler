@@ -27,10 +27,10 @@ public class DataModelHelper {
         init(dataModel);
     }
 
-    public Boolean objectCanBeDeleted(String className) {
+    public Boolean isDataObjectReferenced(String className) {
         Set<String> refs = referencedBy.get(className);
-        if ( (refs != null && refs.size() > 0) || siblingsMap.containsKey(className)) return false;
-        return true;
+        if ( (refs != null && refs.size() > 0) || siblingsMap.containsKey(className)) return true;
+        return false;
     }
 
     public List<String> getClassList() {
@@ -68,11 +68,6 @@ public class DataModelHelper {
     }
 
     public void dataObjectUnSelected(String objectClassName) {
-    }
-
-    public Boolean isDataObjectReferenced(String objectClassName) {
-        Set refdBy = referencedBy.get(objectClassName);
-        return refdBy != null && refdBy.size() > 0;
     }
 
     public Boolean isBeingExtended(String parentClassName) {

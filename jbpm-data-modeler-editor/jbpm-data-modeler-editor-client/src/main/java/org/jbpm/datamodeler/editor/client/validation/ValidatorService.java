@@ -102,21 +102,17 @@ public class ValidatorService {
     }
 
     public void canDeleteDataObject(DataModelHelper helper, DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        if (helper.objectCanBeDeleted(object.getClassName())) callback.onSuccess();
+        if (!helper.isDataObjectReferenced(object.getClassName())) callback.onSuccess();
         else callback.onFailure();
     }
 
     public void canChangeObjectName(DataModelHelper helper, DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        if (!isDataObjectReferenced(helper, object, model)) callback.onSuccess();
+        if (!helper.isDataObjectReferenced(object.getClassName())) callback.onSuccess();
         else callback.onFailure();
     }
 
     public void canChangeObjectPackage(DataModelHelper helper, DataObjectTO object, DataModelTO model, ValidatorCallback callback) {
-        if (!isDataObjectReferenced(helper, object, model)) callback.onSuccess();
+        if (!helper.isDataObjectReferenced(object.getClassName())) callback.onSuccess();
         else callback.onFailure();
-    }
-
-    public Boolean isDataObjectReferenced(DataModelHelper helper, DataObjectTO object, DataModelTO model) {
-        return helper.isDataObjectReferenced(object.getClassName());
     }
 }
