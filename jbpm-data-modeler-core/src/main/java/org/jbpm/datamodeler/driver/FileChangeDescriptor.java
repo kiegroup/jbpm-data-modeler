@@ -16,23 +16,35 @@
 
 package org.jbpm.datamodeler.driver;
 
-
-import org.jbpm.datamodeler.core.AnnotationDefinition;
-import org.jbpm.datamodeler.core.DataModel;
-import org.kie.commons.io.IOService;
 import org.kie.commons.java.nio.file.Path;
 
-import java.util.List;
+public class FileChangeDescriptor {
 
-public interface ModelDriver {
+    public static final int ADD = 0;
+    public static final int DELETE = 1;
+    public static final int UPDATE = 2;
 
-    List<AnnotationDefinition> getConfiguredAnnotations();
+    private Path path;
+    private int action;
 
-    AnnotationDefinition getConfiguredAnnotation(String annotationClass);
+    public FileChangeDescriptor(Path path, int action) {
+        this.path = path;
+        this.action = action;
+    }
 
-    AnnotationDriver getAnnotationDriver(String annotationClass);
+    public Path getPath() {
+        return path;
+    }
 
-    List<FileChangeDescriptor> generateModel(DataModel dataModel, IOService ioService, Path root) throws Exception;
+    public void setPath(Path path) {
+        this.path = path;
+    }
 
-    DataModel createModel();
+    public int getAction() {
+        return action;
+    }
+
+    public void setAction(int action) {
+        this.action = action;
+    }
 }

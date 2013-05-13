@@ -6,7 +6,6 @@ import org.jbpm.datamodeler.core.impl.*;
 import org.jbpm.datamodeler.editor.model.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DataModelerServiceHelper {
@@ -46,8 +45,6 @@ public class DataModelerServiceHelper {
                 dataModelTO.getDataObjects().add(dataObjectTO);
             }
         }
-        //TODO remove this guarrada
-        dataModelTO.setExternalClasses(Arrays.asList("java.lang.ref.PhantomReference", "java.util.regex.Matcher"));
         return dataModelTO;
     }
 
@@ -160,6 +157,4 @@ public class DataModelerServiceHelper {
 
         return annotationDefinitionTO;
     }
-
-
 }

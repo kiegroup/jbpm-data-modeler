@@ -1,18 +1,37 @@
+/**
+ * Copyright 2012 JBoss Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jbpm.datamodeler.driver.impl;
 
 
+import org.jbpm.datamodeler.codegen.GenerationContext;
+import org.jbpm.datamodeler.codegen.GenerationEngine;
+import org.jbpm.datamodeler.codegen.GenerationListener;
 import org.jbpm.datamodeler.commons.NamingUtils;
 import org.jbpm.datamodeler.core.AnnotationDefinition;
 import org.jbpm.datamodeler.core.DataModel;
 import org.jbpm.datamodeler.core.DataObject;
 import org.jbpm.datamodeler.core.ObjectProperty;
-import org.jbpm.datamodeler.core.impl.DataModelImpl;
+import org.jbpm.datamodeler.core.impl.ModelFactoryImpl;
 import org.jbpm.datamodeler.driver.AnnotationDriver;
+import org.jbpm.datamodeler.driver.FileChangeDescriptor;
 import org.jbpm.datamodeler.driver.ModelDriver;
 import org.jbpm.datamodeler.driver.ModelDriverException;
 import org.jbpm.datamodeler.driver.impl.annotations.*;
 import org.kie.commons.io.IOService;
-import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.Path;
 import org.kie.guvnor.datamodel.model.Annotation;
 import org.kie.guvnor.datamodel.model.ModelField;
@@ -30,7 +49,11 @@ public class DataModelOracleDriver implements ModelDriver {
 
     private Map<String, AnnotationDriver> annotationDrivers = new HashMap<String, AnnotationDriver>();
 
-    public DataModelOracleDriver() {
+    public static DataModelOracleDriver getInstance() {
+        return new DataModelOracleDriver();
+    }
+
+    protected DataModelOracleDriver() {
         AnnotationDefinition annotationDefinition = DescriptionAnnotationDefinition.getInstance();
         configuredAnnotations.add(annotationDefinition);
         annotationDrivers.put(annotationDefinition.getClassName(), new DefaultOracleAnnotationDriver());
@@ -72,22 +95,25 @@ public class DataModelOracleDriver implements ModelDriver {
     }
 
     @Override
-    public DataModel loadModel(IOService ioService, Collection<Path> rootPaths, boolean recursiveScan) throws IOException {
-        //TODO check implementations
-        return null;
-    }
+    public List<FileChangeDescriptor> generateModel(DataModel dataModel, IOService ioService, Path root) throws Exception {
 
-    @Override
-    public void generateModel(IOService ioService, Path root) throws IOException {
-        //TODO
+        GenerationContext generationContext = new GenerationContext(dataModel);
+        OracleGenerationListener generationListener = new OracleGenerationListener(ioService, root);
+        generationContext.setGenerationListener(generationListener);
+
+        GenerationEngine generationEngine = GenerationEngine.getInstance();
+        generationEngine.generate(generationContext);
+        return generationListener.getFileChanges();
     }
 
     @Override
     public DataModel createModel() {
-        return new DataModelImpl();
+        return ModelFactoryImpl.getInstance().newModel();
     }
 
-    public void addOracleModel(DataModel dataModel, ProjectDataModelOracle oracleDataModel) throws ModelDriverException {
+    public DataModel loadModel(ProjectDataModelOracle oracleDataModel) throws ModelDriverException {
+
+        DataModel dataModel = createModel();
 
         logger.debug("Adding oracleDataModel: " + oracleDataModel + " to dataModel: " + dataModel);
         
@@ -103,6 +129,7 @@ public class DataModelOracleDriver implements ModelDriver {
         } else {
             logger.debug("oracleDataModel hasn't defined fact types");
         }
+        return dataModel;
     }
 
     private void addFactType(DataModel dataModel, ProjectDataModelOracle oracleDataModel, String factType) throws ModelDriverException {
@@ -207,5 +234,65 @@ public class DataModelOracleDriver implements ModelDriver {
      */
     private boolean isLoadableField(ModelField field) {
         return !"this".equals(field.getName());
+    }
+
+    static class OracleGenerationListener implements GenerationListener {
+
+        org.kie.commons.java.nio.file.Path output;
+        
+        IOService ioService;
+
+        List<FileChangeDescriptor> fileChanges = new ArrayList<FileChangeDescriptor>();
+
+        public OracleGenerationListener(IOService ioService, org.kie.commons.java.nio.file.Path output) {
+            this.ioService = ioService;
+            this.output = output;
+        }
+
+        @Override
+        public void assetGenerated(String fileName, String content) {
+
+            String subDir;
+            org.kie.commons.java.nio.file.Path subDirPath;
+            org.kie.commons.java.nio.file.Path destFilePath;
+            StringTokenizer dirNames;
+
+            subDirPath = output;
+            int index = fileName.lastIndexOf("/");
+            if (index == 0) {
+                //the file names was provided in the form /SomeFile.java
+                fileName = fileName.substring(1, fileName.length());
+            } else if (index > 0) {
+                //the file name was provided in the most common form /dir1/dir2/SomeFile.java
+                String dirNamesPath = fileName.substring(0, index);
+                fileName = fileName.substring(index+1, fileName.length());
+                dirNames = new StringTokenizer(dirNamesPath, "/");
+                while (dirNames.hasMoreElements()) {
+                    subDir = dirNames.nextToken();
+                    subDirPath = subDirPath.resolve(subDir);
+                    if (!ioService.exists(subDirPath)) {
+                        ioService.createDirectory(subDirPath);
+                    }
+                }
+            }
+
+            //the last subDirPath is the directory to crate the file.
+            destFilePath = subDirPath.resolve(fileName);
+            boolean exists = ioService.exists(destFilePath);
+
+            ioService.write(destFilePath, content);
+
+            if (!exists) {
+                logger.debug("Genertion listener created a new file: " + destFilePath);
+                fileChanges.add(new FileChangeDescriptor(destFilePath, FileChangeDescriptor.ADD));
+            } else {
+                logger.debug("Generation listener modified file: " + destFilePath);
+                fileChanges.add(new FileChangeDescriptor(destFilePath, FileChangeDescriptor.UPDATE));
+            }
+        }
+
+        public List<FileChangeDescriptor> getFileChanges() {
+            return fileChanges;
+        }
     }
 }

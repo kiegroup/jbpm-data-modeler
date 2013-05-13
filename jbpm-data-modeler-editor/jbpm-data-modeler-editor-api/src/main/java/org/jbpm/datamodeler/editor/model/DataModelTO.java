@@ -39,12 +39,11 @@ public class DataModelTO {
      * is saved.
      */
     private List<DataObjectTO> deletedDataObjects = new ArrayList<DataObjectTO>();
-    
-    private String defaultPackage;
+
     
     private static int modelIds = 0;
 
-    //only to distinguish models
+    //only to distinguish models created in memory
     private int id = modelIds++;
 
     public DataModelTO() {
@@ -75,14 +74,6 @@ public class DataModelTO {
             if (dataObject.getClassName() != null && dataObject.getClassName().equals(className)) return dataObject;
         }
         return null;
-    }
-
-    public String getDefaultPackage() {
-        return defaultPackage;
-    }
-
-    public void setDefaultPackage(String defaultPackage) {
-        this.defaultPackage = defaultPackage;
     }
 
     public void removeDataObject(DataObjectTO dataObject) {
