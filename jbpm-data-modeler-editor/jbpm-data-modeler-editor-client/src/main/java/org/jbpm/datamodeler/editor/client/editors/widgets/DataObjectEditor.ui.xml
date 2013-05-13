@@ -23,71 +23,72 @@
 
     <ui:with field="i18n" type="org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants"/>
 
-    <gwt:HTMLPanel styleName="well container row-fluid ">
+    <gwt:HTMLPanel styleName="well container row-fluid " height="310px">
 
-        <table class="row-fluid span12">
-            <thead>
-                <tr>
-                    <td style="white-space: nowrap; font-weight: bold;">
-                        <gwt:Label ui:field="nameColumnHeader" text="Name"></gwt:Label>
-                    </td>
-                    <td style="white-space: nowrap; font-weight: bold;">
-                        <gwt:Label ui:field="valueColumnHeader" text="Value"></gwt:Label>
-                    </td>
-                </tr>
-            </thead>
+        <table class="row-fluid span12"  style="padding: 2px;">
+
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="titleLabel" text="Name"/>
                 </td>
-                <td>
+                <td style="padding-left: 4px;">
                     <b:TextBox ui:field="name" styleName="span8"></b:TextBox>
                 </td>
             </tr>
-
+            <tr>
+                <td colspan="2" style="padding: 3px;"></td>
+            </tr>
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="labelLabel" text="Label"/>
                 </td>
-                <td>
+                <td style="padding-left: 4px;">
                     <b:TextBox ui:field="label" styleName="span8"></b:TextBox>
                 </td>
             </tr>
-
+            <tr>
+                <td colspan="2" style="padding: 3px;"></td>
+            </tr>
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="descriptionLabel" text="Description"/>
                 </td>
-                <td>
+                <td style="padding-left: 4px;">
                     <b:TextArea ui:field="description" styleName="span8"></b:TextArea>
                 </td>
             </tr>
-
+            <tr>
+                <td colspan="2" style="padding: 3px;"></td>
+            </tr>
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="packageNameLabel" text="Package"/>
                 </td>
-                <td>
+                <td style="padding-left: 4px;">
                     <gwt:SimplePanel ui:field="packageSelectorPanel"  styleName="span6">
 
                     </gwt:SimplePanel>
                 </td>
             </tr>
-
+            <tr>
+                <td colspan="2" style="padding: 3px;"></td>
+            </tr>
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="superclassLabel" text="Superclass"/>
                 </td>
-                <td>
+                <td style="padding-left: 4px;">
                     <datamodeler:SuperclassSelector ui:field="superclassSelector"  styleName="span8"></datamodeler:SuperclassSelector>
                 </td>
             </tr>
-
+            <tr>
+                <td colspan="2" style="padding: 3px;"></td>
+            </tr>
             <tr>
                 <td style="white-space: nowrap; vertical-align: top;">
                     <gwt:Label ui:field="roleLabel" text="Role"/>
                 </td>
-                <td>
+                <td style="padding-left: 4px;">
                     <b:ListBox ui:field="roleSelector" styleName="span8"></b:ListBox>
                 </td>
             </tr>

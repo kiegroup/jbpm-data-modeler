@@ -52,7 +52,7 @@
                                                 <td class="span3">
                                                     <b:RadioButton ui:field="newPropertyBasicType" name="typeMode" text="{i18n.objectEditor_basicType}" />
                                                 </td>
-                                                <td class="span4">
+                                                <td class="span6" style="padding: 0 4px;">
                                                     <b:ListBox ui:field="newPropertyType"></b:ListBox>
                                                 </td>
                                                 <td class="span3">

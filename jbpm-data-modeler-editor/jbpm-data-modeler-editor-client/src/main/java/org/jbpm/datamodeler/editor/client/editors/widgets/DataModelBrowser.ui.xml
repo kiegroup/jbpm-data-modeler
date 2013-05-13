@@ -24,7 +24,7 @@
     <gwt:HTMLPanel>
         <gwt:VerticalPanel ui:field="mainPanel" styleName="row-fluid">
             <gwt:HTMLPanel>
-                <div class="well">
+                <div class="well"  style="height:450px;">
                 <h4>
                     <gwt:Label ui:field="modelName"></gwt:Label>
                 </h4>
