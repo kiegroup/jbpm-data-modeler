@@ -91,6 +91,7 @@ public class DataModelHelper {
         referencedBy.clear();
         references.clear();
         classNames.clear();
+        siblingsMap.clear();
         classNames.addAll(dataModel.getExternalClasses());
         for (DataObjectTO object : dataModel.getDataObjects()) {
             String className = object.getClassName();

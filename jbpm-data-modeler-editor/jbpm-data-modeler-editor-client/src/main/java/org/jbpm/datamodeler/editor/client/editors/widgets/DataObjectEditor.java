@@ -319,7 +319,7 @@ public class DataObjectEditor extends Composite {
             getContext().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), true);
         } else {
             getDataObject().setSuperClassName(null);
-            getContext().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), false);
+            getContext().getHelper().dataObjectExtended(oldSuperClass, getDataObject().getClassName(), false);
         }
     }
 
