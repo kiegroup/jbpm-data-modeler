@@ -313,11 +313,10 @@ public class DataObjectEditor extends Composite {
             getDataObject().setSuperClassName(newSuperClass);
 
             // Remove former extension refs if superclass has changed
-            if (oldSuperClass != null && !"".equals(oldSuperClass))
+            if (oldSuperClass != null && !"".equals(oldSuperClass)) {
                 getContext().getHelper().dataObjectExtended(oldSuperClass, getDataObject().getClassName(), false);
-
+            }
             getContext().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), true);
-
         } else {
             getDataObject().setSuperClassName(null);
             getContext().getHelper().dataObjectExtended(newSuperClass, getDataObject().getClassName(), false);

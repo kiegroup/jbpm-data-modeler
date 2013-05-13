@@ -15,7 +15,7 @@ public class DataModelHelper {
     private Map<String, Set<String>> referencedBy = new HashMap<String, Set<String>>(10);
     // Map linking DataObjects with the Objects they are referencing by (e.g. u.v.B --> {x.y.A} means B references A)
     private Map<String, Set<String>> references = new HashMap<String, Set<String>>(10);
-    // Map that keep account of the siblings a parent class has.
+    // Map that keeps track of the siblings a parent class has.
     private Map<String, Set<String>> siblingsMap = new HashMap<String, Set<String>>(10);
     // List of all class names that coexist within a project
     private List<String> classNames = new ArrayList<String>(10);
@@ -57,26 +57,17 @@ public class DataModelHelper {
     }
 
     public void dataObjectDeleted(String objectClassName) {
-        objectDeleted(objectClassName);
+        reset();
     }
 
     public void dataObjectCreated(String objectClassName) {
-        //TODO Review if this invocation is correct.
         reset();
     }
 
     public void dataObjectSelected(String objectClassName) {
-        //TODO  Review if this invocation is correct.
-        //JAN, cuando puse este codigo, este metodo no se invoca en ningun lugar del proyecto.
-        //he puesto la invocacion por las dudas.
-        reset();
     }
 
     public void dataObjectUnSelected(String objectClassName) {
-        //TODO Review if this invocation is correct.
-        //JAN, cuando puse este codigo, este metodo tampoco se invoca en ningun lugar del proyecto.
-        //he puesto la invocacion por las dudas.
-        reset();
     }
 
     public Boolean isDataObjectReferenced(String objectClassName) {
@@ -95,14 +86,19 @@ public class DataModelHelper {
     }
 
     // Todo can be improved if required for performance reasons
-    // Recalculate all
+    // Brute force recalculate all
     private void reset() {
         referencedBy.clear();
         references.clear();
         classNames.clear();
         classNames.addAll(dataModel.getExternalClasses());
         for (DataObjectTO object : dataModel.getDataObjects()) {
-            classNames.add(object.getClassName());
+            String className = object.getClassName();
+            classNames.add(className);
+
+            String superClassName = object.getSuperClassName();
+            if (superClassName != null &&  !"".equals(superClassName)) objectExtended(superClassName, className, true);
+
             for (ObjectPropertyTO prop : object.getProperties()) {
                 if (!prop.isBaseType()) {
                     objectReferenced(prop.getClassName(), object.getClassName());
@@ -149,20 +145,8 @@ public class DataModelHelper {
             }
         } else {
             if (_siblings != null && _siblings.size() > 0) _siblings.remove(siblingClassName);
+            if (_siblings.size() == 0) siblingsMap.remove(parentClassName);
 //            else ("Superclass referencing error"));
-        }
-    }
-
-    private void objectDeleted(String subjectClassName) {
-        // For all the Objects that this Object might be referencing, update the corresponding referencedBy list
-        Set<String> refs = references.get(subjectClassName);
-        if (refs != null) {
-            for (String objectClassName : refs) {
-                Set objRefs = referencedBy.get(objectClassName);
-                objRefs.remove(subjectClassName);
-//              if (!objRefs.remove(subjectClassName)) ("Reference-error when deleting data object (referring object)."));
-            }
-            refs.remove(subjectClassName);
         }
     }
 }
