@@ -32,6 +32,7 @@ import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.editors.widgets.SuperclassSelector;
@@ -233,7 +234,7 @@ public class DataObjectEditor extends Composite {
         validatorService.canChangeObjectName(getContext().getHelper(), getDataObject(), getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
-                ep.showMessage("Cannot change this object's name because it is being referenced from other DataObjects");
+                ep.showMessage(Constants.INSTANCE.validation_error_cannot_change_object_name());
             }
 
             @Override
@@ -241,7 +242,7 @@ public class DataObjectEditor extends Composite {
                 validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
                     @Override
                     public void onFailure() {
-                        ep.showMessage("Invalid data object identifier: " + newValue + " is not a valid Java identifier");
+                        ep.showMessage(Constants.INSTANCE.validation_error_invalid_object_identifier(newValue));
                     }
 
                     @Override
@@ -249,7 +250,7 @@ public class DataObjectEditor extends Composite {
                         validatorService.isUniqueEntityName(packageName, newValue, getDataModel(), new ValidatorCallback() {
                             @Override
                             public void onFailure() {
-                                ep.showMessage("A data object with identifier: " + newValue + " already exists in the model.");
+                                ep.showMessage(Constants.INSTANCE.validation_error_object_already_exists(newValue, packageName));
                             }
 
                             @Override
@@ -308,7 +309,7 @@ public class DataObjectEditor extends Composite {
                 // Reset previous value
                 packageSelector.getPackageList().setSelectedValue(getDataObject().getPackageName());
                 ep.showAsError(false);
-                ep.showMessage("Cannot change this object's package because it is being referenced from other DataObjects");
+                ep.showMessage(Constants.INSTANCE.validation_error_cannot_change_object_package());
             }
 
             @Override

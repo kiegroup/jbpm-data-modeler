@@ -283,7 +283,7 @@ public class DataModelBrowser extends Composite {
         validatorService.canDeleteDataObject(getContext().getHelper(), dataObjectTO, getDataModel(), new ValidatorCallback() {
             @Override
             public void onFailure() {
-                ErrorPopup.showMessage("The data object with identifier: " + dataObjectTO.getName() + " cannot be deleted because it is still referenced within the model.");
+                ErrorPopup.showMessage(Constants.INSTANCE.validation_error_cannot_delete_object(dataObjectTO.getName()));
             }
 
             @Override

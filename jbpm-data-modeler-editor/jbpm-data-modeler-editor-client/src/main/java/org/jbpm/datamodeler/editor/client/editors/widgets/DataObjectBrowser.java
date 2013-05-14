@@ -287,7 +287,7 @@ public class DataObjectBrowser extends Composite {
         validatorService.isValidIdentifier(propertyName, new ValidatorCallback() {
             @Override
             public void onFailure() {
-                ErrorPopup.showMessage("Invalid data object attribute identifier: " + propertyName + " is not a valid Java identifier");
+                ErrorPopup.showMessage(Constants.INSTANCE.validation_error_invalid_object_attribute_identifier(propertyName));
             }
 
             @Override
@@ -295,7 +295,7 @@ public class DataObjectBrowser extends Composite {
                 validatorService.isUniqueAttributeName(propertyName, dataObject, new ValidatorCallback() {
                     @Override
                     public void onFailure() {
-                        ErrorPopup.showMessage("An attribute with identifier: " + propertyName + " already exists in the data object.");
+                        ErrorPopup.showMessage(Constants.INSTANCE.validation_error_object_attribute_already_exists(propertyName));
                     }
 
                     @Override

@@ -112,10 +112,24 @@ public interface Constants extends Messages {
 
     public String packageSelector_popup_add();
 
+    public String modeler_callback_error(String localMessage, String excMessage);
+
     public String validation_error_invalid_object_identifier(String name);
+
+    public String validation_error_invalid_object_attribute_identifier(String attributeName);
 
     public String validation_error_invalid_package_identifier(String packageName);
 
+    public String validation_error_invalid_position();
+
     public String validation_error_object_already_exists(String name, String packageName);
+
+    public String validation_error_object_attribute_already_exists(String attributeName);
+
+    public String validation_error_cannot_delete_object(String objectName);
+
+    public String validation_error_cannot_change_object_name();
+
+    public String validation_error_cannot_change_object_package();
 
 }

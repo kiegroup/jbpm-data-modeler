@@ -18,6 +18,7 @@ package org.jbpm.datamodeler.editor.client.editors;
 
 import org.jboss.errai.bus.client.api.ErrorCallback;
 import org.jboss.errai.bus.client.api.Message;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.kie.guvnor.commons.ui.client.popups.errors.ErrorPopup;
 import org.uberfire.client.common.BusyPopup;
 
@@ -36,7 +37,7 @@ public class DataModelerErrorCallback implements ErrorCallback {
     public boolean error( final Message message,
                           final Throwable throwable ) {
         BusyPopup.close();
-        ErrorPopup.showMessage("Error: " + localMessage + ".\nThe server error is: \n" + throwable.getMessage());
+        ErrorPopup.showMessage(Constants.INSTANCE.modeler_callback_error(localMessage, throwable.getMessage()));
         return true;
     }
 }

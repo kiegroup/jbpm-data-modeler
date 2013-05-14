@@ -34,6 +34,7 @@ import org.jboss.errai.bus.client.api.RemoteCallback;
 import org.jboss.errai.ioc.client.api.Caller;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerContext;
 import org.jbpm.datamodeler.editor.client.editors.DataModelerErrorCallback;
+import org.jbpm.datamodeler.editor.client.editors.resources.i18n.Constants;
 import org.jbpm.datamodeler.editor.client.editors.widgets.ErrorPopup;
 import org.jbpm.datamodeler.editor.client.editors.widgets.PackageSelector;
 import org.jbpm.datamodeler.editor.client.util.DataModelerUtils;
@@ -216,7 +217,7 @@ public class DataObjectFieldEditor extends Composite {
         validatorService.isValidIdentifier(newValue, new ValidatorCallback() {
             @Override
             public void onFailure() {
-                ep.showMessage("Invalid data attribute identifier: " + newValue + " is not a valid Java identifier");
+                ep.showMessage(Constants.INSTANCE.validation_error_invalid_object_attribute_identifier(newValue));
             }
 
             @Override
@@ -224,7 +225,7 @@ public class DataObjectFieldEditor extends Composite {
                 validatorService.isUniqueAttributeName(newValue, getDataObject(), new ValidatorCallback() {
                     @Override
                     public void onFailure() {
-                        ep.showMessage("An object attribute with identifier: " + newValue + " already exists in the data object.");
+                        ep.showMessage(Constants.INSTANCE.validation_error_object_attribute_already_exists(newValue));
                     }
 
                     @Override
@@ -320,7 +321,7 @@ public class DataObjectFieldEditor extends Composite {
         validatorService.isValidPosition(newPosition, new ValidatorCallback() {
             @Override
             public void onFailure() {
-                ep.showMessage("Illegal position specified, should be zero or a positive integer");
+                ep.showMessage(Constants.INSTANCE.validation_error_invalid_position());
             }
 
             @Override
