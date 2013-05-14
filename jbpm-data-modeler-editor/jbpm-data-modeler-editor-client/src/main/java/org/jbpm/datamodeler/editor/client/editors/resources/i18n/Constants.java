@@ -38,7 +38,19 @@ public interface Constants extends Messages {
 
     public String modelEditor_menu_generate();
 
+    public String modelEditor_saving();
+
+    public String modelEditor_saving_error();
+
     public String modelEditor_loading();
+
+    public String modelEditor_loading_error();
+
+    public String modelEditor_propertyType_loading_error();
+
+    public String modelEditor_annotationDef_loading_error();
+
+    public String modelEditor_projectPath_calc_error();
 
     public String modelEditor_notification_dataObject_created(String name);
 

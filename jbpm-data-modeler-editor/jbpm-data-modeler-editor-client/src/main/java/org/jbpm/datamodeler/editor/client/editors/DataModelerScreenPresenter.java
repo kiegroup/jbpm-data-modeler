@@ -128,7 +128,7 @@ public class DataModelerScreenPresenter {
     @OnSave
     public void onSave() {
 
-        BusyPopup.showMessage("Saving project datamodel");
+        BusyPopup.showMessage(Constants.INSTANCE.modelEditor_saving());
         modelerService.call(new RemoteCallback<Object>() {
                 @Override
                 public void callback(Object response) {
@@ -138,7 +138,7 @@ public class DataModelerScreenPresenter {
                     notification.fire(new NotificationEvent(Constants.INSTANCE.modelEditor_notification_dataModel_saved()));
                 }
             },
-            new DataModelerErrorCallback("An error was produced during data model saving.")
+            new DataModelerErrorCallback(Constants.INSTANCE.modelEditor_saving_error())
         ).saveModel(getDataModel(), currentProject);
     }
 
@@ -163,7 +163,7 @@ public class DataModelerScreenPresenter {
                         view.setBaseTypes(baseTypes);
                     }
                 },
-                new DataModelerErrorCallback("An error was produced when property types was loaded from server.")
+                new DataModelerErrorCallback(Constants.INSTANCE.modelEditor_propertyType_loading_error())
         ).getBasePropertyTypes();
 
         modelerService.call(
@@ -182,12 +182,12 @@ public class DataModelerScreenPresenter {
                                     }
 
                                 },
-                                new DataModelerErrorCallback("An error was produced when the requested data model was loaded from server.")
+                                new DataModelerErrorCallback(Constants.INSTANCE.modelEditor_loading_error())
                         ).loadModel(path);
 
                     }
                 },
-                new DataModelerErrorCallback("An error was produced when loading the Annotation Definitions from the server.")
+                new DataModelerErrorCallback(Constants.INSTANCE.modelEditor_annotationDef_loading_error())
         ).getAnnotationDefinitions();
 
 
@@ -245,7 +245,7 @@ public class DataModelerScreenPresenter {
                             }
                         }
                     },
-                    new DataModelerErrorCallback("An error was produced during current project path calculation.")
+                    new DataModelerErrorCallback(Constants.INSTANCE.modelEditor_projectPath_calc_error())
             ).resolveProject(newPath);
 
         } else {
