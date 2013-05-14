@@ -41,7 +41,7 @@ public class ObjectPropertyComparator implements Comparator<ObjectPropertyTO> {
             key1 = o1.getClassName();
             key2 = o2.getClassName();
         } else {
-            //by default comparate by name
+            // By default compare by name
             key1 = o1.getName();
             key2 = o2.getName();
         }
